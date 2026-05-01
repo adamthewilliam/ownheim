@@ -1,0 +1,25 @@
+{
+  "name": "strays-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Code-first team ownership for TypeScript. Find a home for every line of code.",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "lint": "bunx oxlint",
+    "format": "bunx oxfmt",
+    "typecheck": "bun run --filter='*' typecheck"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.6.0",
+    "oxlint": "^0.15.0"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  }
+}

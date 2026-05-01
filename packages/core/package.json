@@ -1,0 +1,16 @@
+{
+  "name": "@strays/core",
+  "version": "0.1.0",
+  "description": "strays — typed owner registry, OwnedError, and core types",
+  "type": "module",
+  "exports": {
+    "./defineStrays": "./src/defineStrays.ts",
+    "./OwnedError": "./src/OwnedError.ts",
+    "./symbols": "./src/symbols.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  }
+}

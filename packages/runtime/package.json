@@ -1,0 +1,23 @@
+{
+  "name": "@strays/runtime",
+  "version": "0.1.0",
+  "description": "strays — AsyncLocalStorage scope, logger/tracer factories, manifest-backed stack resolver",
+  "type": "module",
+  "exports": {
+    "./store": "./src/store.ts",
+    "./runWithOwner": "./src/runWithOwner.ts",
+    "./currentOwner": "./src/currentOwner.ts",
+    "./createLogger": "./src/createLogger.ts",
+    "./createTracer": "./src/createTracer.ts",
+    "./walkOwnedErrorChain": "./src/walkOwnedErrorChain.ts",
+    "./lookupCallerOwner": "./src/lookupCallerOwner.ts",
+    "./manifest": "./src/manifest.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*"
+  }
+}
