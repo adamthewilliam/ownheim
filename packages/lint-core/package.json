@@ -1,0 +1,19 @@
+{
+  "name": "@strays/lint-core",
+  "version": "0.1.0",
+  "description": "strays — linter-agnostic rule logic (pure functions, returns Diagnostic[])",
+  "type": "module",
+  "exports": {
+    "./types": "./src/types.ts",
+    "./validateFileOwnership": "./src/validateFileOwnership.ts",
+    "./validateCodeownersEdit": "./src/validateCodeownersEdit.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/build": "workspace:*",
+    "@strays/core": "workspace:*"
+  }
+}

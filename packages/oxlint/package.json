@@ -1,0 +1,22 @@
+{
+  "name": "@strays/oxlint",
+  "version": "0.1.0",
+  "description": "strays — oxlint custom plugin (no-strays + no-codeowners-edit)",
+  "type": "module",
+  "exports": {
+    "./plugin": "./src/plugin.ts",
+    "./rules/no-strays": "./src/rules/no-strays.ts",
+    "./rules/no-codeowners-edit": "./src/rules/no-codeowners-edit.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "@strays/lint-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "oxlint": ">=0.15.0"
+  }
+}
