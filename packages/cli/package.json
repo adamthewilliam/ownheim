@@ -1,0 +1,23 @@
+{
+  "name": "@strays/cli",
+  "version": "0.1.0",
+  "description": "strays CLI: generate | check | coverage | trace | diff",
+  "type": "module",
+  "bin": {
+    "strays": "./src/index.ts"
+  },
+  "exports": {
+    "./commands/generate": "./src/commands/generate.ts",
+    "./commands/check": "./src/commands/check.ts",
+    "./commands/coverage": "./src/commands/coverage.ts",
+    "./commands/trace": "./src/commands/trace.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/build": "workspace:*",
+    "@strays/core": "workspace:*"
+  }
+}

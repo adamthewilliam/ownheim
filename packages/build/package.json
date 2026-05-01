@@ -1,0 +1,30 @@
+{
+  "name": "@strays/build",
+  "version": "0.1.0",
+  "description": "strays — AST walker, rule resolver, CODEOWNERS + manifest generators, esbuild plugin",
+  "type": "module",
+  "exports": {
+    "./extract": "./src/extract.ts",
+    "./resolveRules": "./src/resolveRules.ts",
+    "./generateCodeowners": "./src/generateCodeowners.ts",
+    "./generateManifest": "./src/generateManifest.ts",
+    "./injectOwnerConstant": "./src/injectOwnerConstant.ts",
+    "./transformLoggerImports": "./src/transformLoggerImports.ts",
+    "./esbuildPlugin": "./src/esbuildPlugin.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "ts-morph": "^24.0.0",
+    "picomatch": "^4.0.2"
+  },
+  "peerDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "devDependencies": {
+    "@types/picomatch": "^3.0.1"
+  }
+}
