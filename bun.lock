@@ -17,6 +17,19 @@
         "typescript": "^5.6.0",
       },
     },
+    "examples/bun-effect-http": {
+      "name": "@strays/example-bun-effect-http",
+      "version": "0.0.0",
+      "dependencies": {
+        "@strays/core": "workspace:*",
+        "@strays/datadog": "workspace:*",
+        "@strays/effect": "workspace:*",
+        "@strays/otel": "workspace:*",
+        "@strays/runtime": "workspace:*",
+        "@strays/sentry": "workspace:*",
+        "effect": "^3.10.0",
+      },
+    },
     "packages/build": {
       "name": "@strays/build",
       "version": "0.1.0",
@@ -226,6 +239,8 @@
     "@strays/effect": ["@strays/effect@workspace:packages/effect"],
 
     "@strays/eslint": ["@strays/eslint@workspace:packages/eslint"],
+
+    "@strays/example-bun-effect-http": ["@strays/example-bun-effect-http@workspace:examples/bun-effect-http"],
 
     "@strays/lint-core": ["@strays/lint-core@workspace:packages/lint-core"],
 

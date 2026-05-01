@@ -13,7 +13,7 @@ export interface StraysPluginOptions<TOwners extends Record<string, Owner>> {
   readonly extensions?: readonly string[];
 }
 
-const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mts', '.cts'];
+const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mts', '.cts'] as const;
 
 export function strays<TOwners extends Record<string, Owner>>(
   options: StraysPluginOptions<TOwners>,

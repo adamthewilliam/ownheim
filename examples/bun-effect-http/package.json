@@ -1,0 +1,19 @@
+{
+  "name": "@strays/example-bun-effect-http",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/start.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "@strays/runtime": "workspace:*",
+    "@strays/effect": "workspace:*",
+    "@strays/datadog": "workspace:*",
+    "@strays/sentry": "workspace:*",
+    "@strays/otel": "workspace:*",
+    "effect": "^3.10.0"
+  }
+}
