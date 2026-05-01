@@ -1,0 +1,19 @@
+{
+  "name": "@strays/sentry",
+  "version": "0.1.0",
+  "description": "strays — Sentry event processor + CODEOWNERS API sync",
+  "type": "module",
+  "exports": {
+    "./install": "./src/install.ts",
+    "./syncCodeowners": "./src/syncCodeowners.ts",
+    "./resolveOwner": "./src/resolveOwner.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "@strays/runtime": "workspace:*"
+  }
+}

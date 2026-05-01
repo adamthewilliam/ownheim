@@ -1,0 +1,19 @@
+{
+  "name": "@strays/datadog",
+  "version": "0.1.0",
+  "description": "strays — Datadog (dd-trace + RUM) team-tag adapter",
+  "type": "module",
+  "exports": {
+    "./install": "./src/install.ts",
+    "./rum": "./src/rum.ts",
+    "./resolveOwner": "./src/resolveOwner.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "@strays/runtime": "workspace:*"
+  }
+}

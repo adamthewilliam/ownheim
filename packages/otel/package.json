@@ -1,0 +1,19 @@
+{
+  "name": "@strays/otel",
+  "version": "0.1.0",
+  "description": "strays — OpenTelemetry SpanProcessor + resource attribute injector",
+  "type": "module",
+  "exports": {
+    "./SpanProcessor": "./src/SpanProcessor.ts",
+    "./resource": "./src/resource.ts",
+    "./resolveOwner": "./src/resolveOwner.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "@strays/runtime": "workspace:*"
+  }
+}
