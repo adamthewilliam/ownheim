@@ -1,9 +1,8 @@
-import { runWithOwner } from '@strays/runtime/runWithOwner';
+import { withTeamScope } from '@strays/runtime/withTeamScope';
 
-export type HonoNext = () => Promise<void>;
+export const teamMiddleware = withTeamScope<
+  [unknown, () => Promise<void>],
+  Promise<void>
+>((_c, next) => next);
 
-export type HonoMiddleware = (c: unknown, next: HonoNext) => Promise<void>;
-
-export function teamMiddleware(team: string): HonoMiddleware {
-  return (_c, next) => runWithOwner(team, () => next());
-}
+export type TeamMiddleware = ReturnType<typeof teamMiddleware>;

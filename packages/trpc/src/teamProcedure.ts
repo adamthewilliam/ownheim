@@ -1,7 +1,7 @@
-import { teamMiddleware, type TrpcMiddleware } from './teamMiddleware.ts';
+import { teamMiddleware } from './teamMiddleware.ts';
 
 export interface TrpcProcedureBuilder {
-  use(middleware: TrpcMiddleware): this;
+  use(middleware: ReturnType<typeof teamMiddleware>): this;
 }
 
 export function teamProcedure<T extends TrpcProcedureBuilder>(builder: T, team: string): T {

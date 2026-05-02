@@ -1,11 +1,8 @@
-import { runWithOwner } from '@strays/runtime/runWithOwner';
+import { withTeamScope } from '@strays/runtime/withTeamScope';
 
-export type ExpressNext = (err?: unknown) => void;
+export const owned = withTeamScope<
+  [unknown, unknown, (err?: unknown) => void],
+  void
+>((_req, _res, next) => () => next());
 
-export type ExpressMiddleware = (req: unknown, res: unknown, next: ExpressNext) => void;
-
-export function owned(team: string): ExpressMiddleware {
-  return (_req, _res, next) => {
-    runWithOwner(team, () => next());
-  };
-}
+export type TeamMiddleware = ReturnType<typeof owned>;

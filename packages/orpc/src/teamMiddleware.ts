@@ -1,11 +1,8 @@
-import { runWithOwner } from '@strays/runtime/runWithOwner';
+import { withTeamScope } from '@strays/runtime/withTeamScope';
 
-export interface OrpcMiddlewareOpts {
-  readonly next: () => Promise<unknown>;
-}
+export const teamMiddleware = withTeamScope<
+  [{ next: () => Promise<unknown> }],
+  Promise<unknown>
+>(({ next }) => next);
 
-export type OrpcMiddleware = <TOpts extends OrpcMiddlewareOpts>(opts: TOpts) => Promise<unknown>;
-
-export function teamMiddleware(team: string): OrpcMiddleware {
-  return ({ next }) => runWithOwner(team, () => next());
-}
+export type TeamMiddleware = ReturnType<typeof teamMiddleware>;

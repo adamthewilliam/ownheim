@@ -1,16 +1,8 @@
-import { runWithOwner } from '@strays/runtime/runWithOwner';
+import { withTeamScope } from '@strays/runtime/withTeamScope';
 
-export interface TrpcMiddlewareNext {
-  (): Promise<unknown>;
-  <T>(opts: { ctx: T }): Promise<unknown>;
-}
+export const teamMiddleware = withTeamScope<
+  [{ next: () => Promise<unknown> }],
+  Promise<unknown>
+>(({ next }) => next);
 
-export interface TrpcMiddlewareOpts {
-  readonly next: TrpcMiddlewareNext;
-}
-
-export type TrpcMiddleware = <TOpts extends TrpcMiddlewareOpts>(opts: TOpts) => Promise<unknown>;
-
-export function teamMiddleware(team: string): TrpcMiddleware {
-  return ({ next }) => runWithOwner(team, () => next());
-}
+export type TeamMiddleware = ReturnType<typeof teamMiddleware>;

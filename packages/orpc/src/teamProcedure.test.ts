@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import { currentOwner } from '@strays/runtime/currentOwner';
 import { teamProcedure } from './teamProcedure.ts';
-import type { OrpcMiddleware } from './teamMiddleware.ts';
+import type { TeamMiddleware } from './teamMiddleware.ts';
 
 interface MockBuilder {
-  middlewares: OrpcMiddleware[];
-  use(middleware: OrpcMiddleware): MockBuilder;
+  middlewares: TeamMiddleware[];
+  use(middleware: TeamMiddleware): MockBuilder;
   run(handler: () => unknown): Promise<unknown>;
 }
 

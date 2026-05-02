@@ -11,7 +11,8 @@
     "./createTracer": "./src/createTracer.ts",
     "./walkOwnedErrorChain": "./src/walkOwnedErrorChain.ts",
     "./lookupCallerOwner": "./src/lookupCallerOwner.ts",
-    "./manifest": "./src/manifest.ts"
+    "./manifest": "./src/manifest.ts",
+    "./withTeamScope": "./src/withTeamScope.ts"
   },
   "scripts": {
     "test": "bun test",
