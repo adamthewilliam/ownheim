@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { extractFromSourceText } from '@strays/build/extract';
+import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
 import { generateCodeowners } from '@strays/build/generateCodeowners';
 import { resolveOwnerForFile } from '@strays/build/resolveRules';
 import type { ResolvedOwner } from '@strays/core/types';

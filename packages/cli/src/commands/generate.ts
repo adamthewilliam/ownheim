@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { extractFromSourceText } from '@strays/build/extract';
+import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
 import { generateCodeowners } from '@strays/build/generateCodeowners';
 import { generateManifest } from '@strays/build/generateManifest';
 import { resolveOwnerForFile } from '@strays/build/resolveRules';

@@ -1,4 +1,4 @@
-import { extractFromSourceText } from '@strays/build/extract';
+import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
 import { resolveOwnerForFile } from '@strays/build/resolveRules';
 import type { Owner, StraysConfig } from '@strays/core/types';
 import type { Diagnostic } from './types.ts';

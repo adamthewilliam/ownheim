@@ -2,9 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { extname, relative } from 'node:path';
 import type { Plugin } from 'esbuild';
 import type { Owner, StraysConfig } from '@strays/core/types';
-import { injectOwnerConstant } from './injectOwnerConstant.ts';
-import { transformLoggerImports } from './transformLoggerImports.ts';
-import { extractFromSourceText } from './extract.ts';
+import { analyzeSourceFile } from './analyzeSourceFile.ts';
 import { resolveOwnerForFile } from './resolveRules.ts';
 
 export interface StraysPluginOptions<TOwners extends Record<string, Owner>> {
@@ -29,20 +27,16 @@ export function strays<TOwners extends Record<string, Owner>>(
         const source = await readFile(args.path, 'utf8');
         const relativePath = relative(options.projectRoot, args.path).replace(/\\/g, '/');
 
-        const extraction = extractFromSourceText(relativePath, source);
+        const analyzed = analyzeSourceFile(relativePath, source);
         const resolved = resolveOwnerForFile(options.config, {
           filePath: relativePath,
-          jsdocOwner: extraction.jsdocOwner,
+          jsdocOwner: analyzed.jsdocOwner,
         });
 
         if (!resolved) return undefined;
 
-        const owner = resolved.owners[0] ?? '';
-        let transformed = transformLoggerImports(source);
-        transformed = injectOwnerConstant(transformed, owner);
-
         return {
-          contents: transformed,
+          contents: analyzed.transform(resolved.owners[0] ?? ''),
           loader: pickLoader(args.path),
         };
       });

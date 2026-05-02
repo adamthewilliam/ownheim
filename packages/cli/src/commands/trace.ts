@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join, relative } from 'node:path';
-import { extractFromSourceText } from '@strays/build/extract';
+import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
 import { resolveOwnerForFile } from '@strays/build/resolveRules';
 import type { ResolvedOwner } from '@strays/core/types';
 import type { LoadedConfig } from '../loadConfig.ts';

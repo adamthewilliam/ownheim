@@ -4,12 +4,10 @@
   "description": "strays — AST walker, rule resolver, CODEOWNERS + manifest generators, esbuild plugin",
   "type": "module",
   "exports": {
-    "./extract": "./src/extract.ts",
+    "./analyzeSourceFile": "./src/analyzeSourceFile.ts",
     "./resolveRules": "./src/resolveRules.ts",
     "./generateCodeowners": "./src/generateCodeowners.ts",
     "./generateManifest": "./src/generateManifest.ts",
-    "./injectOwnerConstant": "./src/injectOwnerConstant.ts",
-    "./transformLoggerImports": "./src/transformLoggerImports.ts",
     "./esbuildPlugin": "./src/esbuildPlugin.ts"
   },
   "scripts": {
