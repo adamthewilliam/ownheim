@@ -1,12 +1,9 @@
-import { noStraysRule } from './rules/no-strays.ts';
-import { noCodeownersEditRule } from './rules/no-codeowners-edit.ts';
+import { rules } from '@strays/lint-core/rules/registry';
+import { projectEslintRule } from './adapter.ts';
 
 export const plugin = {
   meta: { name: '@strays/eslint', version: '0.1.0' },
-  rules: {
-    'no-strays': noStraysRule,
-    'no-codeowners-edit': noCodeownersEditRule,
-  },
+  rules: Object.fromEntries(rules.map((r) => [r.meta.id, projectEslintRule(r)])),
 } as const;
 
 export default plugin;

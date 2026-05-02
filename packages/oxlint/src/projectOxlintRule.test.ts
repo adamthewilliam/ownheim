@@ -2,8 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { defineStrays } from '@strays/core/defineStrays';
 import type { Owner, StraysConfig } from '@strays/core/types';
 import { rules } from '@strays/lint-core/rules/registry';
-import { plugin as oxlintPlugin } from './plugin.ts';
-import type { OxlintRuleContext } from './adapter.ts';
+import { projectOxlintRule, type OxlintRuleContext } from './adapter.ts';
 
 const config = defineStrays({
   owners: {
@@ -16,14 +15,26 @@ const config = defineStrays({
   ],
 }) as unknown as StraysConfig<Record<string, Owner>>;
 
-describe('oxlint plugin', () => {
-  it('plugin.rules keys equal registry ids', () => {
-    expect(Object.keys(oxlintPlugin.rules).sort()).toEqual(
-      rules.map((r) => r.meta.id).sort(),
-    );
+describe('projectOxlintRule', () => {
+  it('produces a valid OxlintRule shape for every registered rule', () => {
+    for (const r of rules) {
+      const projected = projectOxlintRule(r);
+      expect(projected.meta.type).toBe(r.meta.category);
+      expect(projected.meta.description).toBe(r.meta.description);
+      if (r.meta.fixable) {
+        expect(projected.meta.fixable).toBe('code');
+      } else {
+        expect(projected.meta.fixable).toBeUndefined();
+      }
+      expect(typeof projected.create).toBe('function');
+    }
   });
 
-  it('no-strays smoke-test fires for fallback-only files', () => {
+  it('end-to-end Program() propagates diagnostics from validateFileOwnership', () => {
+    const noStrays = rules.find((r) => r.meta.id === 'no-strays');
+    expect(noStrays).toBeDefined();
+    const projected = projectOxlintRule(noStrays!);
+
     const reports: Array<{ message: string }> = [];
     const ctx: OxlintRuleContext = {
       filename: 'tools/deploy.ts',
@@ -32,7 +43,7 @@ describe('oxlint plugin', () => {
       report: (r) => reports.push({ message: r.message }),
     };
 
-    oxlintPlugin.rules['no-strays']!.create(ctx).Program();
+    projected.create(ctx).Program();
     expect(reports).toHaveLength(1);
     expect(reports[0]?.message).toContain('fallback');
   });

@@ -9,7 +9,8 @@
     "./validateFileOwnership": "./src/validateFileOwnership.ts",
     "./validateCodeownersEdit": "./src/validateCodeownersEdit.ts",
     "./rules/noStrays": "./src/rules/noStrays.ts",
-    "./rules/noCodeownersEdit": "./src/rules/noCodeownersEdit.ts"
+    "./rules/noCodeownersEdit": "./src/rules/noCodeownersEdit.ts",
+    "./rules/registry": "./src/rules/registry.ts"
   },
   "scripts": {
     "test": "bun test",

@@ -1,5 +1,6 @@
-import type { LintAdapter } from '@strays/lint-core/adapter';
+import { runRule, type LintAdapter } from '@strays/lint-core/adapter';
 import type { Diagnostic } from '@strays/lint-core/types';
+import type { RegisteredRule, RuleMeta } from '@strays/lint-core/rules/registry';
 
 export interface EslintFixer {
   insertTextAfterRange(
@@ -46,3 +47,29 @@ export const eslintAdapter: LintAdapter<EslintRuleContext> = {
     ctx.report(descriptor);
   },
 };
+
+export const schemaFor = (optionsSchema: RuleMeta['optionsSchema']): ReadonlyArray<unknown> => {
+  if (optionsSchema === 'lint-rule-options') {
+    return [
+      {
+        type: 'object',
+        properties: { config: { type: 'object' } },
+        required: ['config'],
+        additionalProperties: false,
+      },
+    ];
+  }
+  return [];
+};
+
+export const projectEslintRule = (r: RegisteredRule<unknown>): EslintRule => ({
+  meta: {
+    type: r.meta.category,
+    docs: { description: r.meta.description },
+    ...(r.meta.fixable ? { fixable: 'code' as const } : {}),
+    schema: schemaFor(r.meta.optionsSchema),
+  },
+  create: (ctx) => ({
+    Program: () => runRule(eslintAdapter, r.definition, ctx),
+  }),
+});

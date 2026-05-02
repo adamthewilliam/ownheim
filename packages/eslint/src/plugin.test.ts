@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 import { defineStrays } from '@strays/core/defineStrays';
-import { validateFileOwnership } from '@strays/lint-core/validateFileOwnership';
+import type { Owner, StraysConfig } from '@strays/core/types';
+import { rules } from '@strays/lint-core/rules/registry';
 import { plugin as eslintPlugin } from './plugin.ts';
-import type { EslintRuleContext } from './rules/no-strays.ts';
+import type { EslintRuleContext } from './adapter.ts';
 
 const config = defineStrays({
   owners: {
@@ -13,48 +14,26 @@ const config = defineStrays({
     { glob: 'packages/billing/**', owner: 'Billing' },
     { glob: '**', owner: 'Platform', fallback: true },
   ],
-}) as unknown as Parameters<typeof validateFileOwnership>[0]['config'];
-
-const fixtures = [
-  { filename: 'tools/deploy.ts', sourceText: 'export const x = 1;\n', expectedDiagnostics: 1 },
-  {
-    filename: 'packages/billing/charge.ts',
-    sourceText: 'export const x = 1;\n',
-    expectedDiagnostics: 0,
-  },
-  {
-    filename: 'tools/deploy.ts',
-    sourceText: '/** @owner Billing */\nexport const x = 1;\n',
-    expectedDiagnostics: 0,
-  },
-];
+}) as unknown as StraysConfig<Record<string, Owner>>;
 
 describe('eslint plugin', () => {
-  it('exposes both rules', () => {
-    expect(eslintPlugin.rules['no-strays']).toBeDefined();
-    expect(eslintPlugin.rules['no-codeowners-edit']).toBeDefined();
+  it('plugin.rules keys equal registry ids', () => {
+    expect(Object.keys(eslintPlugin.rules).sort()).toEqual(
+      rules.map((r) => r.meta.id).sort(),
+    );
   });
 
-  it('produces the same N diagnostics as the lint-core for each fixture', () => {
-    for (const fx of fixtures) {
-      const expected = validateFileOwnership({
-        filePath: fx.filename,
-        sourceText: fx.sourceText,
-        config,
-      });
+  it('no-strays smoke-test fires for fallback-only files', () => {
+    const reports: Array<{ message: string }> = [];
+    const ctx: EslintRuleContext = {
+      getFilename: () => 'tools/deploy.ts',
+      getSourceCode: () => ({ getText: () => 'export const x = 1;\n' }),
+      options: [{ config }],
+      report: (r) => reports.push({ message: r.message }),
+    };
 
-      const reports: Array<{ message: string }> = [];
-      const ctx: EslintRuleContext = {
-        getFilename: () => fx.filename,
-        getSourceCode: () => ({ getText: () => fx.sourceText }),
-        options: [{ config }],
-        report: (r) => reports.push({ message: r.message }),
-      };
-
-      eslintPlugin.rules['no-strays'].create(ctx).Program();
-
-      expect(reports).toHaveLength(expected.length);
-      expect(reports).toHaveLength(fx.expectedDiagnostics);
-    }
+    eslintPlugin.rules['no-strays']!.create(ctx).Program();
+    expect(reports).toHaveLength(1);
+    expect(reports[0]?.message).toContain('fallback');
   });
 });

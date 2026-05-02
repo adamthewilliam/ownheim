@@ -1,5 +1,6 @@
-import type { LintAdapter } from '@strays/lint-core/adapter';
+import { runRule, type LintAdapter } from '@strays/lint-core/adapter';
 import type { Diagnostic } from '@strays/lint-core/types';
+import type { RegisteredRule } from '@strays/lint-core/rules/registry';
 
 export interface OxlintRuleContext {
   filename: string;
@@ -36,3 +37,14 @@ export const oxlintAdapter: LintAdapter<OxlintRuleContext> = {
     ctx.report(report);
   },
 };
+
+export const projectOxlintRule = (r: RegisteredRule<unknown>): OxlintRule => ({
+  meta: {
+    type: r.meta.category,
+    description: r.meta.description,
+    ...(r.meta.fixable ? { fixable: 'code' as const } : {}),
+  },
+  create: (ctx) => ({
+    Program: () => runRule(oxlintAdapter, r.definition, ctx),
+  }),
+});

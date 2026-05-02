@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     "./plugin": "./src/plugin.ts",
-    "./rules/no-strays": "./src/rules/no-strays.ts",
-    "./rules/no-codeowners-edit": "./src/rules/no-codeowners-edit.ts"
+    "./adapter": "./src/adapter.ts"
   },
   "scripts": {
     "test": "bun test",
