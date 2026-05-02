@@ -1,0 +1,19 @@
+{
+  "name": "@strays-it/orpc",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/orpc": "workspace:*",
+    "@strays/runtime": "workspace:*",
+    "@strays/test-utils": "workspace:*"
+  },
+  "optionalDependencies": {
+    "@orpc/client": "^1.14.0",
+    "@orpc/server": "^1.14.0"
+  }
+}

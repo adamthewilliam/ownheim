@@ -1,0 +1,21 @@
+{
+  "name": "@strays-it/express",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/express": "workspace:*",
+    "@strays/runtime": "workspace:*",
+    "@strays/test-utils": "workspace:*"
+  },
+  "optionalDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/supertest": "^7.2.0",
+    "express": "^5.2.1",
+    "supertest": "^7.2.2"
+  }
+}

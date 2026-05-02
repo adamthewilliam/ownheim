@@ -1,0 +1,19 @@
+{
+  "name": "@strays-it/trpc",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/runtime": "workspace:*",
+    "@strays/test-utils": "workspace:*",
+    "@strays/trpc": "workspace:*"
+  },
+  "optionalDependencies": {
+    "@trpc/client": "^11.17.0",
+    "@trpc/server": "^11.17.0"
+  }
+}

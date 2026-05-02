@@ -1,0 +1,17 @@
+{
+  "name": "@strays-it/datadog",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/datadog": "workspace:*",
+    "@strays/runtime": "workspace:*"
+  },
+  "optionalDependencies": {
+    "dd-trace": "^5.99.1"
+  }
+}
