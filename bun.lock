@@ -90,12 +90,36 @@
         "eslint": ">=8.0.0",
       },
     },
+    "packages/express": {
+      "name": "@strays/express",
+      "version": "0.1.0",
+      "dependencies": {
+        "@strays/core": "workspace:*",
+        "@strays/runtime": "workspace:*",
+      },
+    },
+    "packages/hono": {
+      "name": "@strays/hono",
+      "version": "0.1.0",
+      "dependencies": {
+        "@strays/core": "workspace:*",
+        "@strays/runtime": "workspace:*",
+      },
+    },
     "packages/lint-core": {
       "name": "@strays/lint-core",
       "version": "0.1.0",
       "dependencies": {
         "@strays/build": "workspace:*",
         "@strays/core": "workspace:*",
+      },
+    },
+    "packages/orpc": {
+      "name": "@strays/orpc",
+      "version": "0.1.0",
+      "dependencies": {
+        "@strays/core": "workspace:*",
+        "@strays/runtime": "workspace:*",
       },
     },
     "packages/otel": {
@@ -126,6 +150,14 @@
     },
     "packages/sentry": {
       "name": "@strays/sentry",
+      "version": "0.1.0",
+      "dependencies": {
+        "@strays/core": "workspace:*",
+        "@strays/runtime": "workspace:*",
+      },
+    },
+    "packages/trpc": {
+      "name": "@strays/trpc",
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
@@ -242,7 +274,13 @@
 
     "@strays/example-bun-effect-http": ["@strays/example-bun-effect-http@workspace:examples/bun-effect-http"],
 
+    "@strays/express": ["@strays/express@workspace:packages/express"],
+
+    "@strays/hono": ["@strays/hono@workspace:packages/hono"],
+
     "@strays/lint-core": ["@strays/lint-core@workspace:packages/lint-core"],
+
+    "@strays/orpc": ["@strays/orpc@workspace:packages/orpc"],
 
     "@strays/otel": ["@strays/otel@workspace:packages/otel"],
 
@@ -251,6 +289,8 @@
     "@strays/runtime": ["@strays/runtime@workspace:packages/runtime"],
 
     "@strays/sentry": ["@strays/sentry@workspace:packages/sentry"],
+
+    "@strays/trpc": ["@strays/trpc@workspace:packages/trpc"],
 
     "@ts-morph/common": ["@ts-morph/common@0.29.0", "", { "dependencies": { "minimatch": "^10.0.1", "path-browserify": "^1.0.1", "tinyglobby": "^0.2.14" } }, "sha512-35oUmphHbJvQ/+UTwFNme/t2p3FoKiGJ5auTjjpNTop2dyREspirjMy82PLSC1pnDJ8ah1GU98hwpVt64YXQsg=="],
 

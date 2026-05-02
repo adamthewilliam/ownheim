@@ -5,8 +5,11 @@
   "type": "module",
   "exports": {
     "./types": "./src/types.ts",
+    "./adapter": "./src/adapter.ts",
     "./validateFileOwnership": "./src/validateFileOwnership.ts",
-    "./validateCodeownersEdit": "./src/validateCodeownersEdit.ts"
+    "./validateCodeownersEdit": "./src/validateCodeownersEdit.ts",
+    "./rules/noStrays": "./src/rules/noStrays.ts",
+    "./rules/noCodeownersEdit": "./src/rules/noCodeownersEdit.ts"
   },
   "scripts": {
     "test": "bun test",

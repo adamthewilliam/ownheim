@@ -1,11 +1,11 @@
 {
   "name": "@strays/effect",
   "version": "0.1.0",
-  "description": "strays — Effect-TS Owner Context.Tag, TaggedOwnedError, Logger and Tracer Layers",
+  "description": "strays — Effect-TS Owner Context.Tag, ownedBy decorator, Logger and Tracer Layers",
   "type": "module",
   "exports": {
     "./Owner": "./src/Owner.ts",
-    "./TaggedOwnedError": "./src/TaggedOwnedError.ts",
+    "./ownedBy": "./src/ownedBy.ts",
     "./Logger": "./src/Logger.ts",
     "./Tracer": "./src/Tracer.ts"
   },

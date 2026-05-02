@@ -1,25 +1,9 @@
-import { validateFileOwnership } from '@strays/lint-core/validateFileOwnership';
-import type { Owner, StraysConfig } from '@strays/core/types';
+import { runRule, type LintRuleOptions } from '@strays/lint-core/adapter';
+import { noStraysRule as logic } from '@strays/lint-core/rules/noStrays';
+import { oxlintAdapter } from '../adapter.ts';
 
-export interface OxlintRuleContext {
-  filename: string;
-  sourceText: string;
-  options: ReadonlyArray<{ config: StraysConfig<Record<string, Owner>> }>;
-  report(diagnostic: {
-    message: string;
-    loc: { line: number; column: number };
-    fix?: { range: [number, number]; text: string };
-  }): void;
-}
-
-export interface OxlintRule {
-  meta: {
-    type: 'suggestion' | 'problem';
-    description: string;
-    fixable?: 'code';
-  };
-  create(context: OxlintRuleContext): { Program(): void };
-}
+export type { OxlintRule, OxlintRuleContext } from '../adapter.ts';
+import type { OxlintRule } from '../adapter.ts';
 
 export const noStraysRule: OxlintRule = {
   meta: {
@@ -29,27 +13,7 @@ export const noStraysRule: OxlintRule = {
   },
   create(context) {
     return {
-      Program() {
-        const config = context.options[0]?.config;
-        if (!config) return;
-
-        const diagnostics = validateFileOwnership({
-          filePath: context.filename,
-          sourceText: context.sourceText,
-          config,
-        });
-
-        for (const d of diagnostics) {
-          const report: Parameters<OxlintRuleContext['report']>[0] = {
-            message: d.message,
-            loc: { line: d.line, column: d.column },
-          };
-          if (d.fix) {
-            report.fix = { range: [d.fix.insertAt, d.fix.insertAt], text: d.fix.insertText };
-          }
-          context.report(report);
-        }
-      },
+      Program: () => runRule<typeof context, LintRuleOptions>(oxlintAdapter, logic, context),
     };
   },
 };

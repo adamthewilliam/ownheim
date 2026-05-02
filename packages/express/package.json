@@ -1,0 +1,17 @@
+{
+  "name": "@strays/express",
+  "version": "0.1.0",
+  "description": "strays — Express middleware for per-route team tagging",
+  "type": "module",
+  "exports": {
+    "./owned": "./src/owned.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "@strays/runtime": "workspace:*"
+  }
+}

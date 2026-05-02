@@ -1,5 +1,6 @@
-import { validateCodeownersEdit } from '@strays/lint-core/validateCodeownersEdit';
-import type { EslintRule, EslintRuleContext } from './no-strays.ts';
+import { runRule } from '@strays/lint-core/adapter';
+import { noCodeownersEditRule as logic } from '@strays/lint-core/rules/noCodeownersEdit';
+import { eslintAdapter, type EslintRule } from '../adapter.ts';
 
 export const noCodeownersEditRule: EslintRule = {
   meta: {
@@ -7,18 +8,9 @@ export const noCodeownersEditRule: EslintRule = {
     docs: { description: '.github/CODEOWNERS is generated; do not hand-edit' },
     schema: [],
   },
-  create(context: EslintRuleContext) {
+  create(context) {
     return {
-      Program() {
-        const diagnostics = validateCodeownersEdit({
-          filePath: context.getFilename(),
-          sourceText: context.getSourceCode().getText(),
-        });
-
-        for (const d of diagnostics) {
-          context.report({ message: d.message, loc: { line: d.line, column: d.column } });
-        }
-      },
+      Program: () => runRule<typeof context, never>(eslintAdapter, logic, context),
     };
   },
 };

@@ -8,7 +8,8 @@ function makeRecordingSink() {
   const sink: LogSink = {
     info: (record) => records.push({ level: 'info', ...record }),
     warn: (record) => records.push({ level: 'warn', ...record }),
-    error: (record) => records.push({ level: 'error', ...record }),
+    error: (record, err) =>
+      records.push({ level: 'error', ...record, ...(err === undefined ? {} : { err }) }),
   };
   return { records, sink };
 }

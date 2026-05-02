@@ -16,9 +16,13 @@ The library's name is the metric you want at zero. `strays.count` is the number 
 |---|---|
 | `@strays/core` | `defineStrays`, `OwnedError`, types |
 | `@strays/runtime` | `runWithOwner`, `currentOwner`, logger/tracer factories |
-| `@strays/effect` | Effect-TS `Owner` Context.Tag, `TaggedOwnedError`, Layers |
+| `@strays/effect` | Effect-TS `Owner` Context.Tag, `ownedBy` decorator, Layers |
 | `@strays/build` | esbuild plugin + AST extractor |
 | `@strays/cli` | `strays generate \| check \| coverage \| trace \| diff` |
+| `@strays/trpc` | tRPC procedure middleware (`teamProcedure`, `teamMiddleware`) |
+| `@strays/orpc` | oRPC procedure middleware (`teamProcedure`, `teamMiddleware`) |
+| `@strays/hono` | Hono per-route / per-prefix middleware (`teamMiddleware`) |
+| `@strays/express` | Express per-route / per-router middleware (`owned`) |
 | `@strays/datadog` | dd-trace + RUM integration |
 | `@strays/sentry` | Sentry event processor + CODEOWNERS sync |
 | `@strays/otel` | OpenTelemetry SpanProcessor |

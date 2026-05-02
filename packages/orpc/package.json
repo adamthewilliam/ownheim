@@ -1,0 +1,18 @@
+{
+  "name": "@strays/orpc",
+  "version": "0.1.0",
+  "description": "strays — oRPC procedure middleware for per-procedure team tagging",
+  "type": "module",
+  "exports": {
+    "./teamMiddleware": "./src/teamMiddleware.ts",
+    "./teamProcedure": "./src/teamProcedure.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@strays/core": "workspace:*",
+    "@strays/runtime": "workspace:*"
+  }
+}
