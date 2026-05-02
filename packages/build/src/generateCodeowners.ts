@@ -1,4 +1,5 @@
 import type { ResolvedOwner, Owner, StraysConfig } from '@strays/core/types';
+import { compareSpecificity } from './globMatcher.ts';
 
 export interface GenerateCodeownersInput<TOwners extends Record<string, Owner>> {
   readonly config: StraysConfig<TOwners>;
@@ -20,7 +21,7 @@ export function generateCodeowners<TOwners extends Record<string, Owner>>(
   const sortedRules = config.rules
     .filter((r) => !r.fallback)
     .slice()
-    .sort((a, b) => specificity(a.glob) - specificity(b.glob));
+    .sort((a, b) => compareSpecificity(a.glob, b.glob));
 
   const ruleLines = sortedRules.map((r) => {
     const owners = (Array.isArray(r.owner) ? r.owner : [r.owner])
@@ -78,19 +79,4 @@ function globToCodeownersPath(glob: string): string {
 
 function normalisePath(path: string): string {
   return path.replace(/\\/g, '/').replace(/^\/+/, '');
-}
-
-function specificity(glob: string): number {
-  let score = 0;
-  let i = 0;
-  while (i < glob.length) {
-    const c = glob[i];
-    if (c === '*' || c === '?') {
-      while (i < glob.length && (glob[i] === '*' || glob[i] === '?')) i++;
-      continue;
-    }
-    score++;
-    i++;
-  }
-  return score;
 }

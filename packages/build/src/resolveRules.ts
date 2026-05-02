@@ -1,5 +1,5 @@
-import picomatch from 'picomatch';
 import type { ResolvedOwner, Rule, StraysConfig, Owner } from '@strays/core/types';
+import { matches, compareSpecificity } from './globMatcher.ts';
 
 export interface ResolveInput {
   readonly filePath: string;
@@ -22,13 +22,13 @@ export function resolveOwnerForFile<TOwners extends Record<string, Owner>>(
     return undefined;
   }
 
-  const matches = config.rules
+  const matched = config.rules
     .filter((r) => !r.fallback)
-    .filter((r) => picomatch(r.glob, { dot: true })(input.filePath))
-    .sort((a, b) => specificity(b.glob) - specificity(a.glob));
+    .filter((r) => matches(r.glob, input.filePath))
+    .sort((a, b) => compareSpecificity(b.glob, a.glob));
 
-  if (matches.length > 0) {
-    const best = matches[0]!;
+  if (matched.length > 0) {
+    const best = matched[0]!;
     return {
       file: input.filePath,
       owners: ownersOf(best),
@@ -62,21 +62,4 @@ export function resolveAll<TOwners extends Record<string, Owner>>(
 function ownersOf(rule: Rule): readonly string[] {
   const o = rule.owner;
   return Array.isArray(o) ? (o as readonly string[]) : [o as string];
-}
-
-function specificity(glob: string): number {
-  // More literal characters = more specific. Wildcards reduce specificity.
-  let score = 0;
-  let i = 0;
-  while (i < glob.length) {
-    const c = glob[i];
-    if (c === '*' || c === '?') {
-      // skip wildcards (and glob '**')
-      while (i < glob.length && (glob[i] === '*' || glob[i] === '?')) i++;
-      continue;
-    }
-    score++;
-    i++;
-  }
-  return score;
 }
