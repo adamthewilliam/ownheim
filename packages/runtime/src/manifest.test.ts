@@ -1,7 +1,10 @@
+// Back-compat tests: verifies the deprecated free-function shim still routes
+// through the default ManifestRegistry singleton. New code should use
+// `ManifestRegistry` and `getDefaultRegistry()` directly.
 import { afterEach, describe, expect, it } from 'bun:test';
 import { clearManifest, loadManifest, lookupOwner } from './manifest.ts';
 
-describe('manifest', () => {
+describe('manifest (compat shim)', () => {
   afterEach(() => {
     clearManifest();
   });

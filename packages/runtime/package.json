@@ -14,6 +14,9 @@
     "./walkOwnedErrorChain": "./src/walkOwnedErrorChain.ts",
     "./lookupCallerOwner": "./src/lookupCallerOwner.ts",
     "./manifest": "./src/manifest.ts",
+    "./ManifestRegistry": "./src/ManifestRegistry.ts",
+    "./defaultRegistry": "./src/defaultRegistry.ts",
+    "./OwnershipManifest": "./src/OwnershipManifest.ts",
     "./withTeamScope": "./src/withTeamScope.ts"
   },
   "scripts": {

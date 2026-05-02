@@ -1,43 +1,31 @@
-export interface OwnershipManifest {
-  readonly version: 1;
-  readonly files: Readonly<Record<string, string>>;
-}
+import { ManifestRegistry } from './ManifestRegistry.ts';
+import {
+  getDefaultRegistry,
+  resetDefaultRegistry,
+  setDefaultRegistry,
+} from './defaultRegistry.ts';
+import type { OwnershipManifest } from './OwnershipManifest.ts';
 
-let activeManifest: OwnershipManifest | undefined;
-let lookupCache: Map<string, string | undefined> | undefined;
+export type { OwnershipManifest } from './OwnershipManifest.ts';
 
+/**
+ * @deprecated Construct a `ManifestRegistry` and pass it explicitly, or call
+ * `setDefaultRegistry(ManifestRegistry.fromManifest(manifest))` at boot.
+ */
 export function loadManifest(manifest: OwnershipManifest): void {
-  activeManifest = manifest;
-  lookupCache = new Map();
+  setDefaultRegistry(ManifestRegistry.fromManifest(manifest));
 }
 
+/**
+ * @deprecated Use `resetDefaultRegistry()` from `@strays/runtime/defaultRegistry`.
+ */
 export function clearManifest(): void {
-  activeManifest = undefined;
-  lookupCache = undefined;
+  resetDefaultRegistry();
 }
 
+/**
+ * @deprecated Call `registry.lookupOwner(filePath)` on an explicit `ManifestRegistry`.
+ */
 export function lookupOwner(filePath: string): string | undefined {
-  if (!activeManifest) return undefined;
-  if (lookupCache?.has(filePath)) return lookupCache.get(filePath);
-
-  const direct = activeManifest.files[filePath];
-  if (direct !== undefined) {
-    lookupCache?.set(filePath, direct);
-    return direct;
-  }
-
-  const normalised = normalise(filePath);
-  for (const [registered, owner] of Object.entries(activeManifest.files)) {
-    if (normalise(registered) === normalised) {
-      lookupCache?.set(filePath, owner);
-      return owner;
-    }
-  }
-
-  lookupCache?.set(filePath, undefined);
-  return undefined;
-}
-
-function normalise(filePath: string): string {
-  return filePath.replace(/^file:\/\//, '').replace(/\\/g, '/');
+  return getDefaultRegistry().lookupOwner(filePath);
 }

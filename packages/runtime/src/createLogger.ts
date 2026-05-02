@@ -1,6 +1,15 @@
 import { currentOwner } from './currentOwner.ts';
 import { formatOwnedLogEntry, type LogLevel } from './formatOwnedLogEntry.ts';
 import { stdoutJsonSink, type LogSink } from './LogSink.ts';
+import type { ManifestRegistry } from './ManifestRegistry.ts';
+
+export type LogValue =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly LogValue[]
+  | { readonly [key: string]: LogValue };
 
 export interface LogRecord {
   readonly msg: string;
@@ -16,6 +25,7 @@ export interface Logger {
 export interface CreateLoggerOptions {
   readonly sink?: LogSink;
   readonly fallback?: string;
+  readonly registry?: ManifestRegistry;
 }
 
 export function createLogger(moduleOwner: string, options: CreateLoggerOptions = {}): Logger {

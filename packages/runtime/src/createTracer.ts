@@ -1,5 +1,6 @@
 import { currentOwner } from './currentOwner.ts';
 import { lookupCallerOwner } from './lookupCallerOwner.ts';
+import type { ManifestRegistry } from './ManifestRegistry.ts';
 
 export interface TracedSpan {
   setAttribute(key: string, value: string | number | boolean): void;
@@ -17,6 +18,7 @@ export interface Tracer {
 export interface CreateTracerOptions {
   readonly factory: SpanFactory;
   readonly fallback?: string;
+  readonly registry?: ManifestRegistry;
 }
 
 export function createTracer(moduleOwner: string, options: CreateTracerOptions): Tracer {
@@ -26,7 +28,8 @@ export function createTracer(moduleOwner: string, options: CreateTracerOptions):
   return {
     startSpan(name) {
       const span = options.factory.start(name);
-      const team = currentOwner() ?? normalisedOwner ?? lookupCallerOwner(2) ?? fallback;
+      const team =
+        currentOwner() ?? normalisedOwner ?? lookupCallerOwner(2, options.registry) ?? fallback;
       span.setAttribute('team', team);
       return span;
     },

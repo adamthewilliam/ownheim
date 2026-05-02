@@ -1,4 +1,5 @@
-import { lookupOwner } from './manifest.ts';
+import type { ManifestRegistry } from './ManifestRegistry.ts';
+import { getDefaultRegistry } from './defaultRegistry.ts';
 
 const VENDOR_PATTERNS = [
   /\/node_modules\//,
@@ -7,9 +8,10 @@ const VENDOR_PATTERNS = [
   /\(internal\//,
 ];
 
-const cache = new Map<string, string | undefined>();
-
-export function lookupCallerOwner(skipFrames = 1): string | undefined {
+export function lookupCallerOwner(
+  skipFrames = 1,
+  registry: ManifestRegistry = getDefaultRegistry(),
+): string | undefined {
   const stack = captureStack();
   if (!stack) return undefined;
 
@@ -20,17 +22,11 @@ export function lookupCallerOwner(skipFrames = 1): string | undefined {
     const file = parseFrameFile(frame);
     if (!file || isVendor(file)) continue;
 
-    if (cache.has(file)) return cache.get(file);
-    const owner = lookupOwner(file);
-    cache.set(file, owner);
+    const owner = registry.lookupOwner(file);
     if (owner !== undefined) return owner;
   }
 
   return undefined;
-}
-
-export function clearCallerCache(): void {
-  cache.clear();
 }
 
 function captureStack(): string[] | undefined {
