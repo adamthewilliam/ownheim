@@ -35,7 +35,7 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
 
   const emit = (level: LogLevel, record: LogRecord, err?: unknown) => {
     const { msg, ...fields } = record;
-    const team = resolveOwner({
+    const owner = resolveOwner({
       ...(err === undefined ? {} : { error: err }),
       ...(normalisedModuleOwner === undefined ? {} : { moduleOwner: normalisedModuleOwner }),
       fallback,
@@ -45,7 +45,7 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
       message: msg,
       fields,
       ...(err === undefined ? {} : { error: err }),
-      scopeOwner: team,
+      scopeOwner: owner,
       fallback,
     });
     sink.write(line, level);

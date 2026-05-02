@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import { currentOwner } from './currentOwner.ts';
 import { runWithOwner } from './runWithOwner.ts';
-import { withTeamScope } from './withTeamScope.ts';
+import { withOwnerScope } from './withOwnerScope.ts';
 
-describe('withTeamScope', () => {
-  it('runs the thunk returned by pickNext with currentOwner() === team', () => {
-    const factory = withTeamScope<[() => unknown], unknown>((next) => next);
+describe('withOwnerScope', () => {
+  it('runs the thunk returned by pickNext with currentOwner() === owner', () => {
+    const factory = withOwnerScope<[() => unknown], unknown>((next) => next);
     let observed: string | undefined;
 
     factory('Billing')(() => {
@@ -16,10 +16,10 @@ describe('withTeamScope', () => {
   });
 
   it("returns the thunk's value verbatim (sync and Promise)", async () => {
-    const sync = withTeamScope<[() => unknown], unknown>((next) => next);
+    const sync = withOwnerScope<[() => unknown], unknown>((next) => next);
     expect(sync('Billing')(() => 42)).toBe(42);
 
-    const asyncFactory = withTeamScope<[() => Promise<unknown>], Promise<unknown>>(
+    const asyncFactory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
       (next) => next,
     );
     const result = await asyncFactory('Billing')(async () => ({ ok: true, n: 7 }));
@@ -27,13 +27,13 @@ describe('withTeamScope', () => {
   });
 
   it('does not leak the scope past a synchronous thunk', () => {
-    const factory = withTeamScope<[() => unknown], unknown>((next) => next);
+    const factory = withOwnerScope<[() => unknown], unknown>((next) => next);
     factory('Billing')(() => undefined);
     expect(currentOwner()).toBeUndefined();
   });
 
   it('preserves the scope across await boundaries inside the thunk', async () => {
-    const factory = withTeamScope<[() => Promise<unknown>], Promise<unknown>>(
+    const factory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
       (next) => next,
     );
     const samples: Array<string | undefined> = [];
@@ -50,7 +50,7 @@ describe('withTeamScope', () => {
   });
 
   it('nested invocations shadow the outer scope and unwind correctly', async () => {
-    const factory = withTeamScope<[() => Promise<unknown>], Promise<unknown>>(
+    const factory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
       (next) => next,
     );
     let inside: string | undefined;
@@ -68,7 +68,7 @@ describe('withTeamScope', () => {
   });
 
   it('propagates errors thrown by the thunk without leaking the scope', async () => {
-    const factory = withTeamScope<[() => Promise<unknown>], Promise<unknown>>(
+    const factory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
       (next) => next,
     );
     let observedDuringError: string | undefined;

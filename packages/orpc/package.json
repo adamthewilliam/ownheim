@@ -4,8 +4,8 @@
   "description": "strays — oRPC procedure middleware for per-procedure team tagging",
   "type": "module",
   "exports": {
-    "./teamMiddleware": "./src/teamMiddleware.ts",
-    "./teamProcedure": "./src/teamProcedure.ts"
+    "./ownerMiddleware": "./src/ownerMiddleware.ts",
+    "./ownedProcedure": "./src/ownedProcedure.ts"
   },
   "scripts": {
     "test": "bun test",

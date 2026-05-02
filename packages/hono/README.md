@@ -16,12 +16,12 @@ You also need `hono`. Strays doesn't pin a version. Anything with the standard `
 
 ```ts
 import { Hono } from 'hono';
-import { teamMiddleware } from '@strays/hono/teamMiddleware';
+import { ownerMiddleware } from '@strays/hono/ownerMiddleware';
 
 const app = new Hono();
 
-app.post('/charge', teamMiddleware('Billing'), chargeHandler);
-app.get('/users/:id', teamMiddleware('Identity'), getUserHandler);
+app.post('/charge', ownerMiddleware('Billing'), chargeHandler);
+app.get('/users/:id', ownerMiddleware('Identity'), getUserHandler);
 ```
 
 ## Per-prefix
@@ -29,23 +29,23 @@ app.get('/users/:id', teamMiddleware('Identity'), getUserHandler);
 Hono's `app.use(path, mw)` already does path-based mounting, so you don't need a separate API for it:
 
 ```ts
-app.use('/api/billing/*', teamMiddleware('Billing'));
-app.use('/api/identity/*', teamMiddleware('Identity'));
+app.use('/api/billing/*', ownerMiddleware('Billing'));
+app.use('/api/identity/*', ownerMiddleware('Identity'));
 
-// Routes mounted underneath these prefixes inherit the team automatically.
+// Routes mounted underneath these prefixes inherit the owner automatically.
 app.post('/api/billing/charge', chargeHandler);
 app.get('/api/identity/me', meHandler);
 ```
 
-This is the cleanest setup if your URL structure already mirrors team ownership.
+This is the cleanest setup if your URL structure already mirrors ownership.
 
 ## What the middleware actually does
 
 ```ts
-(_c, next) => runWithOwner(team, () => next());
+(_c, next) => runWithOwner(owner, () => next());
 ```
 
-That's it. AsyncLocalStorage holds the team for the duration of `next()` and any async work it spawns. Anything downstream calling `currentOwner()` — handlers, span processors, Sentry event processors — gets the team back.
+That's it. AsyncLocalStorage holds the owner for the duration of `next()` and any async work it spawns. Anything downstream calling `currentOwner()` — handlers, span processors, Sentry event processors — gets the owner back. On the wire (logs, spans, Sentry tags) it's emitted as `team` per observability-vendor convention.
 
 ## Pairing with `hono/context-storage`
 
@@ -55,17 +55,17 @@ Hono ships its own AsyncLocalStorage helper (`contextStorage()` / `getContext()`
 import { contextStorage } from 'hono/context-storage';
 
 app.use(contextStorage());
-app.use(teamMiddleware('Billing'));
+app.use(ownerMiddleware('Billing'));
 ```
 
-Order doesn't really matter for correctness, but registering `contextStorage()` first means it sees every request including ones that get short-circuited by team-tagged middleware (none of those exist by default, but it's the safer default).
+Order doesn't really matter for correctness, but registering `contextStorage()` first means it sees every request including ones that get short-circuited by tagged middleware (none of those exist by default, but it's the safer default).
 
 ## Pairing with `@strays/sentry` and `@strays/datadog`
 
-Nothing extra to wire up. Once `installSentry` / `installDatadog` are running, every error and span emitted from a route picks up the team from the scope:
+Nothing extra to wire up. Once `installSentry` / `installDatadog` are running, every error and span emitted from a route picks up the owner from the scope:
 
 ```
-teamMiddleware('Billing')
+ownerMiddleware('Billing')
     → runWithOwner('Billing', () => next())
         → handler runs
             → throws or starts a span
@@ -75,9 +75,9 @@ teamMiddleware('Billing')
 
 ## Caveats
 
-- The middleware doesn't write to `c.var`. If you want `c.var.team` available inside handlers, set it yourself: `(c, next) => { c.set('team', team); return runWithOwner(team, () => next()); }`. I left it out to avoid forcing a `Variables` shape on consumers.
+- The middleware doesn't write to `c.var`. If you want `c.var.team` available inside handlers, set it yourself: `(c, next) => { c.set('team', owner); return runWithOwner(owner, () => next()); }`. I left it out to avoid forcing a `Variables` shape on consumers.
 - WebSocket and SSE handlers that push outside the request lifecycle aren't covered by the middleware's scope — wrap the push site too if you need tagging there.
 
 ## Testing without `hono`
 
-The exported types (`HonoMiddleware`, `HonoNext`) are structural — `c` is typed as `unknown` because the middleware never reads it. Pass any object as `c` and an async function as `next`. The package's own tests do this. See `src/teamMiddleware.test.ts`.
+The exported types (`HonoMiddleware`, `HonoNext`) are structural — `c` is typed as `unknown` because the middleware never reads it. Pass any object as `c` and an async function as `next`. The package's own tests do this. See `src/ownerMiddleware.test.ts`.

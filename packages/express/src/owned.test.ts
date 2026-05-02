@@ -3,7 +3,7 @@ import { currentOwner } from '@strays/runtime/currentOwner';
 import { owned } from './owned.ts';
 
 describe('express owned shape', () => {
-  it('extracts `next` from the (req, res, next) positional args and runs it under the team scope', () => {
+  it('extracts `next` from the (req, res, next) positional args and runs it under the owner scope', () => {
     let observed: string | undefined;
     const result = owned('Billing')({}, {}, () => {
       observed = currentOwner();

@@ -44,6 +44,8 @@ function serialiseError(value: unknown): unknown {
 
 export function formatOwnedLogEntry(entry: OwnedLogEntry): FormattedLogLine {
   const causeOwner = entry.error !== undefined ? walkOwnedErrorChain(entry.error) : undefined;
+  // Owner-side identifier crosses the input/output boundary here: the resolved
+  // OwnerId is emitted as the `team` field per observability-vendor convention.
   const team =
     causeOwner ?? entry.scopeOwner ?? entry.moduleOwner ?? entry.fallback ?? 'unowned';
 

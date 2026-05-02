@@ -11,13 +11,13 @@ const levelFromLabel = (label: string): LogLevel =>
 export const makeOwnershipLogger = (sink: LogSink = stdoutJsonSink) =>
   EffectLogger.make(({ logLevel, message, annotations, cause }) => {
     const annotationsObj = Object.fromEntries(annotations);
-    const annotationTeam =
+    const annotatedOwner =
       typeof annotationsObj.team === 'string' ? annotationsObj.team : undefined;
     const level = levelFromLabel(logLevel.label);
     const error = extractCauseError(cause);
-    const team = resolveOwner({
+    const owner = resolveOwner({
       ...(error === undefined ? {} : { error }),
-      ...(annotationTeam === undefined ? {} : { moduleOwner: annotationTeam }),
+      ...(annotatedOwner === undefined ? {} : { moduleOwner: annotatedOwner }),
       fallback: 'unowned',
     });
     const line = formatOwnedLogEntry({
@@ -25,7 +25,7 @@ export const makeOwnershipLogger = (sink: LogSink = stdoutJsonSink) =>
       message: typeof message === 'string' ? message : String(message),
       fields: annotationsObj,
       ...(error === undefined ? {} : { error }),
-      scopeOwner: team,
+      scopeOwner: owner,
     });
     sink.write(line, level);
   });

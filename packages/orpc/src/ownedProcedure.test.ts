@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import { currentOwner } from '@strays/runtime/currentOwner';
-import { teamProcedure } from './teamProcedure.ts';
-import type { TeamMiddleware } from './teamMiddleware.ts';
+import { ownedProcedure } from './ownedProcedure.ts';
+import type { OwnerMiddleware } from './ownerMiddleware.ts';
 
 interface MockBuilder {
-  middlewares: TeamMiddleware[];
-  use(middleware: TeamMiddleware): MockBuilder;
+  middlewares: OwnerMiddleware[];
+  use(middleware: OwnerMiddleware): MockBuilder;
   run(handler: () => unknown): Promise<unknown>;
 }
 
@@ -27,24 +27,24 @@ function makeMockBuilder(): MockBuilder {
   return builder;
 }
 
-describe('teamProcedure', () => {
-  it('chains a teamMiddleware onto the builder', () => {
+describe('ownedProcedure (oRPC)', () => {
+  it('chains an ownerMiddleware onto the builder', () => {
     const builder = makeMockBuilder();
-    const tagged = teamProcedure(builder, 'Billing');
+    const tagged = ownedProcedure(builder, 'Billing');
 
     expect(tagged.middlewares).toHaveLength(1);
   });
 
-  it('returns the same builder reference for chaining', () => {
+  it('returns the same builder reference', () => {
     const builder = makeMockBuilder();
-    const tagged = teamProcedure(builder, 'Billing');
+    const tagged = ownedProcedure(builder, 'Billing');
 
     expect(tagged).toBe(builder);
   });
 
-  it('runs handlers inside the team scope', async () => {
+  it('runs handlers inside the owner scope', async () => {
     const builder = makeMockBuilder();
-    const tagged = teamProcedure(builder, 'Billing');
+    const tagged = ownedProcedure(builder, 'Billing');
     let observed: string | undefined;
 
     await tagged.run(() => {
@@ -54,10 +54,10 @@ describe('teamProcedure', () => {
     expect(observed).toBe('Billing');
   });
 
-  it('composes with existing middlewares (inner team wins)', async () => {
+  it('composes with existing middlewares (inner owner wins)', async () => {
     const builder = makeMockBuilder();
-    teamProcedure(builder, 'Outer');
-    teamProcedure(builder, 'Inner');
+    ownedProcedure(builder, 'Outer');
+    ownedProcedure(builder, 'Inner');
     let observed: string | undefined;
 
     await builder.run(() => {

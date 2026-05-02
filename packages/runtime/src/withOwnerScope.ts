@@ -11,20 +11,25 @@ export type NextThunk = () => unknown;
  * Build a framework-shaped middleware factory.
  *
  * `pickNext` extracts the framework's continuation from its native call args.
- * The returned factory takes a team name and yields a middleware whose call
+ * The returned factory takes an owner id and yields a middleware whose call
  * shape is exactly `(...args) => TReturn`.
  *
+ * Vocabulary note: this lives on the *resolution* side of the input/output
+ * boundary, so the parameter is `owner` (the OwnerId, e.g. `"Billing"`). The
+ * string is later emitted on telemetry as the `team` tag — that crossover
+ * happens in the formatter / span processor, not here.
+ *
  * Behavioral guarantees:
- *  - The continuation runs inside `runWithOwner(team, ...)`.
+ *  - The continuation runs inside `runWithOwner(owner, ...)`.
  *  - Whatever the continuation returns is returned directly to the framework
  *    (so async frameworks can `await` it, sync frameworks see `undefined`).
  *  - The owner scope does not leak past the synchronous return of `pickNext`.
  */
-export function withTeamScope<TArgs extends readonly unknown[], TReturn = unknown>(
+export function withOwnerScope<TArgs extends readonly unknown[], TReturn = unknown>(
   pickNext: (...args: TArgs) => NextThunk,
-): (team: string) => (...args: TArgs) => TReturn {
-  return (team) =>
-    ((...args: TArgs) => runWithOwner(team, () => pickNext(...args)())) as (
+): (owner: string) => (...args: TArgs) => TReturn {
+  return (owner) =>
+    ((...args: TArgs) => runWithOwner(owner, () => pickNext(...args)())) as (
       ...args: TArgs
     ) => TReturn;
 }

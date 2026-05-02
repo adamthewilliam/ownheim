@@ -1,0 +1,8 @@
+import { withOwnerScope } from '@strays/runtime/withOwnerScope';
+
+export const ownerMiddleware = withOwnerScope<
+  [{ next: () => Promise<unknown> }],
+  Promise<unknown>
+>(({ next }) => next);
+
+export type OwnerMiddleware = ReturnType<typeof ownerMiddleware>;

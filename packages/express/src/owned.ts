@@ -1,8 +1,8 @@
-import { withTeamScope } from '@strays/runtime/withTeamScope';
+import { withOwnerScope } from '@strays/runtime/withOwnerScope';
 
-export const owned = withTeamScope<
+export const owned = withOwnerScope<
   [unknown, unknown, (err?: unknown) => void],
   void
 >((_req, _res, next) => () => next());
 
-export type TeamMiddleware = ReturnType<typeof owned>;
+export type OwnerMiddleware = ReturnType<typeof owned>;
