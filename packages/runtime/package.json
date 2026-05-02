@@ -9,6 +9,8 @@
     "./currentOwner": "./src/currentOwner.ts",
     "./createLogger": "./src/createLogger.ts",
     "./createTracer": "./src/createTracer.ts",
+    "./formatOwnedLogEntry": "./src/formatOwnedLogEntry.ts",
+    "./LogSink": "./src/LogSink.ts",
     "./walkOwnedErrorChain": "./src/walkOwnedErrorChain.ts",
     "./lookupCallerOwner": "./src/lookupCallerOwner.ts",
     "./manifest": "./src/manifest.ts",
