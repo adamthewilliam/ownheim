@@ -50,7 +50,7 @@ export function formatOwnedLogEntry(entry: OwnedLogEntry): FormattedLogLine {
   const record: Record<string, unknown> = {
     level: entry.level,
     msg: entry.message,
-    ...(entry.fields ?? {}),
+    ...entry.fields,
     ...(entry.error !== undefined ? { err: serialiseError(entry.error) } : {}),
     team,
   };

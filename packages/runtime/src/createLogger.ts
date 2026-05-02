@@ -1,7 +1,7 @@
-import { currentOwner } from './currentOwner.ts';
 import { formatOwnedLogEntry, type LogLevel } from './formatOwnedLogEntry.ts';
 import { stdoutJsonSink, type LogSink } from './LogSink.ts';
 import type { ManifestRegistry } from './ManifestRegistry.ts';
+import { resolveOwner } from './resolveOwner.ts';
 
 export type LogValue =
   | string
@@ -35,14 +35,17 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
 
   const emit = (level: LogLevel, record: LogRecord, err?: unknown) => {
     const { msg, ...fields } = record;
-    const scope = currentOwner();
+    const team = resolveOwner({
+      ...(err === undefined ? {} : { error: err }),
+      ...(normalisedModuleOwner === undefined ? {} : { moduleOwner: normalisedModuleOwner }),
+      fallback,
+    });
     const line = formatOwnedLogEntry({
       level,
       message: msg,
       fields,
       ...(err === undefined ? {} : { error: err }),
-      ...(scope === undefined ? {} : { scopeOwner: scope }),
-      ...(normalisedModuleOwner === undefined ? {} : { moduleOwner: normalisedModuleOwner }),
+      scopeOwner: team,
       fallback,
     });
     sink.write(line, level);

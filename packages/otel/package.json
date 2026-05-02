@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     "./SpanProcessor": "./src/SpanProcessor.ts",
-    "./resource": "./src/resource.ts",
-    "./resolveOwner": "./src/resolveOwner.ts"
+    "./resource": "./src/resource.ts"
   },
   "scripts": {
     "test": "bun test",

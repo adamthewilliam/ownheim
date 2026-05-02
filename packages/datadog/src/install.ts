@@ -1,4 +1,4 @@
-import { resolveOwner } from './resolveOwner.ts';
+import { resolveOwner } from '@strays/runtime/resolveOwner';
 
 export interface DatadogSpan {
   setTag(key: string, value: string): void;
@@ -20,7 +20,7 @@ export function installDatadog(tracer: DatadogTracer, options: InstallOptions = 
   const original = tracer.startSpan.bind(tracer);
   tracer.startSpan = (name: string, opts?: unknown) => {
     const span = original(name, opts);
-    span.setTag(tagKey, resolveOwner(undefined, fallback));
+    span.setTag(tagKey, resolveOwner({ fallback }));
     return span;
   };
 }

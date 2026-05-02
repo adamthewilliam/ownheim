@@ -1,4 +1,4 @@
-import { resolveOwner } from './resolveOwner.ts';
+import { resolveOwner } from '@strays/runtime/resolveOwner';
 
 export interface DatadogRumLike {
   addError(error: unknown, context?: Record<string, unknown>): void;
@@ -8,6 +8,6 @@ export interface DatadogRumLike {
 export function installDatadogRum(rum: DatadogRumLike, fallback = 'unowned'): void {
   const original = rum.addError.bind(rum);
   rum.addError = (error: unknown, context?: Record<string, unknown>) => {
-    original(error, { ...context, team: resolveOwner(error, fallback) });
+    original(error, { ...context, team: resolveOwner({ error, fallback }) });
   };
 }

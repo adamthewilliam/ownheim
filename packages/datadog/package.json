@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     "./install": "./src/install.ts",
-    "./rum": "./src/rum.ts",
-    "./resolveOwner": "./src/resolveOwner.ts"
+    "./rum": "./src/rum.ts"
   },
   "scripts": {
     "test": "bun test",

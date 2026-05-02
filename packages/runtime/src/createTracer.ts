@@ -1,6 +1,5 @@
-import { currentOwner } from './currentOwner.ts';
-import { lookupCallerOwner } from './lookupCallerOwner.ts';
 import type { ManifestRegistry } from './ManifestRegistry.ts';
+import { resolveOwner } from './resolveOwner.ts';
 
 export interface TracedSpan {
   setAttribute(key: string, value: string | number | boolean): void;
@@ -28,8 +27,7 @@ export function createTracer(moduleOwner: string, options: CreateTracerOptions):
   return {
     startSpan(name) {
       const span = options.factory.start(name);
-      const team =
-        currentOwner() ?? normalisedOwner ?? lookupCallerOwner(2, options.registry) ?? fallback;
+      const team = resolveOwner({ moduleOwner: normalisedOwner, fallback });
       span.setAttribute('team', team);
       return span;
     },
