@@ -11,6 +11,7 @@
     "./createTracer": "./src/createTracer.ts",
     "./formatOwnedLogEntry": "./src/formatOwnedLogEntry.ts",
     "./LogSink": "./src/LogSink.ts",
+    "./defaultLogSink": "./src/defaultLogSink.ts",
     "./walkOwnedErrorChain": "./src/walkOwnedErrorChain.ts",
     "./lookupCallerOwner": "./src/lookupCallerOwner.ts",
     "./manifest": "./src/manifest.ts",

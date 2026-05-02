@@ -156,6 +156,18 @@
         "@strays/runtime": "workspace:*",
       },
     },
+    "packages/test-utils": {
+      "name": "@strays/test-utils",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@strays/build": "workspace:*",
+        "@strays/core": "workspace:*",
+        "@strays/runtime": "workspace:*",
+      },
+      "peerDependencies": {
+        "esbuild": "^0.28.0",
+      },
+    },
     "packages/trpc": {
       "name": "@strays/trpc",
       "version": "0.1.0",
@@ -289,6 +301,8 @@
     "@strays/runtime": ["@strays/runtime@workspace:packages/runtime"],
 
     "@strays/sentry": ["@strays/sentry@workspace:packages/sentry"],
+
+    "@strays/test-utils": ["@strays/test-utils@workspace:packages/test-utils"],
 
     "@strays/trpc": ["@strays/trpc@workspace:packages/trpc"],
 

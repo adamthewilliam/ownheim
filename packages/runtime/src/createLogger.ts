@@ -1,5 +1,6 @@
+import { getDefaultLogSink } from './defaultLogSink.ts';
 import { formatOwnedLogEntry, type LogLevel } from './formatOwnedLogEntry.ts';
-import { stdoutJsonSink, type LogSink } from './LogSink.ts';
+import type { LogSink } from './LogSink.ts';
 import type { ManifestRegistry } from './ManifestRegistry.ts';
 import { resolveOwner } from './resolveOwner.ts';
 
@@ -29,7 +30,7 @@ export interface CreateLoggerOptions {
 }
 
 export function createLogger(moduleOwner: string, options: CreateLoggerOptions = {}): Logger {
-  const sink = options.sink ?? stdoutJsonSink;
+  const sink = options.sink ?? getDefaultLogSink();
   const fallback = options.fallback ?? 'unowned';
   const normalisedModuleOwner = moduleOwner === '' ? undefined : moduleOwner;
 

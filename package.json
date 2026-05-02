@@ -10,6 +10,8 @@
   ],
   "scripts": {
     "test": "bun test",
+    "test:contract": "bun test packages/build",
+    "test:integration": "bun test packages/datadog packages/sentry packages/otel packages/hono packages/orpc packages/trpc packages/express packages/effect",
     "lint": "bunx oxlint",
     "format": "bunx oxfmt",
     "typecheck": "bun run --filter='*' typecheck"

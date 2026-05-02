@@ -1,0 +1,26 @@
+{
+  "name": "@strays/test-utils",
+  "version": "0.1.0",
+  "description": "strays — shared in-memory bundle, subprocess, log, and OTel exporter helpers for the test suite",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./buildBundleFixture": "./src/buildBundleFixture.ts",
+    "./runBundleInSubprocess": "./src/runBundleInSubprocess.ts",
+    "./captureStructuredLogs": "./src/captureStructuredLogs.ts",
+    "./createInMemoryOtelExporter": "./src/createInMemoryOtelExporter.ts",
+    "./RecordedSpan": "./src/RecordedSpan.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@strays/build": "workspace:*",
+    "@strays/core": "workspace:*",
+    "@strays/runtime": "workspace:*"
+  },
+  "peerDependencies": {
+    "esbuild": "^0.28.0"
+  }
+}
