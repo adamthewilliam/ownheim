@@ -20,6 +20,8 @@
     "./OwnershipManifest": "./src/OwnershipManifest.ts",
     "./withOwnerScope": "./src/withOwnerScope.ts",
     "./resolveOwner": "./src/resolveOwner.ts",
+    "./resolveOwnerWithSource": "./src/resolveOwnerWithSource.ts",
+    "./OwnerResolution": "./src/OwnerResolution.ts",
     "./ResolveOwnerInput": "./src/ResolveOwnerInput.ts",
     "./FrameSource": "./src/FrameSource.ts",
     "./callerFrameSource": "./src/callerFrameSource.ts",

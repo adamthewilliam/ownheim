@@ -50,4 +50,49 @@ describe('installDatadog', () => {
 
     expect(spans[0]?.tags['dd.team']).toBe('Identity');
   });
+
+  it('omits team_source by default to keep cardinality minimal', () => {
+    const { spans, tracer } = makeMockTracer();
+    installDatadog(tracer);
+
+    runWithOwner('Billing', () => {
+      tracer.startSpan('http.request');
+    });
+
+    expect(spans[0]?.tags.team).toBe('Billing');
+    expect(spans[0]?.tags.team_source).toBeUndefined();
+  });
+
+  it('emits team_source when emitSource is opted in (source: scope)', () => {
+    const { spans, tracer } = makeMockTracer();
+    installDatadog(tracer, { emitSource: true });
+
+    runWithOwner('Billing', () => {
+      tracer.startSpan('http.request');
+    });
+
+    expect(spans[0]?.tags.team).toBe('Billing');
+    expect(spans[0]?.tags.team_source).toBe('scope');
+  });
+
+  it('emits team_source as "fallback" when opted in and no scope is active', () => {
+    const { spans, tracer } = makeMockTracer();
+    installDatadog(tracer, { emitSource: true, fallback: 'platform-default' });
+
+    tracer.startSpan('background.job');
+
+    expect(spans[0]?.tags.team).toBe('platform-default');
+    expect(spans[0]?.tags.team_source).toBe('fallback');
+  });
+
+  it('honours a custom sourceTagKey when emitSource is opted in', () => {
+    const { spans, tracer } = makeMockTracer();
+    installDatadog(tracer, { emitSource: true, sourceTagKey: 'dd.team_source' });
+
+    runWithOwner('Billing', () => {
+      tracer.startSpan('http.request');
+    });
+
+    expect(spans[0]?.tags['dd.team_source']).toBe('scope');
+  });
 });

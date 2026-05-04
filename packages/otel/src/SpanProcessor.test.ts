@@ -40,6 +40,44 @@ describe('OwnershipSpanProcessor', () => {
     expect(attributes['otel.team']).toBe('Identity');
   });
 
+  it('omits team_source attribute by default to keep cardinality minimal', () => {
+    const processor = new OwnershipSpanProcessor();
+    const { attributes, span } = makeMockSpan();
+
+    runWithOwner('Billing', () => processor.onStart(span, undefined));
+
+    expect(attributes.team).toBe('Billing');
+    expect(attributes.team_source).toBeUndefined();
+  });
+
+  it('emits team_source when emitSource is opted in (source: scope)', () => {
+    const processor = new OwnershipSpanProcessor({ emitSource: true });
+    const { attributes, span } = makeMockSpan();
+
+    runWithOwner('Billing', () => processor.onStart(span, undefined));
+
+    expect(attributes.team).toBe('Billing');
+    expect(attributes.team_source).toBe('scope');
+  });
+
+  it('emits team_source as "fallback" when opted in and no scope is active', () => {
+    const processor = new OwnershipSpanProcessor({ emitSource: true, fallback: 'platform-default' });
+    const { attributes, span } = makeMockSpan();
+
+    processor.onStart(span, undefined);
+
+    expect(attributes.team_source).toBe('fallback');
+  });
+
+  it('honours a custom sourceAttributeKey when emitSource is opted in', () => {
+    const processor = new OwnershipSpanProcessor({ emitSource: true, sourceAttributeKey: 'otel.team_source' });
+    const { attributes, span } = makeMockSpan();
+
+    runWithOwner('Identity', () => processor.onStart(span, undefined));
+
+    expect(attributes['otel.team_source']).toBe('scope');
+  });
+
   it('shutdown and forceFlush resolve immediately', async () => {
     const processor = new OwnershipSpanProcessor();
     await expect(processor.shutdown()).resolves.toBeUndefined();
