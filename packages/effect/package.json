@@ -3,7 +3,13 @@
   "version": "0.1.0",
   "description": "strays — Effect-TS Owner Context.Tag, ownedBy decorator, Logger and Tracer Layers",
   "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
+    ".": "./src/index.ts",
     "./Owner": "./src/Owner.ts",
     "./ownedBy": "./src/ownedBy.ts",
     "./Logger": "./src/Logger.ts",

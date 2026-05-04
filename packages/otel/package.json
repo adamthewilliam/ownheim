@@ -3,7 +3,13 @@
   "version": "0.1.0",
   "description": "strays — OpenTelemetry SpanProcessor + resource attribute injector",
   "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
+    ".": "./src/index.ts",
     "./SpanProcessor": "./src/SpanProcessor.ts",
     "./resource": "./src/resource.ts"
   },
