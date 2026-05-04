@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { currentOwner } from '@strays/runtime/scope/currentOwner';
+import { currentOwner } from '@strays/core/scope/currentOwner';
 import { ownedProcedure } from './ownedProcedure.ts';
 import type { OwnerMiddleware } from './ownerMiddleware.ts';
 

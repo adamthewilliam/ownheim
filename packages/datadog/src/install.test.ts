@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { runWithOwner } from '@strays/runtime/scope/runWithOwner';
+import { runWithOwner } from '@strays/core/scope/runWithOwner';
 import { installDatadog, type DatadogSpan, type DatadogTracer } from './install.ts';
 
 function makeMockTracer() {

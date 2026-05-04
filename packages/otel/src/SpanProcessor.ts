@@ -1,9 +1,9 @@
-import { resolveOwnerWithSource } from '@strays/runtime/resolution/resolveOwner';
+import { resolveOwnerWithSource } from '@strays/core/resolution/resolveOwner';
 import {
   DEFAULT_FALLBACK,
   DEFAULT_SOURCE_TAG_KEY,
   DEFAULT_TAG_KEY,
-} from '@strays/runtime/tracing/resolveTagOptions';
+} from '@strays/core/tracing/resolveTagOptions';
 
 export interface OtelSpan {
   setAttribute(key: string, value: string | number | boolean): void;

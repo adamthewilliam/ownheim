@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@strays/otel": "workspace:*",
-    "@strays/runtime": "workspace:*"
+    "@strays/core": "workspace:*"
   },
   "optionalDependencies": {
     "@opentelemetry/api": "^1.9.1",

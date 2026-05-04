@@ -1,5 +1,5 @@
 // RFC 0006 Phase 1 contract: namespace imports and re-exports of
-// `@strays/runtime` are *deliberately* not rewritten by the esbuild plugin.
+// `@strays/core` are *deliberately* not rewritten by the esbuild plugin.
 //
 // This test file locks the *current observed behavior* into a regression
 // fence. Its purpose is to make any silent change to that behavior visible
@@ -7,15 +7,15 @@
 // markers live at the bottom as `it.todo`.
 //
 // Observed behavior (May 2026, RFC 0006 Phase 1, see analyzeSourceFile.ts:8-22):
-//   1. Namespace imports `import * as ns from '@strays/runtime'` are passed
+//   1. Namespace imports `import * as ns from '@strays/core'` are passed
 //      through verbatim by analyzeSourceFile. The `ns.logger.info(...)` call
 //      site is NOT rewritten to `const logger = createLogger(__OWNER__)`.
 //      esbuild then inlines the namespace at bundle time (`ns.logger` ->
 //      `logger`), so the call resolves to the *unbound* default `logger`
-//      export from `@strays/runtime`. At runtime that logger calls
+//      export from `@strays/core`. At runtime that logger calls
 //      `resolveOwner({})` with no `moduleOwner`, which falls through to
 //      stack-frame -> manifest lookup (see runtime/src/resolveOwner.ts).
-//   2. Re-exports `export { logger } from '@strays/runtime'` are likewise
+//   2. Re-exports `export { logger } from '@strays/core'` are likewise
 //      passed through verbatim. esbuild flattens the re-export so a
 //      downstream `import { logger } from './reexport.ts'` resolves to the
 //      same unbound default `logger`.
@@ -39,7 +39,7 @@ const config = {
   rules: [{ glob: 'src/**/*.ts', owner: 'Billing' as const }],
 };
 
-// A virtual `@strays/runtime` package whose `logger.info` writes a uniquely
+// A virtual `@strays/core` package whose `logger.info` writes a uniquely
 // identifiable line to stdout, including a `_hasOwner` field that tells us
 // whether a build-time `__OWNER__` literal was wired into the call site.
 //
@@ -47,12 +47,12 @@ const config = {
 // `_hasOwner` would flip to `"string"` (or the `_owner` field would carry
 // the resolved team name).
 const VIRTUAL_RUNTIME_FILES = {
-  'node_modules/@strays/runtime/package.json': JSON.stringify({
-    name: '@strays/runtime',
+  'node_modules/@strays/core/package.json': JSON.stringify({
+    name: '@strays/core',
     type: 'module',
     main: './index.js',
   }),
-  'node_modules/@strays/runtime/index.js':
+  'node_modules/@strays/core/index.js':
     "export const logger = { info: (r) => process.stdout.write('LOG:' + JSON.stringify({ msg: r.msg, _hasOwnerGlobal: typeof globalThis.__OWNER__ }) + '\\n') };\n",
 } as const;
 
@@ -63,7 +63,7 @@ describe('namespace import passthrough (RFC 0006 Phase 1)', () => {
   it('does not rewrite ns.logger call sites to factory bindings', async () => {
     const fixture = await buildBundleFixture({
       source:
-        "import * as rt from '@strays/runtime';\nrt.logger.info({ msg: 'hi' });\n",
+        "import * as rt from '@strays/core';\nrt.logger.info({ msg: 'hi' });\n",
       extraFiles: { ...VIRTUAL_RUNTIME_FILES },
       format: 'esm',
       config,
@@ -96,7 +96,7 @@ describe('namespace import passthrough (RFC 0006 Phase 1)', () => {
   it('runtime: ns.logger resolves to the unbound default logger (no build-time __OWNER__ on globalThis)', async () => {
     const fixture = await buildBundleFixture({
       source:
-        "import * as rt from '@strays/runtime';\nrt.logger.info({ msg: 'phase1-ns' });\n",
+        "import * as rt from '@strays/core';\nrt.logger.info({ msg: 'phase1-ns' });\n",
       extraFiles: { ...VIRTUAL_RUNTIME_FILES },
       format: 'esm',
       config,
@@ -123,12 +123,12 @@ describe('namespace import passthrough (RFC 0006 Phase 1)', () => {
 // Group 2: re-export passthrough
 // ---------------------------------------------------------------------------
 describe('re-export passthrough (RFC 0006 Phase 1)', () => {
-  it('preserves `export { logger } from "@strays/runtime"` verbatim through bundling', async () => {
+  it('preserves `export { logger } from "@strays/core"` verbatim through bundling', async () => {
     const fixture = await buildBundleFixture({
       source:
         "import { logger } from './reexport.ts';\nlogger.info({ msg: 'hi' });\n",
       extraFiles: {
-        'src/reexport.ts': "export { logger } from '@strays/runtime';\n",
+        'src/reexport.ts': "export { logger } from '@strays/core';\n",
         ...VIRTUAL_RUNTIME_FILES,
       },
       format: 'esm',
@@ -138,7 +138,7 @@ describe('re-export passthrough (RFC 0006 Phase 1)', () => {
     try {
       // Phase 1 contract: the re-export is not transformed. esbuild
       // flattens it so the bundle text doesn't literally contain the
-      // `export { logger } from '@strays/runtime'` line, but — crucially —
+      // `export { logger } from '@strays/core'` line, but — crucially —
       // it does NOT contain a `createLogger` factory binding for the
       // re-exported symbol either. The downstream import resolves to the
       // unbound default.
@@ -159,7 +159,7 @@ describe('re-export passthrough (RFC 0006 Phase 1)', () => {
       source:
         "import { logger } from './reexport.ts';\nlogger.info({ msg: 'phase1-reexport' });\n",
       extraFiles: {
-        'src/reexport.ts': "export { logger } from '@strays/runtime';\n",
+        'src/reexport.ts': "export { logger } from '@strays/core';\n",
         ...VIRTUAL_RUNTIME_FILES,
       },
       format: 'esm',
@@ -184,12 +184,12 @@ describe('re-export passthrough (RFC 0006 Phase 1)', () => {
 // Group 3: Phase 2 follow-up markers
 // ---------------------------------------------------------------------------
 describe('Phase 2 follow-ups (deferred per RFC 0006)', () => {
-  // When Phase 2 lands, namespace usage of `@strays/runtime` factory-bound
+  // When Phase 2 lands, namespace usage of `@strays/core` factory-bound
   // exports (logger, tracer, …) should compile down to per-call-site
   // factory bindings stamped with the resolved owner — same as plain named
   // imports do today.
   it.todo(
-    'Phase 2: namespace imports of @strays/runtime should rewrite ns.logger calls to factory bindings',
+    'Phase 2: namespace imports of @strays/core should rewrite ns.logger calls to factory bindings',
     () => {
       // Implementation pending — see RFC 0006 §3 (namespace import handling).
     },

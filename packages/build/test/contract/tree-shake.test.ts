@@ -2,7 +2,7 @@
 //
 // The strays esbuild plugin (packages/build/src/esbuildPlugin.ts) injects
 // per-file `__OWNER__` constants and rewrites `import { logger } from
-// '@strays/runtime'` into a `createLogger(<owner>)` factory call. Both of
+// '@strays/core'` into a `createLogger(<owner>)` factory call. Both of
 // these are top-level statements with apparent side effects (function
 // invocation, top-level binding) — but bundlers under aggressive
 // configuration (`minify: true, treeShaking: true, sideEffects: false`) may
@@ -22,7 +22,7 @@
 //      strays plugin computes a relative path that begins with `..` —
 //      breaking glob matching.
 //   2. The harness does not expose `nodePaths`, so esbuild cannot resolve
-//      the workspace's `@strays/runtime` package from a tmp-dir entry.
+//      the workspace's `@strays/core` package from a tmp-dir entry.
 //
 // We do continue to use `runBundleInSubprocess` from `@strays/test-utils`
 // to keep execution-side semantics identical to the rest of the suite.
@@ -39,7 +39,7 @@ import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess'
 
 // ---------------------------------------------------------------------------
 // Bundling helper — local replacement for `buildBundleFixture` that fixes
-// the macOS realpath issue and supplies `nodePaths` for `@strays/runtime`.
+// the macOS realpath issue and supplies `nodePaths` for `@strays/core`.
 // ---------------------------------------------------------------------------
 
 interface BundleArgs {
@@ -119,7 +119,7 @@ describe('A4 tree-shake survival contract', () => {
   it('Scenario 1: log call inside `process.env.NODE_ENV === "production"` branch survives with team tag', async () => {
     const fixture = await bundleFixture({
       files: {
-        'src/entry.ts': `import { logger } from '@strays/runtime';
+        'src/entry.ts': `import { logger } from '@strays/core';
 
 if (process.env.NODE_ENV === 'production') {
   logger.info({ msg: 'charging' });
@@ -154,7 +154,7 @@ if (process.env.NODE_ENV === 'production') {
   it('Scenario 2: exported-but-unused `billCustomer` — if retained, team tag is correct on execution', async () => {
     const fixture = await bundleFixture({
       files: {
-        'src/entry.ts': `import { logger } from '@strays/runtime';
+        'src/entry.ts': `import { logger } from '@strays/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });
@@ -187,7 +187,7 @@ console.log('hello-from-entry');
         // call site reachable from the entry.
         const invokerFixture = await bundleFixture({
           files: {
-            'src/lib/billCustomer.ts': `import { logger } from '@strays/runtime';
+            'src/lib/billCustomer.ts': `import { logger } from '@strays/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });
@@ -239,7 +239,7 @@ billCustomer();
           type: 'module',
           sideEffects: false,
         }),
-        'src/lib/billCustomer.ts': `import { logger } from '@strays/runtime';
+        'src/lib/billCustomer.ts': `import { logger } from '@strays/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });
@@ -285,7 +285,7 @@ void billCustomer;
           type: 'module',
           sideEffects: false,
         }),
-        'src/lib/billCustomer.ts': `import { logger } from '@strays/runtime';
+        'src/lib/billCustomer.ts': `import { logger } from '@strays/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });

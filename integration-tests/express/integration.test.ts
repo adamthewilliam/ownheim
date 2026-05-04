@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import express, { type NextFunction, type Request, type Response, Router } from 'express';
 import request from 'supertest';
 import { captureStructuredLogs, type CapturedLogs } from '@strays/test-utils/captureStructuredLogs';
-import { createLogger } from '@strays/runtime/logging/createLogger';
-import { currentOwner } from '@strays/runtime/scope/currentOwner';
+import { createLogger } from '@strays/core/logging/createLogger';
+import { currentOwner } from '@strays/core/scope/currentOwner';
 import { ownerMiddleware } from '@strays/express/ownerMiddleware';
 
 // Each handler logs once with `msg` echoing the per-request marker so the test

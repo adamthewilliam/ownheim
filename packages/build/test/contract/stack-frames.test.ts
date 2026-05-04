@@ -50,7 +50,6 @@ import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess'
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MONOREPO_ROOT = resolve(HERE, '../../../..');
-const RUNTIME_SRC = `${MONOREPO_ROOT}/packages/runtime/src`;
 const CORE_SRC = `${MONOREPO_ROOT}/packages/core/src`;
 
 interface RunOutput {
@@ -63,7 +62,7 @@ interface RunOutput {
 
 const FEATURE_SOURCE = `
 import { OwnedError } from '${CORE_SRC}/OwnedError.ts';
-import { lookupCallerOwner } from '${RUNTIME_SRC}/resolution/lookupCallerOwner.ts';
+import { lookupCallerOwner } from '${CORE_SRC}/resolution/lookupCallerOwner.ts';
 
 // Capture this module's V8-reported file path via a fresh Error stack.
 // We grab the first frame after the Error header (which is the frame
@@ -101,9 +100,9 @@ export function throwOwned() {
 `;
 
 const ENTRY_SOURCE = `
-import { ManifestRegistry } from '${RUNTIME_SRC}/manifest/ManifestRegistry.ts';
-import { setDefaultRegistry } from '${RUNTIME_SRC}/manifest/defaultRegistry.ts';
-import { walkOwnedErrorChain } from '${RUNTIME_SRC}/resolution/walkOwnedErrorChain.ts';
+import { ManifestRegistry } from '${CORE_SRC}/manifest/ManifestRegistry.ts';
+import { setDefaultRegistry } from '${CORE_SRC}/manifest/defaultRegistry.ts';
+import { walkOwnedErrorChain } from '${CORE_SRC}/resolution/walkOwnedErrorChain.ts';
 import {
   captureMyFramePath,
   callLookupFromFeature,

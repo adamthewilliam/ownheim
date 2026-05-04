@@ -17,8 +17,7 @@
   },
   "devDependencies": {
     "@strays/build": "workspace:*",
-    "@strays/core": "workspace:*",
-    "@strays/runtime": "workspace:*"
+    "@strays/core": "workspace:*"
   },
   "peerDependencies": {
     "esbuild": "^0.28.0"

@@ -1,13 +1,31 @@
 {
   "name": "@strays/core",
   "version": "0.1.0",
-  "description": "strays — typed owner registry, OwnedError, and core types",
+  "description": "strays — ownership resolution, scope propagation, logging, and tracing",
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
     "./defineStrays": "./src/defineStrays.ts",
     "./OwnedError": "./src/OwnedError.ts",
     "./symbols": "./src/symbols.ts",
-    "./types": "./src/types.ts"
+    "./types": "./src/types.ts",
+    "./scope/store": "./src/scope/store.ts",
+    "./scope/runWithOwner": "./src/scope/runWithOwner.ts",
+    "./scope/currentOwner": "./src/scope/currentOwner.ts",
+    "./scope/withOwnerScope": "./src/scope/withOwnerScope.ts",
+    "./resolution/resolveOwner": "./src/resolution/resolveOwner.ts",
+    "./resolution/callerFrameSource": "./src/resolution/callerFrameSource.ts",
+    "./resolution/fromSentryFrames": "./src/resolution/fromSentryFrames.ts",
+    "./resolution/walkOwnedErrorChain": "./src/resolution/walkOwnedErrorChain.ts",
+    "./resolution/lookupCallerOwner": "./src/resolution/lookupCallerOwner.ts",
+    "./manifest/ManifestRegistry": "./src/manifest/ManifestRegistry.ts",
+    "./manifest/defaultRegistry": "./src/manifest/defaultRegistry.ts",
+    "./logging/createLogger": "./src/logging/createLogger.ts",
+    "./logging/formatOwnedLogEntry": "./src/logging/formatOwnedLogEntry.ts",
+    "./logging/LogSink": "./src/logging/LogSink.ts",
+    "./logging/defaultLogSink": "./src/logging/defaultLogSink.ts",
+    "./tracing/createTracer": "./src/tracing/createTracer.ts",
+    "./tracing/resolveTagOptions": "./src/tracing/resolveTagOptions.ts"
   },
   "scripts": {
     "test": "bun test",

@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@strays/core": "workspace:*",
-    "@strays/runtime": "workspace:*",
     "@strays/effect": "workspace:*",
     "@strays/datadog": "workspace:*",
     "@strays/sentry": "workspace:*",

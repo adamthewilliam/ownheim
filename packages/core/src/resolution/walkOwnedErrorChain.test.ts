@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { OwnedError } from '@strays/core/OwnedError';
+import { OwnedError } from '../OwnedError.ts';
 import { walkOwnedErrorChain } from './walkOwnedErrorChain.ts';
 
 describe('walkOwnedErrorChain', () => {

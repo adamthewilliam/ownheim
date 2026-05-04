@@ -14,8 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
-    "@strays/runtime": "workspace:*"
+    "@strays/core": "workspace:*"
   },
   "peerDependencies": {
     "effect": "^3.10.0"

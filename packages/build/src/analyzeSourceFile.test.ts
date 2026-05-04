@@ -80,28 +80,28 @@ describe('analyzeSourceFile.transform', () => {
   it('rewrites a single logger import to a createLogger factory call', () => {
     const out = analyzeSourceFile(
       'a.ts',
-      `import { logger } from '@strays/runtime';\n`,
+      `import { logger } from '@strays/core';\n`,
     ).transform('Billing');
     expect(out).toContain('createLogger');
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/core\/logging\/createLogger['"]/);
     expect(out).toMatch(/const logger\s*=\s*createLogger\(/);
     expect(out).toContain('"Billing"');
   });
 
   // 2. Type-only import is preserved (no rewrite)
   it('leaves type-only runtime imports alone', () => {
-    const source = `import type { logger } from '@strays/runtime';\n`;
+    const source = `import type { logger } from '@strays/core';\n`;
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
-    expect(out).toContain(`import type { logger } from '@strays/runtime';`);
+    expect(out).toContain(`import type { logger } from '@strays/core';`);
     expect(out).not.toContain('createLogger');
     expect(out).not.toMatch(/const logger\s*=/);
   });
 
   // 3. Namespace import is preserved (Phase 1 — no warning, no rewrite)
   it('leaves namespace imports alone in Phase 1', () => {
-    const source = `import * as runtime from '@strays/runtime';\nruntime.logger.info({ msg: 'hi' });\n`;
+    const source = `import * as runtime from '@strays/core';\nruntime.logger.info({ msg: 'hi' });\n`;
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
-    expect(out).toContain(`import * as runtime from '@strays/runtime';`);
+    expect(out).toContain(`import * as runtime from '@strays/core';`);
     expect(out).toContain('runtime.logger.info');
     // The namespace usage is preserved verbatim — no factory init for it.
     expect(out).not.toMatch(/const runtime\s*=\s*createLogger/);
@@ -109,10 +109,10 @@ describe('analyzeSourceFile.transform', () => {
 
   // 4. Mixed named imports — passthrough survives, factory init present
   it('rewrites factory-bound bindings while passing through unrelated bindings', () => {
-    const source = `import { logger, runWithOwner } from '@strays/runtime';\n`;
+    const source = `import { logger, runWithOwner } from '@strays/core';\n`;
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
-    expect(out).toMatch(/import\s+\{\s*runWithOwner\s*\}\s+from\s+['"]@strays\/runtime['"]/);
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
+    expect(out).toMatch(/import\s+\{\s*runWithOwner\s*\}\s+from\s+['"]@strays\/core['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/core\/logging\/createLogger['"]/);
     // Exactly one `const logger = createLogger(...)` initializer
     const matches = out.match(/const logger\s*=\s*createLogger\(/g) ?? [];
     expect(matches.length).toBe(1);
@@ -120,7 +120,7 @@ describe('analyzeSourceFile.transform', () => {
 
   // 5. Aliased import → const <alias> = createLogger(...)
   it('honours import aliases', () => {
-    const source = `import { logger as log } from '@strays/runtime';\n`;
+    const source = `import { logger as log } from '@strays/core';\n`;
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
     expect(out).toMatch(/const log\s*=\s*createLogger\(/);
     expect(out).not.toMatch(/const logger\s*=/);
@@ -128,9 +128,9 @@ describe('analyzeSourceFile.transform', () => {
 
   // 6. Re-export — Phase 1 preserves it verbatim (no silent corruption)
   it('preserves runtime re-exports verbatim in Phase 1', () => {
-    const source = `export { logger } from '@strays/runtime';\n`;
+    const source = `export { logger } from '@strays/core';\n`;
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
-    expect(out).toContain(`export { logger } from '@strays/runtime';`);
+    expect(out).toContain(`export { logger } from '@strays/core';`);
     // No factory init injected for the re-exported symbol.
     expect(out).not.toMatch(/const logger\s*=\s*createLogger/);
   });
@@ -141,12 +141,12 @@ describe('analyzeSourceFile.transform', () => {
       'import {',
       '  logger,',
       '  /* keep */ runWithOwner,',
-      "} from '@strays/runtime';",
+      "} from '@strays/core';",
       '',
     ].join('\n');
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
     expect(out).toContain('runWithOwner');
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/core\/logging\/createLogger['"]/);
     expect(out).toMatch(/const logger\s*=\s*createLogger\(/);
   });
 
@@ -193,7 +193,7 @@ export class BillingError extends OwnedError {
 
   // 11. Empty owner string
   it('handles empty owner strings without breaking the contract', () => {
-    const source = `import { logger } from '@strays/runtime';\n`;
+    const source = `import { logger } from '@strays/core';\n`;
     const out = analyzeSourceFile('a.ts', source).transform('');
     expect(out).toContain('const __OWNER__ = "";');
     expect(out).toMatch(/const logger\s*=\s*createLogger\(""\);/);
@@ -201,7 +201,7 @@ export class BillingError extends OwnedError {
 
   // 12. Idempotency — re-running transform doesn't double-inject
   it('is idempotent: rerunning transform on the output is a no-op for __OWNER__ and factory inits', () => {
-    const source = `import { logger } from '@strays/runtime';\nlogger.info({ msg: 'hi' });\n`;
+    const source = `import { logger } from '@strays/core';\nlogger.info({ msg: 'hi' });\n`;
     const once = analyzeSourceFile('a.ts', source).transform('Billing');
     const twice = analyzeSourceFile('a.ts', once).transform('Billing');
 
@@ -212,7 +212,7 @@ export class BillingError extends OwnedError {
     expect(factoryInitCount).toBe(1);
 
     const factoryImportCount = (
-      twice.match(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/g) ?? []
+      twice.match(/from\s+['"]@strays\/core\/logging\/createLogger['"]/g) ?? []
     ).length;
     expect(factoryImportCount).toBe(1);
   });
@@ -221,16 +221,16 @@ export class BillingError extends OwnedError {
   it('rewrites tracer imports to createTracer factory calls', () => {
     const out = analyzeSourceFile(
       'a.ts',
-      `import { tracer } from '@strays/runtime';\n`,
+      `import { tracer } from '@strays/core';\n`,
     ).transform('Billing');
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/tracing\/createTracer['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/core\/tracing\/createTracer['"]/);
     expect(out).toMatch(/const tracer\s*=\s*createTracer\(/);
   });
 
   it('rewrites both logger and tracer in the same import', () => {
     const out = analyzeSourceFile(
       'a.ts',
-      `import { logger, tracer } from '@strays/runtime';\n`,
+      `import { logger, tracer } from '@strays/core';\n`,
     ).transform('Billing');
     expect(out).toContain('createLogger');
     expect(out).toContain('createTracer');

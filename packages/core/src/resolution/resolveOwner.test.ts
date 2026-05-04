@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import { OwnedError } from '@strays/core/OwnedError';
+import { OwnedError } from '../OwnedError.ts';
 import { ManifestRegistry, type OwnershipManifest } from '../manifest/ManifestRegistry.ts';
 import { resetDefaultRegistry, setDefaultRegistry } from '../manifest/defaultRegistry.ts';
 import { fromSentryFrames } from './fromSentryFrames.ts';

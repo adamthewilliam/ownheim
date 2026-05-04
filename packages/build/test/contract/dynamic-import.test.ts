@@ -8,11 +8,11 @@
 //
 // We deliberately do NOT use `buildBundleFixture` from @strays/test-utils
 // here. That harness is locked to `platform: 'neutral'` for ESM and does
-// not expose `nodePaths`. A runnable bundle that imports `@strays/runtime`
+// not expose `nodePaths`. A runnable bundle that imports `@strays/core`
 // requires (a) `platform: 'node'` so `node:async_hooks` (used by the
 // runtime's AsyncLocalStorage) resolves, and (b) `nodePaths` pointing at
 // the workspace's `node_modules` so the rewritten
-// `@strays/runtime/logging/createLogger` subpath specifier resolves from the
+// `@strays/core/logging/createLogger` subpath specifier resolves from the
 // off-tree fixture root. Extending the shared harness is out of scope per
 // the task constraints (only `packages/build/test/contract/` may change).
 //
@@ -72,7 +72,7 @@ async function buildContractFixture<TOwners extends Record<string, Owner>>(
     write: false,
     format: 'esm',
     platform: 'node',
-    // Make `@strays/runtime/logging/createLogger` resolvable from a fixture root
+    // Make `@strays/core/logging/createLogger` resolvable from a fixture root
     // that lives outside the workspace tree. Use the monorepo root rather
     // than `process.cwd()` so the test passes regardless of where it's
     // invoked from (workspace root, package dir, or via turbo).
@@ -135,7 +135,7 @@ describe('A3 — dynamic import + TLA contract', () => {
         {
           entry: `await import('./feature.ts').then((m) => m.run());\n`,
           feature: [
-            `import { logger } from '@strays/runtime';`,
+            `import { logger } from '@strays/core';`,
             `export function run() {`,
             `  logger.info({ msg: 'hi-from-feature' });`,
             `}`,
@@ -174,7 +174,7 @@ describe('A3 — dynamic import + TLA contract', () => {
             ``,
           ].join('\n'),
           feature: [
-            `import { logger } from '@strays/runtime';`,
+            `import { logger } from '@strays/core';`,
             `export function run() {`,
             `  logger.info({ msg: 'hi-from-try-catch' });`,
             `}`,
@@ -209,7 +209,7 @@ describe('A3 — dynamic import + TLA contract', () => {
           // logger calls. TLA lives in feature.ts.
           entry: `import './feature.ts';\n`,
           feature: [
-            `import { logger } from '@strays/runtime';`,
+            `import { logger } from '@strays/core';`,
             ``,
             `async function someAsync() {`,
             `  return 'ready';`,

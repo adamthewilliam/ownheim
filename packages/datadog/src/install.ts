@@ -1,5 +1,5 @@
-import { resolveOwnerWithSource } from '@strays/runtime/resolution/resolveOwner';
-import { resolveTagOptions, type TagOptions } from '@strays/runtime/tracing/resolveTagOptions';
+import { resolveOwnerWithSource } from '@strays/core/resolution/resolveOwner';
+import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
 
 export interface DatadogSpan {
   setTag(key: string, value: string): void;

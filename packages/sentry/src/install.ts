@@ -1,6 +1,6 @@
-import { fromSentryFrames, type SentryStacktrace } from '@strays/runtime/resolution/fromSentryFrames';
-import { resolveOwnerWithSource } from '@strays/runtime/resolution/resolveOwner';
-import { resolveTagOptions, type TagOptions } from '@strays/runtime/tracing/resolveTagOptions';
+import { fromSentryFrames, type SentryStacktrace } from '@strays/core/resolution/fromSentryFrames';
+import { resolveOwnerWithSource } from '@strays/core/resolution/resolveOwner';
+import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
 
 export interface SentryEvent {
   tags?: Record<string, string>;

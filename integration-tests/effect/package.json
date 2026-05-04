@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "@strays/core": "workspace:*",
-    "@strays/effect": "workspace:*",
-    "@strays/runtime": "workspace:*"
+    "@strays/effect": "workspace:*"
   },
   "optionalDependencies": {
     "effect": "^3.21.2"

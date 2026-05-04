@@ -27,7 +27,6 @@
         "@strays/datadog": "workspace:*",
         "@strays/effect": "workspace:*",
         "@strays/otel": "workspace:*",
-        "@strays/runtime": "workspace:*",
         "@strays/sentry": "workspace:*",
         "effect": "^3.10.0",
       },
@@ -36,8 +35,8 @@
       "name": "@strays-it/datadog",
       "version": "0.0.0",
       "dependencies": {
+        "@strays/core": "workspace:*",
         "@strays/datadog": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
       "optionalDependencies": {
         "dd-trace": "^5.99.1",
@@ -49,7 +48,6 @@
       "dependencies": {
         "@strays/core": "workspace:*",
         "@strays/effect": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
       "optionalDependencies": {
         "effect": "^3.21.2",
@@ -59,8 +57,8 @@
       "name": "@strays-it/express",
       "version": "0.0.0",
       "dependencies": {
+        "@strays/core": "workspace:*",
         "@strays/express": "workspace:*",
-        "@strays/runtime": "workspace:*",
         "@strays/test-utils": "workspace:*",
       },
       "optionalDependencies": {
@@ -74,8 +72,8 @@
       "name": "@strays-it/hono",
       "version": "0.0.0",
       "dependencies": {
+        "@strays/core": "workspace:*",
         "@strays/hono": "workspace:*",
-        "@strays/runtime": "workspace:*",
         "@strays/test-utils": "workspace:*",
       },
       "optionalDependencies": {
@@ -86,8 +84,8 @@
       "name": "@strays-it/orpc",
       "version": "0.0.0",
       "dependencies": {
+        "@strays/core": "workspace:*",
         "@strays/orpc": "workspace:*",
-        "@strays/runtime": "workspace:*",
         "@strays/test-utils": "workspace:*",
       },
       "optionalDependencies": {
@@ -99,8 +97,8 @@
       "name": "@strays-it/otel",
       "version": "0.0.0",
       "dependencies": {
+        "@strays/core": "workspace:*",
         "@strays/otel": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
       "optionalDependencies": {
         "@opentelemetry/api": "^1.9.1",
@@ -112,7 +110,6 @@
       "version": "0.0.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
         "@strays/sentry": "workspace:*",
       },
       "optionalDependencies": {
@@ -123,7 +120,7 @@
       "name": "@strays-it/trpc",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/runtime": "workspace:*",
+        "@strays/core": "workspace:*",
         "@strays/test-utils": "workspace:*",
         "@strays/trpc": "workspace:*",
       },
@@ -167,7 +164,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
     },
     "packages/effect": {
@@ -175,7 +171,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
       "peerDependencies": {
         "effect": "^3.10.0",
@@ -197,7 +192,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
     },
     "packages/hono": {
@@ -205,7 +199,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
     },
     "packages/lint-core": {
@@ -221,7 +214,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
     },
     "packages/otel": {
@@ -229,7 +221,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
     },
     "packages/oxlint": {
@@ -243,19 +234,11 @@
         "oxlint": ">=0.15.0",
       },
     },
-    "packages/runtime": {
-      "name": "@strays/runtime",
-      "version": "0.1.0",
-      "dependencies": {
-        "@strays/core": "workspace:*",
-      },
-    },
     "packages/sentry": {
       "name": "@strays/sentry",
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
     },
     "packages/test-utils": {
@@ -264,7 +247,6 @@
       "devDependencies": {
         "@strays/build": "workspace:*",
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
       "peerDependencies": {
         "esbuild": "^0.28.0",
@@ -275,7 +257,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@strays/core": "workspace:*",
-        "@strays/runtime": "workspace:*",
       },
     },
   },
@@ -585,8 +566,6 @@
     "@strays/otel": ["@strays/otel@workspace:packages/otel"],
 
     "@strays/oxlint": ["@strays/oxlint@workspace:packages/oxlint"],
-
-    "@strays/runtime": ["@strays/runtime@workspace:packages/runtime"],
 
     "@strays/sentry": ["@strays/sentry@workspace:packages/sentry"],
 

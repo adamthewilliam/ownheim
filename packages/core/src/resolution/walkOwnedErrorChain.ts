@@ -1,4 +1,4 @@
-import { OWNER_TAG } from '@strays/core/symbols';
+import { OWNER_TAG } from '../symbols.ts';
 
 interface OwnedShape {
   readonly [OWNER_TAG]?: unknown;

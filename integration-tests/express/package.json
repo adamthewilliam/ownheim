@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@strays/express": "workspace:*",
-    "@strays/runtime": "workspace:*",
+    "@strays/core": "workspace:*",
     "@strays/test-utils": "workspace:*"
   },
   "optionalDependencies": {

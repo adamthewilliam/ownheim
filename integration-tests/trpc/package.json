@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/runtime": "workspace:*",
+    "@strays/core": "workspace:*",
     "@strays/test-utils": "workspace:*",
     "@strays/trpc": "workspace:*"
   },

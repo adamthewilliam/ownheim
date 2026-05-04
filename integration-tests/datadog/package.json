@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@strays/datadog": "workspace:*",
-    "@strays/runtime": "workspace:*"
+    "@strays/core": "workspace:*"
   },
   "optionalDependencies": {
     "dd-trace": "^5.99.1"

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 import { OwnedError } from '@strays/core/OwnedError';
-import { ManifestRegistry, type OwnershipManifest } from '@strays/runtime/manifest/ManifestRegistry';
-import { resetDefaultRegistry, setDefaultRegistry } from '@strays/runtime/manifest/defaultRegistry';
-import { runWithOwner } from '@strays/runtime/scope/runWithOwner';
+import { ManifestRegistry, type OwnershipManifest } from '@strays/core/manifest/ManifestRegistry';
+import { resetDefaultRegistry, setDefaultRegistry } from '@strays/core/manifest/defaultRegistry';
+import { runWithOwner } from '@strays/core/scope/runWithOwner';
 import { installSentry, type SentryClient, type SentryEventProcessor } from './install.ts';
 
 function loadManifest(manifest: OwnershipManifest): void {

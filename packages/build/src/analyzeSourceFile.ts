@@ -2,16 +2,16 @@
 //
 // One ts-morph parse per file. The same parsed `SourceFile` is reused for
 // (a) the read-only extraction (jsdoc owner + OwnedError super calls) and
-// (b) the transform pass (`@strays/runtime` import rewriting + `__OWNER__`
+// (b) the transform pass (`@strays/core` import rewriting + `__OWNER__`
 // constant injection).
 //
 // Phase 1 scope (deliberately narrow — see RFC §3, §4):
 //
-//   - Namespace imports (`import * as ns from '@strays/runtime'`) are
+//   - Namespace imports (`import * as ns from '@strays/core'`) are
 //     left untouched. We do not yet rewrite `ns.logger` call sites; the
 //     RFC accepts this as a Phase 2 follow-up rather than a regression
 //     vs today, where the regex-based pass also failed silently.
-//   - Re-exports (`export { logger } from '@strays/runtime'`) are left
+//   - Re-exports (`export { logger } from '@strays/core'`) are left
 //     untouched. The deferred design decision is whether to rewrite them
 //     to a factory-binding shim or to reject them as a structured
 //     diagnostic. Phase 1 preserves them verbatim so we don't introduce a
@@ -22,7 +22,7 @@
 // module — that's the deepening payoff.
 import { Project, SyntaxKind, type SourceFile, type ts } from 'ts-morph';
 
-const RUNTIME_SPECIFIER = '@strays/runtime';
+const RUNTIME_SPECIFIER = '@strays/core';
 
 /**
  * Map of factory-bound runtime exports → the factory function name and the
@@ -182,10 +182,10 @@ function readStringLiteral(node: ts.Node | undefined): string | undefined {
 function transformSourceFile(sourceFile: SourceFile, resolvedOwner: string): string {
   const ownerLiteral = JSON.stringify(resolvedOwner);
 
-  // Collect factory-bound bindings from all `@strays/runtime[/sub]` imports.
+  // Collect factory-bound bindings from all `@strays/core[/sub]` imports.
   // Each binding becomes a `const <local> = createX(<owner literal>);`
   // initializer; we also add a sibling `import { createX } from
-  // '@strays/runtime/<folder>/createX';` declaration for each unique factory.
+  // '@strays/core/<folder>/createX';` declaration for each unique factory.
   interface FactoryBinding {
     readonly importedName: string; // e.g. 'logger' (key in FACTORY_MAP)
     readonly localName: string; // e.g. 'logger' or 'log' (alias-aware)
@@ -258,7 +258,7 @@ function injectOwnerConstant(sourceFile: SourceFile, ownerLiteral: string): void
 }
 
 function addFactoryImports(sourceFile: SourceFile, factories: ReadonlySet<string>): void {
-  // Insert one `import { createX } from '@strays/runtime/<folder>/createX';`
+  // Insert one `import { createX } from '@strays/core/<folder>/createX';`
   // per factory we encountered, skipping any factory whose import is already
   // present (idempotency, test 12).
   const existingFactoryImports = new Set<string>();

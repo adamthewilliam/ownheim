@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { runWithOwner } from '@strays/runtime/scope/runWithOwner';
+import { runWithOwner } from '@strays/core/scope/runWithOwner';
 import { OwnershipSpanProcessor, type OtelSpan } from './SpanProcessor.ts';
 
 function makeMockSpan(): { attributes: Record<string, unknown>; span: OtelSpan } {
