@@ -1,4 +1,4 @@
-import type { FrameSource } from './FrameSource.ts';
+import type { FrameSource } from './callerFrameSource.ts';
 
 export interface SentryFrame {
   readonly filename?: string;

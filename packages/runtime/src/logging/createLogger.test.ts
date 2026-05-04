@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { createLogger } from './createLogger.ts';
 import { makeMemorySink } from './LogSink.ts';
-import { runWithOwner } from './runWithOwner.ts';
+import { runWithOwner } from '../scope/runWithOwner.ts';
 
 describe('createLogger (wiring)', () => {
   it('passes currentOwner() as scopeOwner to the formatter', () => {

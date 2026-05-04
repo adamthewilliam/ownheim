@@ -63,7 +63,7 @@ interface RunOutput {
 
 const FEATURE_SOURCE = `
 import { OwnedError } from '${CORE_SRC}/OwnedError.ts';
-import { lookupCallerOwner } from '${RUNTIME_SRC}/lookupCallerOwner.ts';
+import { lookupCallerOwner } from '${RUNTIME_SRC}/resolution/lookupCallerOwner.ts';
 
 // Capture this module's V8-reported file path via a fresh Error stack.
 // We grab the first frame after the Error header (which is the frame
@@ -101,9 +101,9 @@ export function throwOwned() {
 `;
 
 const ENTRY_SOURCE = `
-import { ManifestRegistry } from '${RUNTIME_SRC}/ManifestRegistry.ts';
-import { setDefaultRegistry } from '${RUNTIME_SRC}/defaultRegistry.ts';
-import { walkOwnedErrorChain } from '${RUNTIME_SRC}/walkOwnedErrorChain.ts';
+import { ManifestRegistry } from '${RUNTIME_SRC}/manifest/ManifestRegistry.ts';
+import { setDefaultRegistry } from '${RUNTIME_SRC}/manifest/defaultRegistry.ts';
+import { walkOwnedErrorChain } from '${RUNTIME_SRC}/resolution/walkOwnedErrorChain.ts';
 import {
   captureMyFramePath,
   callLookupFromFeature,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Schema } from 'effect';
-import { walkOwnedErrorChain } from '@strays/runtime/walkOwnedErrorChain';
+import { walkOwnedErrorChain } from '@strays/runtime/resolution/walkOwnedErrorChain';
 import { ownedBy } from './ownedBy.ts';
 
 class BillingError extends Schema.TaggedError<BillingError>('BillingError')(

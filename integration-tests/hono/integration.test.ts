@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import { createLogger } from '@strays/runtime/createLogger';
-import { currentOwner } from '@strays/runtime/currentOwner';
+import { createLogger } from '@strays/runtime/logging/createLogger';
+import { currentOwner } from '@strays/runtime/scope/currentOwner';
 import { captureStructuredLogs } from '@strays/test-utils/captureStructuredLogs';
 import { Hono } from 'hono';
 import { ownerMiddleware } from '@strays/hono/ownerMiddleware';
@@ -12,7 +12,7 @@ type HonoMiddleware = Parameters<Hono['use']>[1];
 const honoOwnerMiddleware = (owner: string): HonoMiddleware =>
   ownerMiddleware(owner) as unknown as HonoMiddleware;
 
-// Per @strays/runtime/formatOwnedLogEntry the `team` field is the OwnerId
+// Per @strays/runtime/logging/formatOwnedLogEntry the `team` field is the OwnerId
 // verbatim (e.g. 'Billing'), not lowercased — the prompt's `'billing'`
 // expectation predates that rename.
 

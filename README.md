@@ -22,7 +22,7 @@ The library's name is the metric you want at zero. `strays.count` is the number 
 | `@strays/trpc` | tRPC procedure middleware (`ownedProcedure`, `ownerMiddleware`) |
 | `@strays/orpc` | oRPC procedure middleware (`ownedProcedure`, `ownerMiddleware`) |
 | `@strays/hono` | Hono per-route / per-prefix middleware (`ownerMiddleware`) |
-| `@strays/express` | Express per-route / per-router middleware (`owned`) |
+| `@strays/express` | Express per-route / per-router middleware (`ownerMiddleware`) |
 | `@strays/datadog` | dd-trace + RUM integration |
 | `@strays/sentry` | Sentry event processor + CODEOWNERS sync |
 | `@strays/otel` | OpenTelemetry SpanProcessor |

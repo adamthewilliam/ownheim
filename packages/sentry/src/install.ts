@@ -1,5 +1,6 @@
-import { fromSentryFrames, type SentryStacktrace } from '@strays/runtime/fromSentryFrames';
-import { resolveOwnerWithSource } from '@strays/runtime/resolveOwnerWithSource';
+import { fromSentryFrames, type SentryStacktrace } from '@strays/runtime/resolution/fromSentryFrames';
+import { resolveOwnerWithSource } from '@strays/runtime/resolution/resolveOwner';
+import { resolveTagOptions, type TagOptions } from '@strays/runtime/tracing/resolveTagOptions';
 
 export interface SentryEvent {
   tags?: Record<string, string>;
@@ -19,18 +20,10 @@ export interface SentryClient {
   addEventProcessor(processor: SentryEventProcessor): void;
 }
 
-export interface InstallOptions {
-  readonly fallback?: string;
-  readonly tagKey?: string;
-  readonly sourceTagKey?: string;
-  readonly emitSource?: boolean;
-}
+export type InstallOptions = TagOptions;
 
 export function installSentry(client: SentryClient, options: InstallOptions = {}): void {
-  const fallback = options.fallback ?? 'unowned';
-  const tagKey = options.tagKey ?? 'team';
-  const sourceTagKey = options.sourceTagKey ?? 'team_source';
-  const emitSource = options.emitSource ?? false;
+  const { fallback, tagKey, sourceTagKey, emitSource } = resolveTagOptions(options);
 
   client.addEventProcessor((event, hint) => {
     const stacktrace = event.exception?.values?.[0]?.stacktrace;

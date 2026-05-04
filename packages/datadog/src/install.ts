@@ -1,4 +1,5 @@
-import { resolveOwnerWithSource } from '@strays/runtime/resolveOwnerWithSource';
+import { resolveOwnerWithSource } from '@strays/runtime/resolution/resolveOwner';
+import { resolveTagOptions, type TagOptions } from '@strays/runtime/tracing/resolveTagOptions';
 
 export interface DatadogSpan {
   setTag(key: string, value: string): void;
@@ -8,18 +9,10 @@ export interface DatadogTracer {
   startSpan(name: string, options?: unknown): DatadogSpan;
 }
 
-export interface InstallOptions {
-  readonly fallback?: string;
-  readonly tagKey?: string;
-  readonly sourceTagKey?: string;
-  readonly emitSource?: boolean;
-}
+export type InstallOptions = TagOptions;
 
 export function installDatadog(tracer: DatadogTracer, options: InstallOptions = {}): void {
-  const fallback = options.fallback ?? 'unowned';
-  const tagKey = options.tagKey ?? 'team';
-  const sourceTagKey = options.sourceTagKey ?? 'team_source';
-  const emitSource = options.emitSource ?? false;
+  const { fallback, tagKey, sourceTagKey, emitSource } = resolveTagOptions(options);
 
   const original = tracer.startSpan.bind(tracer);
   tracer.startSpan = (name: string, opts?: unknown) => {

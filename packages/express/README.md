@@ -16,24 +16,24 @@ You also need `express`. Strays doesn't pin a version. Anything with the standar
 
 ```ts
 import express from 'express';
-import { owned } from '@strays/express/owned';
+import { ownerMiddleware } from '@strays/express/ownerMiddleware';
 
 const app = express();
 
-app.post('/charge', owned('Billing'), chargeHandler);
-app.get('/users/:id', owned('Identity'), getUserHandler);
-app.delete('/admin/users/:id', owned('Platform'), authMiddleware, deleteUser);
+app.post('/charge', ownerMiddleware('Billing'), chargeHandler);
+app.get('/users/:id', ownerMiddleware('Identity'), getUserHandler);
+app.delete('/admin/users/:id', ownerMiddleware('Platform'), authMiddleware, deleteUser);
 ```
 
-`owned(team)` returns a middleware. Slot it into the chain wherever ownership starts. Anything *after* `owned()` in the chain — including the final route handler — sees the team.
+`ownerMiddleware(team)` returns a middleware. Slot it into the chain wherever ownership starts. Anything *after* `ownerMiddleware()` in the chain — including the final route handler — sees the team.
 
 ## Per-prefix
 
 Express supports path mounting on `app.use`, so the same factory works for prefix-level tagging:
 
 ```ts
-app.use('/api/billing', owned('Billing'));
-app.use('/api/identity', owned('Identity'));
+app.use('/api/billing', ownerMiddleware('Billing'));
+app.use('/api/identity', ownerMiddleware('Identity'));
 
 // Routes underneath these prefixes inherit the team:
 app.post('/api/billing/charge', chargeHandler);
@@ -44,11 +44,11 @@ This is the cleanest shape if your URL structure already mirrors team ownership.
 
 ## Per-router
 
-If you split your app into multiple `express.Router()` instances, mount `owned()` once at the router level:
+If you split your app into multiple `express.Router()` instances, mount `ownerMiddleware()` once at the router level:
 
 ```ts
 const billingRouter = express.Router();
-billingRouter.use(owned('Billing'));
+billingRouter.use(ownerMiddleware('Billing'));
 billingRouter.post('/charge', chargeHandler);
 billingRouter.get('/invoice/:id', getInvoiceHandler);
 
@@ -74,7 +74,7 @@ Express 4 works too, but if your handlers return promises and you don't `.catch`
 Nothing extra to wire up. Once `installSentry` / `installDatadog` are running, every error and span emitted from a route picks up the team from the scope:
 
 ```
-owned('Billing')
+ownerMiddleware('Billing')
     → runWithOwner('Billing', () => next())
         → handler runs
             → throws or starts a span
@@ -89,4 +89,4 @@ owned('Billing')
 
 ## Testing without `express`
 
-`ExpressMiddleware` and `ExpressNext` are structural — `req` and `res` are typed as `unknown` because the middleware never reads them. Pass empty objects and a callback. The package's own tests do this. See `src/owned.test.ts`.
+`ExpressMiddleware` and `ExpressNext` are structural — `req` and `res` are typed as `unknown` because the middleware never reads them. Pass empty objects and a callback. The package's own tests do this. See `src/ownerMiddleware.test.ts`.

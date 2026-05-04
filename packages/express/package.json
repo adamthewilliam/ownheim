@@ -4,7 +4,7 @@
   "description": "strays — Express middleware for per-route team tagging",
   "type": "module",
   "exports": {
-    "./owned": "./src/owned.ts"
+    "./ownerMiddleware": "./src/ownerMiddleware.ts"
   },
   "scripts": {
     "test": "bun test",

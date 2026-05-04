@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Fiber, Layer, Logger as EffectLogger, Schema } from 'effect';
 import { OwnedError } from '@strays/core/OwnedError';
-import { makeMemorySink } from '@strays/runtime/LogSink';
-import { walkOwnedErrorChain } from '@strays/runtime/walkOwnedErrorChain';
+import { makeMemorySink } from '@strays/runtime/logging/LogSink';
+import { walkOwnedErrorChain } from '@strays/runtime/resolution/walkOwnedErrorChain';
 import { Owner, withOwner } from '@strays/effect/Owner';
 import { ownedBy } from '@strays/effect/ownedBy';
 import { makeOwnershipLogger } from '@strays/effect/Logger';

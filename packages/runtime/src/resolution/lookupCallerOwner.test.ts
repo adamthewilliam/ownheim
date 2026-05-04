@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { ManifestRegistry } from './ManifestRegistry.ts';
+import { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
 import { lookupCallerOwner } from './lookupCallerOwner.ts';
 
 describe('lookupCallerOwner', () => {

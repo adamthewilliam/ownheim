@@ -1,4 +1,4 @@
-import { walkOwnedErrorChain } from './walkOwnedErrorChain.ts';
+import { walkOwnedErrorChain } from '../resolution/walkOwnedErrorChain.ts';
 
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 

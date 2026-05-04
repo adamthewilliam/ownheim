@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { initTRPC, TRPCError } from '@trpc/server';
 import type { AnyTRPCMiddlewareFunction, TRPCProcedureBuilder } from '@trpc/server';
-import { createLogger } from '@strays/runtime/createLogger';
-import { currentOwner } from '@strays/runtime/currentOwner';
+import { createLogger } from '@strays/runtime/logging/createLogger';
+import { currentOwner } from '@strays/runtime/scope/currentOwner';
 import {
   captureStructuredLogs,
   type CapturedLogs,

@@ -1,4 +1,7 @@
-import type { FrameSource } from './FrameSource.ts';
+export interface FrameSource {
+  /** Yields candidate file paths in the order they should be consulted. */
+  frames(): Iterable<string>;
+}
 
 export function callerFrameSource(skipFrames = 2): FrameSource {
   return {

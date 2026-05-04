@@ -1,6 +1,6 @@
-import type { FormattedLogLine, LogLevel } from '@strays/runtime/formatOwnedLogEntry';
-import type { LogSink } from '@strays/runtime/LogSink';
-import { resetDefaultLogSink, setDefaultLogSink } from '@strays/runtime/defaultLogSink';
+import type { FormattedLogLine, LogLevel } from '@strays/runtime/logging/formatOwnedLogEntry';
+import type { LogSink } from '@strays/runtime/logging/LogSink';
+import { resetDefaultLogSink, setDefaultLogSink } from '@strays/runtime/logging/defaultLogSink';
 
 // Re-shape: a captured log entry pairs the formatter output with the level
 // the logger emitted it at. Wave 2 contract tests assert on `.level` and
@@ -18,7 +18,7 @@ export interface CapturedLogs {
 
 /**
  * Installs a process-wide capturing `LogSink` via
- * `@strays/runtime/defaultLogSink`. Loggers created by `createLogger` (and
+ * `@strays/runtime/logging/defaultLogSink`. Loggers created by `createLogger` (and
  * by the build-time-rewritten `logger` factory) without an explicit `sink`
  * option will emit into this capture buffer until `.restore()` is called.
  *

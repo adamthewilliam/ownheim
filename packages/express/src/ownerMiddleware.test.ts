@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
-import { currentOwner } from '@strays/runtime/currentOwner';
-import { owned } from './owned.ts';
+import { currentOwner } from '@strays/runtime/scope/currentOwner';
+import { ownerMiddleware } from './ownerMiddleware.ts';
 
-describe('express owned shape', () => {
+describe('express ownerMiddleware shape', () => {
   it('extracts `next` from the (req, res, next) positional args and runs it under the owner scope', () => {
     let observed: string | undefined;
-    const result = owned('Billing')({}, {}, () => {
+    const result = ownerMiddleware('Billing')({}, {}, () => {
       observed = currentOwner();
     });
     expect(observed).toBe('Billing');

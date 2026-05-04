@@ -1,8 +1,8 @@
 import { getDefaultLogSink } from './defaultLogSink.ts';
 import { formatOwnedLogEntry, type LogLevel } from './formatOwnedLogEntry.ts';
 import type { LogSink } from './LogSink.ts';
-import type { ManifestRegistry } from './ManifestRegistry.ts';
-import { resolveOwner } from './resolveOwner.ts';
+import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
+import { resolveOwner } from '../resolution/resolveOwner.ts';
 
 export type LogValue =
   | string

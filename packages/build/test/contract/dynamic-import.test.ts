@@ -12,7 +12,7 @@
 // requires (a) `platform: 'node'` so `node:async_hooks` (used by the
 // runtime's AsyncLocalStorage) resolves, and (b) `nodePaths` pointing at
 // the workspace's `node_modules` so the rewritten
-// `@strays/runtime/createLogger` subpath specifier resolves from the
+// `@strays/runtime/logging/createLogger` subpath specifier resolves from the
 // off-tree fixture root. Extending the shared harness is out of scope per
 // the task constraints (only `packages/build/test/contract/` may change).
 //
@@ -28,10 +28,14 @@ import { describe, expect, it } from 'bun:test';
 import { mkdtemp, mkdir, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { strays } from '@strays/build/esbuildPlugin';
 import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess';
 import type { Owner, StraysConfig } from '@strays/core/types';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const MONOREPO_ROOT = resolve(HERE, '../../../..');
 
 interface BuiltFixture {
   readonly text: string;
@@ -68,9 +72,11 @@ async function buildContractFixture<TOwners extends Record<string, Owner>>(
     write: false,
     format: 'esm',
     platform: 'node',
-    // Make `@strays/runtime/createLogger` resolvable from a fixture root
-    // that lives outside the workspace tree.
-    nodePaths: [resolve(process.cwd(), 'node_modules')],
+    // Make `@strays/runtime/logging/createLogger` resolvable from a fixture root
+    // that lives outside the workspace tree. Use the monorepo root rather
+    // than `process.cwd()` so the test passes regardless of where it's
+    // invoked from (workspace root, package dir, or via turbo).
+    nodePaths: [resolve(MONOREPO_ROOT, 'node_modules')],
     absWorkingDir: fixtureRoot,
     plugins: [strays({ config, projectRoot: fixtureRoot })],
   });

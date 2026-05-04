@@ -1,4 +1,4 @@
-import { resolveOwner } from '@strays/runtime/resolveOwner';
+import { resolveOwner } from '@strays/runtime/resolution/resolveOwner';
 
 export interface DatadogRumLike {
   addError(error: unknown, context?: Record<string, unknown>): void;

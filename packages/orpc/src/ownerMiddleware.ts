@@ -1,4 +1,4 @@
-import { withOwnerScope } from '@strays/runtime/withOwnerScope';
+import { withOwnerScope } from '@strays/runtime/scope/withOwnerScope';
 
 export const ownerMiddleware = withOwnerScope<
   [{ next: () => Promise<unknown> }],

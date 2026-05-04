@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { OwnedError } from '@strays/core/OwnedError';
-import { clearManifest } from '@strays/runtime/manifest';
-import { runWithOwner } from '@strays/runtime/runWithOwner';
+import { resetDefaultRegistry } from '@strays/runtime/manifest/defaultRegistry';
+import { runWithOwner } from '@strays/runtime/scope/runWithOwner';
 import * as Sentry from '@sentry/node';
 import { parseEnvelope } from '@sentry/core';
 import type {
@@ -85,7 +85,7 @@ beforeEach(() => {
 
 afterEach(async () => {
   await Sentry.close(2000);
-  clearManifest();
+  resetDefaultRegistry();
 });
 
 describe('@strays/sentry integration with real @sentry/node', () => {

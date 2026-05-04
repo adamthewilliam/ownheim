@@ -1,4 +1,7 @@
-import type { OwnershipManifest } from './OwnershipManifest.ts';
+export interface OwnershipManifest {
+  readonly version: 1;
+  readonly files: Readonly<Record<string, string>>;
+}
 
 const EMPTY_MANIFEST: OwnershipManifest = { version: 1, files: {} };
 

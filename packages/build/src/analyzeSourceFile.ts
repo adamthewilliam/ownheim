@@ -25,16 +25,25 @@ import { Project, SyntaxKind, type SourceFile, type ts } from 'ts-morph';
 const RUNTIME_SPECIFIER = '@strays/runtime';
 
 /**
- * Map of factory-bound runtime exports → their per-owner factory module name.
+ * Map of factory-bound runtime exports → the factory function name and the
+ * runtime subpath module that exports it.
  *
  * Lookups happen by identifier name on a parsed `ImportSpecifier`, so adding
  * a new factory is a one-line entry here. No regex, no per-export sub-path
  * allowlist.
  */
-const FACTORY_MAP: Record<string, string> = {
-  logger: 'createLogger',
-  tracer: 'createTracer',
+interface FactoryDescriptor {
+  readonly fn: string;
+  readonly modulePath: string;
+}
+
+const FACTORY_MAP: Record<string, FactoryDescriptor> = {
+  logger: { fn: 'createLogger', modulePath: 'logging/createLogger' },
+  tracer: { fn: 'createTracer', modulePath: 'tracing/createTracer' },
 };
+
+const FACTORY_MODULE_PATHS = new Set(Object.values(FACTORY_MAP).map((d) => d.modulePath));
+const FACTORY_FN_NAMES = new Set(Object.values(FACTORY_MAP).map((d) => d.fn));
 
 const OWNER_TAG_REGEX = /@owner\s+([A-Za-z_][\w-]*)/;
 
@@ -176,9 +185,9 @@ function transformSourceFile(sourceFile: SourceFile, resolvedOwner: string): str
   // Collect factory-bound bindings from all `@strays/runtime[/sub]` imports.
   // Each binding becomes a `const <local> = createX(<owner literal>);`
   // initializer; we also add a sibling `import { createX } from
-  // '@strays/runtime/createX';` declaration for each unique factory.
+  // '@strays/runtime/<folder>/createX';` declaration for each unique factory.
   interface FactoryBinding {
-    readonly factory: string; // e.g. 'createLogger'
+    readonly importedName: string; // e.g. 'logger' (key in FACTORY_MAP)
     readonly localName: string; // e.g. 'logger' or 'log' (alias-aware)
   }
   const bindings: FactoryBinding[] = [];
@@ -192,12 +201,11 @@ function transformSourceFile(sourceFile: SourceFile, resolvedOwner: string): str
     for (const spec of decl.getNamedImports()) {
       if (spec.isTypeOnly()) continue;
       const importedName = spec.getName();
-      const factory = FACTORY_MAP[importedName];
-      if (!factory) continue;
+      if (!FACTORY_MAP[importedName]) continue;
       const aliasNode = spec.getAliasNode();
       const localName = aliasNode ? aliasNode.getText() : importedName;
-      bindings.push({ factory, localName });
-      factoriesSeen.add(factory);
+      bindings.push({ importedName, localName });
+      factoriesSeen.add(importedName);
       spec.remove();
     }
 
@@ -250,31 +258,32 @@ function injectOwnerConstant(sourceFile: SourceFile, ownerLiteral: string): void
 }
 
 function addFactoryImports(sourceFile: SourceFile, factories: ReadonlySet<string>): void {
-  // Insert one `import { createX } from '@strays/runtime/createX';` per
-  // factory we encountered, skipping any factory whose import is already
+  // Insert one `import { createX } from '@strays/runtime/<folder>/createX';`
+  // per factory we encountered, skipping any factory whose import is already
   // present (idempotency, test 12).
   const existingFactoryImports = new Set<string>();
   for (const decl of sourceFile.getImportDeclarations()) {
     const spec = decl.getModuleSpecifierValue();
     if (!spec.startsWith(`${RUNTIME_SPECIFIER}/`)) continue;
     const tail = spec.slice(RUNTIME_SPECIFIER.length + 1);
-    if (Object.values(FACTORY_MAP).includes(tail)) {
+    if (FACTORY_MODULE_PATHS.has(tail)) {
       existingFactoryImports.add(tail);
     }
   }
 
-  for (const factory of factories) {
-    if (existingFactoryImports.has(factory)) continue;
+  for (const importedName of factories) {
+    const descriptor = FACTORY_MAP[importedName]!;
+    if (existingFactoryImports.has(descriptor.modulePath)) continue;
     sourceFile.addImportDeclaration({
-      moduleSpecifier: `${RUNTIME_SPECIFIER}/${factory}`,
-      namedImports: [factory],
+      moduleSpecifier: `${RUNTIME_SPECIFIER}/${descriptor.modulePath}`,
+      namedImports: [descriptor.fn],
     });
   }
 }
 
 function addFactoryInitializers(
   sourceFile: SourceFile,
-  bindings: ReadonlyArray<{ factory: string; localName: string }>,
+  bindings: ReadonlyArray<{ importedName: string; localName: string }>,
   ownerLiteral: string,
 ): void {
   // Insert each `const <local> = <factory>(<ownerLiteral>);` after the
@@ -290,7 +299,7 @@ function addFactoryInitializers(
     if (stmt.getKind() !== SyntaxKind.VariableStatement) continue;
     const text = stmt.getText();
     const match = text.match(/^\s*(?:export\s+)?const\s+(\S+)\s*=\s*(\w+)\(/);
-    if (match && Object.values(FACTORY_MAP).includes(match[2]!)) {
+    if (match && FACTORY_FN_NAMES.has(match[2]!)) {
       existingLocals.add(match[1]!);
     }
   }
@@ -308,7 +317,7 @@ function addFactoryInitializers(
 
   const newStatements = bindings
     .filter((b) => !existingLocals.has(b.localName))
-    .map((b) => `const ${b.localName} = ${b.factory}(${ownerLiteral});`);
+    .map((b) => `const ${b.localName} = ${FACTORY_MAP[b.importedName]!.fn}(${ownerLiteral});`);
 
   if (newStatements.length > 0) {
     sourceFile.insertStatements(insertIndex, newStatements);

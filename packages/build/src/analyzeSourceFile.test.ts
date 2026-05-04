@@ -83,7 +83,7 @@ describe('analyzeSourceFile.transform', () => {
       `import { logger } from '@strays/runtime';\n`,
     ).transform('Billing');
     expect(out).toContain('createLogger');
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/createLogger['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
     expect(out).toMatch(/const logger\s*=\s*createLogger\(/);
     expect(out).toContain('"Billing"');
   });
@@ -112,7 +112,7 @@ describe('analyzeSourceFile.transform', () => {
     const source = `import { logger, runWithOwner } from '@strays/runtime';\n`;
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
     expect(out).toMatch(/import\s+\{\s*runWithOwner\s*\}\s+from\s+['"]@strays\/runtime['"]/);
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/createLogger['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
     // Exactly one `const logger = createLogger(...)` initializer
     const matches = out.match(/const logger\s*=\s*createLogger\(/g) ?? [];
     expect(matches.length).toBe(1);
@@ -146,7 +146,7 @@ describe('analyzeSourceFile.transform', () => {
     ].join('\n');
     const out = analyzeSourceFile('a.ts', source).transform('Billing');
     expect(out).toContain('runWithOwner');
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/createLogger['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
     expect(out).toMatch(/const logger\s*=\s*createLogger\(/);
   });
 
@@ -212,7 +212,7 @@ export class BillingError extends OwnedError {
     expect(factoryInitCount).toBe(1);
 
     const factoryImportCount = (
-      twice.match(/from\s+['"]@strays\/runtime\/createLogger['"]/g) ?? []
+      twice.match(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/g) ?? []
     ).length;
     expect(factoryImportCount).toBe(1);
   });
@@ -223,7 +223,7 @@ export class BillingError extends OwnedError {
       'a.ts',
       `import { tracer } from '@strays/runtime';\n`,
     ).transform('Billing');
-    expect(out).toMatch(/from\s+['"]@strays\/runtime\/createTracer['"]/);
+    expect(out).toMatch(/from\s+['"]@strays\/runtime\/tracing\/createTracer['"]/);
     expect(out).toMatch(/const tracer\s*=\s*createTracer\(/);
   });
 

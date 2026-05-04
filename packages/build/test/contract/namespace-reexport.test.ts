@@ -74,7 +74,7 @@ describe('namespace import passthrough (RFC 0006 Phase 1)', () => {
       // never wrapped in `createLogger(__OWNER__)`. Asserting the *absence*
       // of factory wiring is what makes this a regression fence.
       expect(fixture.text).not.toContain('createLogger');
-      expect(fixture.text).not.toMatch(/from\s+['"]@strays\/runtime\/createLogger['"]/);
+      expect(fixture.text).not.toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
       expect(fixture.text).not.toMatch(/const\s+rt\s*=\s*createLogger/);
       expect(fixture.text).not.toMatch(/const\s+logger\s*=\s*createLogger/);
 
@@ -143,7 +143,7 @@ describe('re-export passthrough (RFC 0006 Phase 1)', () => {
       // re-exported symbol either. The downstream import resolves to the
       // unbound default.
       expect(fixture.text).not.toContain('createLogger');
-      expect(fixture.text).not.toMatch(/from\s+['"]@strays\/runtime\/createLogger['"]/);
+      expect(fixture.text).not.toMatch(/from\s+['"]@strays\/runtime\/logging\/createLogger['"]/);
       expect(fixture.text).not.toMatch(/const\s+logger\s*=\s*createLogger/);
 
       // The downstream call site survives — pointed at the unbound default.

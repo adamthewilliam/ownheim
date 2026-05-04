@@ -1,4 +1,9 @@
-import { resolveOwnerWithSource } from '@strays/runtime/resolveOwnerWithSource';
+import { resolveOwnerWithSource } from '@strays/runtime/resolution/resolveOwner';
+import {
+  DEFAULT_FALLBACK,
+  DEFAULT_SOURCE_TAG_KEY,
+  DEFAULT_TAG_KEY,
+} from '@strays/runtime/tracing/resolveTagOptions';
 
 export interface OtelSpan {
   setAttribute(key: string, value: string | number | boolean): void;
@@ -22,9 +27,9 @@ export class OwnershipSpanProcessor implements OtelSpanProcessor {
   constructor(private readonly options: OwnershipSpanProcessorOptions = {}) {}
 
   onStart(span: OtelSpan, _parentContext?: unknown): void {
-    const fallback = this.options.fallback ?? 'unowned';
-    const key = this.options.attributeKey ?? 'team';
-    const sourceKey = this.options.sourceAttributeKey ?? 'team_source';
+    const fallback = this.options.fallback ?? DEFAULT_FALLBACK;
+    const key = this.options.attributeKey ?? DEFAULT_TAG_KEY;
+    const sourceKey = this.options.sourceAttributeKey ?? DEFAULT_SOURCE_TAG_KEY;
     const emitSource = this.options.emitSource ?? false;
 
     const { owner, source } = resolveOwnerWithSource({ fallback });

@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import express, { type NextFunction, type Request, type Response, Router } from 'express';
 import request from 'supertest';
 import { captureStructuredLogs, type CapturedLogs } from '@strays/test-utils/captureStructuredLogs';
-import { createLogger } from '@strays/runtime/createLogger';
-import { currentOwner } from '@strays/runtime/currentOwner';
-import { owned } from '@strays/express/owned';
+import { createLogger } from '@strays/runtime/logging/createLogger';
+import { currentOwner } from '@strays/runtime/scope/currentOwner';
+import { ownerMiddleware } from '@strays/express/ownerMiddleware';
 
 // Each handler logs once with `msg` echoing the per-request marker so the test
 // can correlate logs to the request that emitted them. The `team` field on the
@@ -30,7 +30,7 @@ describe('@strays/express integration (real Express + supertest)', () => {
 
   it('per-route middleware tags logs with the route owner', async () => {
     const app = express();
-    app.get('/charge', owned('Billing'), (_req: Request, res: Response) => {
+    app.get('/charge', ownerMiddleware('Billing'), (_req: Request, res: Response) => {
       logger.info({ msg: 'charge:hit' });
       res.status(200).json({ ok: true });
     });
@@ -45,7 +45,7 @@ describe('@strays/express integration (real Express + supertest)', () => {
 
   it('per-router middleware tags every sub-route mounted under it', async () => {
     const billingRouter = Router();
-    billingRouter.use(owned('Billing'));
+    billingRouter.use(ownerMiddleware('Billing'));
     billingRouter.get('/charge', (_req: Request, res: Response) => {
       logger.info({ msg: 'router:charge' });
       res.status(200).json({ ok: true });
@@ -72,7 +72,7 @@ describe('@strays/express integration (real Express + supertest)', () => {
 
   it('preserves the ALS scope across `await` in async handlers', async () => {
     const app = express();
-    app.get('/async', owned('Billing'), async (_req: Request, res: Response) => {
+    app.get('/async', ownerMiddleware('Billing'), async (_req: Request, res: Response) => {
       // Yield to the microtask queue, then to a macrotask, then assert the
       // owner is still observable via ALS.
       await Promise.resolve();
@@ -93,7 +93,7 @@ describe('@strays/express integration (real Express + supertest)', () => {
 
   it('error middleware still observes the owner when handlers call next(err)', async () => {
     const app = express();
-    app.get('/boom', owned('Billing'), (_req: Request, _res: Response, next: NextFunction) => {
+    app.get('/boom', ownerMiddleware('Billing'), (_req: Request, _res: Response, next: NextFunction) => {
       // Force an async hop before raising, to prove ALS survives the boundary
       // between the handler and the error middleware Express dispatches to.
       setTimeout(() => next(new Error('kaboom')), 1);
@@ -117,7 +117,7 @@ describe('@strays/express integration (real Express + supertest)', () => {
     const app = express();
 
     const billingRouter = Router();
-    billingRouter.use(owned('Billing'));
+    billingRouter.use(ownerMiddleware('Billing'));
     billingRouter.get('/op', async (req: Request, res: Response) => {
       // Random async stagger to maximise interleaving across handlers.
       await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * 8)));
@@ -127,7 +127,7 @@ describe('@strays/express integration (real Express + supertest)', () => {
     });
 
     const platformRouter = Router();
-    platformRouter.use(owned('Platform'));
+    platformRouter.use(ownerMiddleware('Platform'));
     platformRouter.get('/op', async (req: Request, res: Response) => {
       await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * 8)));
       const marker = String(req.query.id);
@@ -163,14 +163,14 @@ describe('@strays/express integration (real Express + supertest)', () => {
 
   it('with nested routers, the innermost owner wins', async () => {
     const innerRouter = Router();
-    innerRouter.use(owned('Billing'));
+    innerRouter.use(ownerMiddleware('Billing'));
     innerRouter.get('/charge', (_req: Request, res: Response) => {
       logger.info({ msg: 'nested:inner' });
       res.status(200).json({ ok: true });
     });
 
     const outerRouter = Router();
-    outerRouter.use(owned('Platform'));
+    outerRouter.use(ownerMiddleware('Platform'));
     outerRouter.get('/health', (_req: Request, res: Response) => {
       logger.info({ msg: 'nested:outer' });
       res.status(200).json({ ok: true });

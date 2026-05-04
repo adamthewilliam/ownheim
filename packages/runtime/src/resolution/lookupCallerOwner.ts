@@ -1,5 +1,5 @@
-import type { ManifestRegistry } from './ManifestRegistry.ts';
-import { getDefaultRegistry } from './defaultRegistry.ts';
+import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
+import { getDefaultRegistry } from '../manifest/defaultRegistry.ts';
 
 const VENDOR_PATTERNS = [
   /\/node_modules\//,
