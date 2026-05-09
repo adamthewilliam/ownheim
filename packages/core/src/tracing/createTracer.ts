@@ -1,5 +1,5 @@
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
-import { resolveOwner } from '../resolution/resolveOwner.ts';
+import { resolveOwner } from '../ownership.ts';
 
 export interface TracedSpan {
   setAttribute(key: string, value: string | number | boolean): void;

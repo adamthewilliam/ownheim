@@ -57,7 +57,7 @@ process.env.DD_TELEMETRY_HEARTBEAT_INTERVAL = '0';
 process.env.DD_REMOTE_CONFIGURATION_ENABLED = 'false';
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import { runWithOwner } from '@strays/core/scope/runWithOwner';
+import { runWithOwner } from '@strays/core/ownership';
 import { installDatadog, type DatadogTracer } from '@strays/datadog/install';
 
 // dd-trace's runtime types are not exported for our adapter shape, so

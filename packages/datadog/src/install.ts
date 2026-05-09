@@ -1,4 +1,4 @@
-import { resolveOwnerWithSource } from '@strays/core/resolution/resolveOwner';
+import { resolveOwnerWithSource } from '@strays/core/ownership';
 import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
 
 export interface DatadogSpan {

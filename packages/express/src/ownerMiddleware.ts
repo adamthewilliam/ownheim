@@ -1,4 +1,4 @@
-import { withOwnerScope } from '@strays/core/scope/withOwnerScope';
+import { withOwnerScope } from '@strays/core/ownership';
 
 export const ownerMiddleware = withOwnerScope<
   [unknown, unknown, (err?: unknown) => void],

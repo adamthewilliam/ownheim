@@ -1,51 +1,33 @@
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
 import { getDefaultRegistry } from '../manifest/defaultRegistry.ts';
-
-const VENDOR_PATTERNS = [
-  /\/node_modules\//,
-  /^node:/,
-  /\(node:internal\//,
-  /\(internal\//,
-];
+import { findOwnedFrame, parseFrameFile, type FrameSource } from './frames.ts';
 
 export function lookupCallerOwner(
   skipFrames = 1,
   registry: ManifestRegistry = getDefaultRegistry(),
 ): string | undefined {
-  const stack = captureStack();
+  // Capture here (not in `callerFrameSource`) so the documented
+  // `skipFrames` semantics — "1 = land on the caller of lookupCallerOwner"
+  // — survive: the stack-trim boundary must be this function.
+  const stack = capture();
   if (!stack) return undefined;
 
-  for (let i = skipFrames; i < stack.length; i++) {
-    const frame = stack[i];
-    if (!frame) continue;
-
-    const file = parseFrameFile(frame);
-    if (!file || isVendor(file)) continue;
-
-    const owner = registry.lookupOwner(file);
-    if (owner !== undefined) return owner;
-  }
-
-  return undefined;
+  const source: FrameSource = {
+    *frames() {
+      for (let i = skipFrames; i < stack.length; i++) {
+        const frame = stack[i];
+        if (!frame) continue;
+        const file = parseFrameFile(frame);
+        if (file) yield file;
+      }
+    },
+  };
+  return findOwnedFrame(source, registry);
 }
 
-function captureStack(): string[] | undefined {
+function capture(): string[] | undefined {
   const err = new Error();
-  Error.captureStackTrace(err, captureStack);
+  Error.captureStackTrace(err, capture);
   if (typeof err.stack !== 'string') return undefined;
   return err.stack.split('\n').slice(1);
-}
-
-function parseFrameFile(frame: string): string | undefined {
-  const parenMatch = frame.match(/\((.+):\d+:\d+\)\s*$/);
-  if (parenMatch?.[1]) return parenMatch[1];
-
-  const bareMatch = frame.match(/at\s+(\S+):\d+:\d+\s*$/);
-  if (bareMatch?.[1]) return bareMatch[1];
-
-  return undefined;
-}
-
-function isVendor(file: string): boolean {
-  return VENDOR_PATTERNS.some((p) => p.test(file));
 }

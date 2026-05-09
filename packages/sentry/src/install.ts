@@ -1,5 +1,5 @@
-import { fromSentryFrames, type SentryStacktrace } from '@strays/core/resolution/fromSentryFrames';
-import { resolveOwnerWithSource } from '@strays/core/resolution/resolveOwner';
+import { fromSentryFrames, type SentryStacktrace } from '@strays/core/resolution/frames';
+import { resolveOwnerWithSource } from '@strays/core/ownership';
 import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
 
 export interface SentryEvent {

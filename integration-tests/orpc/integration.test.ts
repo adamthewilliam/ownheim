@@ -6,7 +6,7 @@ import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
 import { BatchLinkPlugin } from '@orpc/client/plugins';
 import { createLogger } from '@strays/core/logging/createLogger';
-import { currentOwner } from '@strays/core/scope/currentOwner';
+import { currentOwner } from '@strays/core/ownership';
 import { captureStructuredLogs, type CapturedLogs } from '@strays/test-utils/captureStructuredLogs';
 import { ownedProcedure } from '@strays/orpc/ownedProcedure';
 import { ownerMiddleware } from '@strays/orpc/ownerMiddleware';

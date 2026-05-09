@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { OwnedError } from '@strays/core/OwnedError';
 import { resetDefaultRegistry } from '@strays/core/manifest/defaultRegistry';
-import { runWithOwner } from '@strays/core/scope/runWithOwner';
+import { runWithOwner } from '@strays/core/ownership';
 import * as Sentry from '@sentry/node';
 import { parseEnvelope } from '@sentry/core';
 import type {

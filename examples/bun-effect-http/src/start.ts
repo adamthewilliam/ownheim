@@ -1,4 +1,4 @@
-import { runWithOwner } from '@strays/core/scope/runWithOwner';
+import { runWithOwner } from '@strays/core/ownership';
 import { createLogger } from '@strays/core/logging/createLogger';
 import { adminRefund } from './billing/admin/refund.ts';
 import { chargeInvoice } from './billing/charge.ts';

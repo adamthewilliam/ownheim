@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { initTRPC, TRPCError } from '@trpc/server';
 import type { AnyTRPCMiddlewareFunction, TRPCProcedureBuilder } from '@trpc/server';
 import { createLogger } from '@strays/core/logging/createLogger';
-import { currentOwner } from '@strays/core/scope/currentOwner';
+import { currentOwner } from '@strays/core/ownership';
 import {
   captureStructuredLogs,
   type CapturedLogs,

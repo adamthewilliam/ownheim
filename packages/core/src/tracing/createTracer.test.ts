@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { createTracer, type SpanFactory, type TracedSpan } from './createTracer.ts';
-import { runWithOwner } from '../scope/runWithOwner.ts';
+import { runWithOwner } from '../ownership.ts';
 
 function makeRecordingFactory() {
   const spans: Array<{ name: string; attributes: Record<string, unknown> }> = [];

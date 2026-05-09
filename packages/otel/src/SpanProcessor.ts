@@ -1,4 +1,4 @@
-import { resolveOwnerWithSource } from '@strays/core/resolution/resolveOwner';
+import { resolveOwnerWithSource } from '@strays/core/ownership';
 import {
   DEFAULT_FALLBACK,
   DEFAULT_SOURCE_TAG_KEY,

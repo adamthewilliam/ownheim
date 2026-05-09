@@ -72,7 +72,7 @@ export default defineStrays({
 
 ```ts
 // at HTTP entry point
-import { runWithOwner } from '@strays/core/scope/runWithOwner';
+import { runWithOwner } from '@strays/core/ownership';
 
 app.use((req, _res, next) => {
   runWithOwner(routeOwnerFor(req.path), () => next());

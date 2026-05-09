@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 import { createLogger } from '@strays/core/logging/createLogger';
-import { currentOwner } from '@strays/core/scope/currentOwner';
+import { currentOwner } from '@strays/core/ownership';
 import { captureStructuredLogs } from '@strays/test-utils/captureStructuredLogs';
 import { Hono } from 'hono';
 import { ownerMiddleware } from '@strays/hono/ownerMiddleware';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { currentOwner } from '@strays/core/scope/currentOwner';
+import { currentOwner } from '@strays/core/ownership';
 import { ownerMiddleware } from './ownerMiddleware.ts';
 
 describe('trpc ownerMiddleware shape', () => {

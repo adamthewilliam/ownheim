@@ -3,26 +3,29 @@ export { OwnedError, isOwnedError, getErrorOwner } from './OwnedError.ts';
 export { OWNER_TAG, type OwnerTag } from './symbols.ts';
 export type { Owner, OwnerId, Rule, StraysConfig, ResolvedOwner } from './types.ts';
 
-export { runWithOwner } from './scope/runWithOwner.ts';
-export { currentOwner } from './scope/currentOwner.ts';
-export { withOwnerScope, type NextThunk } from './scope/withOwnerScope.ts';
-export { ownerStore } from './scope/store.ts';
-
 export {
+  runWithOwner,
+  currentOwner,
+  withOwnerScope,
   resolveOwner,
   resolveOwnerWithSource,
+  type NextThunk,
   type OwnerSource,
   type OwnerResolution,
   type ResolveOwnerInput,
-} from './resolution/resolveOwner.ts';
+} from './ownership.ts';
 export { lookupCallerOwner } from './resolution/lookupCallerOwner.ts';
 export { walkOwnedErrorChain, isOwnedShape } from './resolution/walkOwnedErrorChain.ts';
-export { callerFrameSource, type FrameSource } from './resolution/callerFrameSource.ts';
 export {
+  callerFrameSource,
   fromSentryFrames,
+  findOwnedFrame,
+  isVendorFrame,
+  parseFrameFile,
+  type FrameSource,
   type SentryFrame,
   type SentryStacktrace,
-} from './resolution/fromSentryFrames.ts';
+} from './resolution/frames.ts';
 
 export { ManifestRegistry, type OwnershipManifest } from './manifest/ManifestRegistry.ts';
 export {

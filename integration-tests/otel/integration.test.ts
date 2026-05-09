@@ -5,7 +5,7 @@ import {
   NodeTracerProvider,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
-import { runWithOwner } from '@strays/core/scope/runWithOwner';
+import { runWithOwner } from '@strays/core/ownership';
 import { OwnershipSpanProcessor } from '@strays/otel/SpanProcessor';
 
 describe('@strays/otel integration with real SDK', () => {

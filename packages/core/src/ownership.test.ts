@@ -1,14 +1,148 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import { OwnedError } from '../OwnedError.ts';
-import { ManifestRegistry, type OwnershipManifest } from '../manifest/ManifestRegistry.ts';
-import { resetDefaultRegistry, setDefaultRegistry } from '../manifest/defaultRegistry.ts';
-import { fromSentryFrames } from './fromSentryFrames.ts';
-import { resolveOwner, resolveOwnerWithSource } from './resolveOwner.ts';
-import { runWithOwner } from '../scope/runWithOwner.ts';
+import { OwnedError } from './OwnedError.ts';
+import { ManifestRegistry, type OwnershipManifest } from './manifest/ManifestRegistry.ts';
+import { resetDefaultRegistry, setDefaultRegistry } from './manifest/defaultRegistry.ts';
+import { fromSentryFrames } from './resolution/frames.ts';
+import {
+  currentOwner,
+  resolveOwner,
+  resolveOwnerWithSource,
+  runWithOwner,
+  withOwnerScope,
+} from './ownership.ts';
 
 function loadManifest(manifest: OwnershipManifest): void {
   setDefaultRegistry(ManifestRegistry.fromManifest(manifest));
 }
+
+// ---------------------------------------------------------------------------
+// Scope: runWithOwner / currentOwner
+// ---------------------------------------------------------------------------
+
+describe('runWithOwner / currentOwner', () => {
+  it('returns undefined outside any scope', () => {
+    expect(currentOwner()).toBeUndefined();
+  });
+
+  it('exposes the scope owner inside the callback', () => {
+    runWithOwner('Billing', () => {
+      expect(currentOwner()).toBe('Billing');
+    });
+  });
+
+  it('propagates through promises and timers', async () => {
+    await runWithOwner('Identity', async () => {
+      await Promise.resolve();
+      expect(currentOwner()).toBe('Identity');
+
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      expect(currentOwner()).toBe('Identity');
+    });
+  });
+
+  it('nested scopes override the outer scope', () => {
+    runWithOwner('Billing', () => {
+      runWithOwner('Platform', () => {
+        expect(currentOwner()).toBe('Platform');
+      });
+      expect(currentOwner()).toBe('Billing');
+    });
+  });
+
+  it('returns the callback result', () => {
+    const result = runWithOwner('Billing', () => 42);
+    expect(result).toBe(42);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Scope: withOwnerScope (framework middleware factory)
+// ---------------------------------------------------------------------------
+
+describe('withOwnerScope', () => {
+  it('runs the thunk returned by pickNext with currentOwner() === owner', () => {
+    const factory = withOwnerScope<[() => unknown], unknown>((next) => next);
+    let observed: string | undefined;
+
+    factory('Billing')(() => {
+      observed = currentOwner();
+    });
+
+    expect(observed).toBe('Billing');
+  });
+
+  it("returns the thunk's value verbatim (sync and Promise)", async () => {
+    const sync = withOwnerScope<[() => unknown], unknown>((next) => next);
+    expect(sync('Billing')(() => 42)).toBe(42);
+
+    const asyncFactory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
+      (next) => next,
+    );
+    const result = await asyncFactory('Billing')(async () => ({ ok: true, n: 7 }));
+    expect(result).toEqual({ ok: true, n: 7 });
+  });
+
+  it('does not leak the scope past a synchronous thunk', () => {
+    const factory = withOwnerScope<[() => unknown], unknown>((next) => next);
+    factory('Billing')(() => undefined);
+    expect(currentOwner()).toBeUndefined();
+  });
+
+  it('preserves the scope across await boundaries inside the thunk', async () => {
+    const factory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
+      (next) => next,
+    );
+    const samples: Array<string | undefined> = [];
+
+    await factory('Identity')(async () => {
+      samples.push(currentOwner());
+      await Promise.resolve();
+      samples.push(currentOwner());
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      samples.push(currentOwner());
+    });
+
+    expect(samples).toEqual(['Identity', 'Identity', 'Identity']);
+  });
+
+  it('nested invocations shadow the outer scope and unwind correctly', async () => {
+    const factory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
+      (next) => next,
+    );
+    let inside: string | undefined;
+    let after: string | undefined;
+
+    await runWithOwner('Outer', async () => {
+      await factory('Inner')(async () => {
+        inside = currentOwner();
+      });
+      after = currentOwner();
+    });
+
+    expect(inside).toBe('Inner');
+    expect(after).toBe('Outer');
+  });
+
+  it('propagates errors thrown by the thunk without leaking the scope', async () => {
+    const factory = withOwnerScope<[() => Promise<unknown>], Promise<unknown>>(
+      (next) => next,
+    );
+    let observedDuringError: string | undefined;
+
+    const failing = factory('Billing')(async () => {
+      observedDuringError = currentOwner();
+      throw new Error('boom');
+    });
+
+    await expect(failing).rejects.toThrow('boom');
+    expect(observedDuringError).toBe('Billing');
+    expect(currentOwner()).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Resolution: resolveOwner / resolveOwnerWithSource
+// ---------------------------------------------------------------------------
 
 describe('resolveOwner', () => {
   afterEach(() => {
@@ -28,17 +162,14 @@ describe('resolveOwner', () => {
   });
 
   it('scope beats module owner beats frames', () => {
-    // With scope set, scope wins.
     const fromScope = runWithOwner('Platform', () =>
       resolveOwner({ moduleOwner: 'Module', fallback: 'unowned' }),
     );
     expect(fromScope).toBe('Platform');
 
-    // Without scope and without a manifest match, moduleOwner wins.
     const fromModule = resolveOwner({ moduleOwner: 'Module', fallback: 'unowned' });
     expect(fromModule).toBe('Module');
 
-    // Without scope, no moduleOwner, but a manifest entry for the caller, frame wins.
     const callerFile = import.meta.path;
     loadManifest({ version: 1, files: { [callerFile]: 'Frames' } });
     const fromFrames = resolveOwner({ fallback: 'unowned' });
@@ -53,7 +184,6 @@ describe('resolveOwner', () => {
 
     const stacktrace = {
       frames: [
-        // Sentry payload: deepest frame is last; iterate newest-last.
         { filename: 'src/billing/charge.ts' },
         { filename: '/path/to/node_modules/lodash/index.js' },
         { filename: 'src/internal/helper.ts', in_app: false },
