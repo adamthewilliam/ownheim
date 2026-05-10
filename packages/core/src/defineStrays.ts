@@ -1,22 +1,23 @@
-import type { Owner, StraysConfig } from './types.ts';
+import type { Team, StraysConfig } from './types.ts';
 
-export function defineStrays<const TOwners extends Record<string, Owner>>(
-  config: StraysConfig<TOwners>,
-): StraysConfig<TOwners> {
-  const fallbackCount = config.rules.filter((r) => r.fallback).length;
-  if (fallbackCount > 1) {
+export function defineStrays<const TTeams extends Record<string, Team>>(
+  config: StraysConfig<TTeams>,
+): StraysConfig<TTeams> {
+  const fallbackTeams = Object.entries(config.teams).filter(([, team]) => team.fallback);
+  if (fallbackTeams.length > 1) {
     throw new Error(
-      `defineStrays: at most one rule may have fallback: true, found ${fallbackCount}`,
+      `defineStrays: at most one team may have fallback: true, found ${fallbackTeams.length} (${fallbackTeams.map(([id]) => id).join(', ')})`,
     );
   }
 
-  for (const rule of config.rules) {
-    const owners = Array.isArray(rule.owner) ? rule.owner : [rule.owner];
-    for (const ownerId of owners) {
-      if (!(ownerId in config.owners)) {
-        throw new Error(
-          `defineStrays: rule for glob '${rule.glob}' references unknown owner '${ownerId}'`,
-        );
+  if (config.shared) {
+    for (const rule of config.shared) {
+      for (const teamId of rule.owners) {
+        if (!(teamId in config.teams)) {
+          throw new Error(
+            `defineStrays: shared rule for glob '${rule.glob}' references unknown team '${teamId}'`,
+          );
+        }
       }
     }
   }

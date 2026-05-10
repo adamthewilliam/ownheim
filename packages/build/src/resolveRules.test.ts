@@ -3,17 +3,15 @@ import { defineStrays } from '@strays/core/defineStrays';
 import { resolveOwnerForFile } from './resolveRules.ts';
 
 const config = defineStrays({
-  owners: {
-    Billing: { id: 'Billing', github: '@org/billing' },
-    Identity: { id: 'Identity', github: '@org/identity' },
-    Platform: { id: 'Platform', github: '@org/platform' },
+  teams: {
+    Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
+    Identity: { github: '@org/identity', owns: ['packages/auth/**'] },
+    Platform: {
+      github: '@org/platform',
+      owns: ['packages/billing/admin/**'],
+      fallback: true,
+    },
   },
-  rules: [
-    { glob: 'packages/billing/**', owner: 'Billing' },
-    { glob: 'packages/auth/**', owner: 'Identity' },
-    { glob: 'packages/billing/admin/**', owner: 'Platform' },
-    { glob: '**', owner: 'Platform', fallback: true },
-  ],
 });
 
 describe('resolveOwnerForFile', () => {
@@ -22,11 +20,11 @@ describe('resolveOwnerForFile', () => {
       filePath: 'packages/billing/charge.ts',
       jsdocOwner: 'Identity',
     });
-    expect(result?.owners).toEqual(['Identity']);
+    expect(result?.teams).toEqual(['Identity']);
     expect(result?.source).toBe('jsdoc');
   });
 
-  it('returns undefined when JSDoc references an unknown owner', () => {
+  it('returns undefined when JSDoc references an unknown team', () => {
     const result = resolveOwnerForFile(config, {
       filePath: 'packages/billing/charge.ts',
       jsdocOwner: 'Nonexistent',
@@ -38,7 +36,7 @@ describe('resolveOwnerForFile', () => {
     const result = resolveOwnerForFile(config, {
       filePath: 'packages/billing/admin/refund.ts',
     });
-    expect(result?.owners).toEqual(['Platform']);
+    expect(result?.teams).toEqual(['Platform']);
     expect(result?.matchedGlob).toBe('packages/billing/admin/**');
     expect(result?.source).toBe('rule');
   });
@@ -47,7 +45,7 @@ describe('resolveOwnerForFile', () => {
     const result = resolveOwnerForFile(config, {
       filePath: 'packages/auth/session.ts',
     });
-    expect(result?.owners).toEqual(['Identity']);
+    expect(result?.teams).toEqual(['Identity']);
     expect(result?.source).toBe('rule');
   });
 
@@ -56,29 +54,28 @@ describe('resolveOwnerForFile', () => {
       filePath: 'tools/deploy.ts',
     });
     expect(result?.source).toBe('fallback');
-    expect(result?.owners).toEqual(['Platform']);
+    expect(result?.teams).toEqual(['Platform']);
   });
 
   it('returns undefined when no fallback and no match', () => {
     const cfg = defineStrays({
-      owners: {
-        Billing: { id: 'Billing', github: '@org/billing' },
+      teams: {
+        Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
       },
-      rules: [{ glob: 'packages/billing/**', owner: 'Billing' }],
     });
     expect(resolveOwnerForFile(cfg, { filePath: 'tools/deploy.ts' })).toBeUndefined();
   });
 
-  it('multi-team rule returns all owners', () => {
+  it('shared rule returns all teams', () => {
     const cfg = defineStrays({
-      owners: {
-        Billing: { id: 'Billing', github: '@org/billing' },
-        Platform: { id: 'Platform', github: '@org/platform' },
+      teams: {
+        Billing: { github: '@org/billing' },
+        Platform: { github: '@org/platform' },
       },
-      rules: [{ glob: 'shared/**', owner: ['Billing', 'Platform'] }],
+      shared: [{ glob: 'shared/**', owners: ['Billing', 'Platform'] }],
     });
 
     const result = resolveOwnerForFile(cfg, { filePath: 'shared/util.ts' });
-    expect(result?.owners).toEqual(['Billing', 'Platform']);
+    expect(result?.teams).toEqual(['Billing', 'Platform']);
   });
 });

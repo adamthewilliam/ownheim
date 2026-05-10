@@ -4,63 +4,59 @@ import { defineStrays } from './defineStrays.ts';
 describe('defineStrays', () => {
   it('returns the config unchanged for valid input', () => {
     const config = defineStrays({
-      owners: {
-        Billing: { id: 'Billing', github: '@org/billing' },
+      teams: {
+        Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
       },
-      rules: [{ glob: 'packages/billing/**', owner: 'Billing' }],
     });
 
-    expect(config.owners.Billing.github).toBe('@org/billing');
-    expect(config.rules).toHaveLength(1);
+    expect(config.teams.Billing.github).toBe('@org/billing');
+    expect(config.teams.Billing.owns).toEqual(['packages/billing/**']);
   });
 
-  it('throws when a rule references an unknown owner', () => {
+  it('throws when a shared rule references an unknown team', () => {
     expect(() =>
       defineStrays({
-        owners: {
-          Billing: { id: 'Billing', github: '@org/billing' },
+        teams: {
+          Billing: { github: '@org/billing' },
         },
-        // @ts-expect-error - intentional invalid owner reference for runtime check
-        rules: [{ glob: '**', owner: 'Platform' }],
+        // @ts-expect-error - intentional invalid team reference for runtime check
+        shared: [{ glob: '**', owners: ['Platform'] }],
       }),
-    ).toThrow(/unknown owner 'Platform'/);
+    ).toThrow(/unknown team 'Platform'/);
   });
 
-  it('throws when more than one rule has fallback: true', () => {
+  it('throws when more than one team has fallback: true', () => {
     expect(() =>
       defineStrays({
-        owners: {
-          Billing: { id: 'Billing', github: '@org/billing' },
+        teams: {
+          Billing: { github: '@org/billing', fallback: true },
+          Platform: { github: '@org/platform', fallback: true },
         },
-        rules: [
-          { glob: '**/*.ts', owner: 'Billing', fallback: true },
-          { glob: '**', owner: 'Billing', fallback: true },
-        ],
       }),
-    ).toThrow(/at most one rule may have fallback: true/);
+    ).toThrow(/at most one team may have fallback: true/);
   });
 
-  it('accepts arrays of owners for multi-team rules', () => {
+  it('accepts shared rules with multiple teams', () => {
     const config = defineStrays({
-      owners: {
-        Billing: { id: 'Billing', github: '@org/billing' },
-        Platform: { id: 'Platform', github: '@org/platform' },
+      teams: {
+        Billing: { github: '@org/billing' },
+        Platform: { github: '@org/platform' },
       },
-      rules: [{ glob: 'shared/**', owner: ['Billing', 'Platform'] }],
+      shared: [{ glob: 'shared/**', owners: ['Billing', 'Platform'] }],
     });
 
-    expect(config.rules[0]?.owner).toEqual(['Billing', 'Platform']);
+    expect(config.shared?.[0]?.owners).toEqual(['Billing', 'Platform']);
   });
 
-  it('rejects multi-team rules with an unknown owner in the array', () => {
+  it('rejects shared rules with an unknown team in the array', () => {
     expect(() =>
       defineStrays({
-        owners: {
-          Billing: { id: 'Billing', github: '@org/billing' },
+        teams: {
+          Billing: { github: '@org/billing' },
         },
         // @ts-expect-error
-        rules: [{ glob: 'shared/**', owner: ['Billing', 'Identity'] }],
+        shared: [{ glob: 'shared/**', owners: ['Billing', 'Identity'] }],
       }),
-    ).toThrow(/unknown owner 'Identity'/);
+    ).toThrow(/unknown team 'Identity'/);
   });
 });

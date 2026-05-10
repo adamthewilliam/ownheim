@@ -1,9 +1,3 @@
-export interface OwnerAttributes {
-  readonly 'service.team': string;
-  readonly 'service.team.tier'?: number;
-  readonly 'service.team.pagerduty'?: string;
-}
-
 export interface ResourceLike {
   attributes: Record<string, string | number | boolean | undefined>;
 }
@@ -11,12 +5,13 @@ export interface ResourceLike {
 export function decorateResource(
   resource: ResourceLike,
   team: string,
-  extras: { tier?: number; pagerduty?: string } = {},
+  handles?: Record<string, string>,
 ): ResourceLike {
   resource.attributes['service.team'] = team;
-  if (extras.tier !== undefined) resource.attributes['service.team.tier'] = extras.tier;
-  if (extras.pagerduty !== undefined) {
-    resource.attributes['service.team.pagerduty'] = extras.pagerduty;
+  if (handles) {
+    for (const [key, value] of Object.entries(handles)) {
+      resource.attributes[`service.team.handle.${key}`] = value;
+    }
   }
   return resource;
 }

@@ -1,16 +1,16 @@
 import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
 import { resolveOwnerForFile } from '@strays/build/resolveRules';
-import type { Owner, StraysConfig } from '@strays/core/types';
+import type { Team, StraysConfig } from '@strays/core/types';
 import type { Diagnostic } from './types.ts';
 
-export interface ValidateOptions<TOwners extends Record<string, Owner>> {
+export interface ValidateOptions<TTeams extends Record<string, Team>> {
   readonly filePath: string;
   readonly sourceText: string;
-  readonly config: StraysConfig<TOwners>;
+  readonly config: StraysConfig<TTeams>;
 }
 
-export function validateFileOwnership<TOwners extends Record<string, Owner>>(
-  options: ValidateOptions<TOwners>,
+export function validateFileOwnership<TTeams extends Record<string, Team>>(
+  options: ValidateOptions<TTeams>,
 ): Diagnostic[] {
   const extraction = extractFromSourceText(options.filePath, options.sourceText);
   const resolved = resolveOwnerForFile(options.config, {

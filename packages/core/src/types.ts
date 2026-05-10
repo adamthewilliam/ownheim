@@ -1,26 +1,25 @@
-export interface Owner {
-  readonly id: string;
+export interface Team {
   readonly github: string;
-  readonly pagerduty?: string;
-  readonly tier?: number;
-}
-
-export type OwnerId<TOwners extends Record<string, Owner>> = Extract<keyof TOwners, string>;
-
-export interface Rule<TKey extends string = string> {
-  readonly glob: string;
-  readonly owner: TKey | readonly TKey[];
+  readonly handles?: Record<string, string>;
+  readonly owns?: readonly string[];
   readonly fallback?: boolean;
 }
 
-export interface StraysConfig<TOwners extends Record<string, Owner>> {
-  readonly owners: TOwners;
-  readonly rules: ReadonlyArray<Rule<OwnerId<TOwners>>>;
+export type TeamId<TTeams extends Record<string, Team>> = Extract<keyof TTeams, string>;
+
+export interface SharedRule<TKey extends string = string> {
+  readonly glob: string;
+  readonly owners: readonly TKey[];
 }
 
-export interface ResolvedOwner {
+export interface StraysConfig<TTeams extends Record<string, Team>> {
+  readonly teams: TTeams;
+  readonly shared?: readonly SharedRule<TeamId<TTeams>>[];
+}
+
+export interface ResolvedOwnership {
   readonly file: string;
-  readonly owners: readonly string[];
+  readonly teams: readonly string[];
   readonly source: 'jsdoc' | 'rule' | 'fallback';
   readonly matchedGlob?: string;
 }

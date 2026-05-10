@@ -1,20 +1,18 @@
 import { describe, expect, it } from 'bun:test';
 import { defineStrays } from '@strays/core/defineStrays';
 import { generateCodeowners } from './generateCodeowners.ts';
-import type { ResolvedOwner } from '@strays/core/types';
+import type { ResolvedOwnership } from '@strays/core/types';
 
 const config = defineStrays({
-  owners: {
-    Billing: { id: 'Billing', github: '@org/billing' },
-    Identity: { id: 'Identity', github: '@org/identity' },
-    Platform: { id: 'Platform', github: '@org/platform' },
+  teams: {
+    Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
+    Identity: { github: '@org/identity', owns: ['packages/auth/**'] },
+    Platform: {
+      github: '@org/platform',
+      owns: ['packages/billing/admin/**'],
+      fallback: true,
+    },
   },
-  rules: [
-    { glob: 'packages/billing/**', owner: 'Billing' },
-    { glob: 'packages/auth/**', owner: 'Identity' },
-    { glob: 'packages/billing/admin/**', owner: 'Platform' },
-    { glob: '**', owner: 'Platform', fallback: true },
-  ],
 });
 
 describe('generateCodeowners', () => {
@@ -34,11 +32,11 @@ describe('generateCodeowners', () => {
     expect(adminIdx).toBeGreaterThan(billingIdx);
   });
 
-  it('emits per-file overrides for jsdoc-resolved owners', () => {
-    const resolved: ResolvedOwner[] = [
+  it('emits per-file overrides for jsdoc-resolved teams', () => {
+    const resolved: ResolvedOwnership[] = [
       {
         file: 'packages/billing/charge.ts',
-        owners: ['Identity'],
+        teams: ['Identity'],
         source: 'jsdoc',
       },
     ];

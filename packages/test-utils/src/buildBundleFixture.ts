@@ -2,10 +2,10 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { build, type BuildOptions, type Plugin } from 'esbuild';
-import type { Owner, StraysConfig } from '@strays/core/types';
+import type { Team, StraysConfig } from '@strays/core/types';
 import { strays } from '@strays/build/esbuildPlugin';
 
-export interface BundleFixtureOptions<TOwners extends Record<string, Owner>> {
+export interface BundleFixtureOptions<TTeams extends Record<string, Team>> {
   readonly source: string;
   readonly entryPath?: string;
   readonly extraFiles?: Record<string, string>;
@@ -13,7 +13,7 @@ export interface BundleFixtureOptions<TOwners extends Record<string, Owner>> {
   readonly minify?: boolean;
   readonly treeShake?: boolean;
   readonly sourcemap?: boolean | 'inline' | 'external';
-  readonly config: StraysConfig<TOwners>;
+  readonly config: StraysConfig<TTeams>;
   readonly projectRoot?: string;
 }
 
@@ -23,8 +23,8 @@ export interface BundleFixtureResult {
   readonly cleanup: () => Promise<void>;
 }
 
-export async function buildBundleFixture<TOwners extends Record<string, Owner>>(
-  opts: BundleFixtureOptions<TOwners>,
+export async function buildBundleFixture<TTeams extends Record<string, Team>>(
+  opts: BundleFixtureOptions<TTeams>,
 ): Promise<BundleFixtureResult> {
   // Always allocate a fresh tmp dir per call so concurrent fixtures do not
   // step on each other. The strays plugin reads files off disk inside its

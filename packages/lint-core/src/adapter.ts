@@ -1,8 +1,8 @@
-import type { Owner, StraysConfig } from '@strays/core/types';
+import type { Team, StraysConfig } from '@strays/core/types';
 import type { Diagnostic } from './types.ts';
 
-export interface LintRuleOptions<TOwners extends Record<string, Owner> = Record<string, Owner>> {
-  readonly config: StraysConfig<TOwners>;
+export interface LintRuleOptions<TTeams extends Record<string, Team> = Record<string, Team>> {
+  readonly config: StraysConfig<TTeams>;
 }
 
 /**

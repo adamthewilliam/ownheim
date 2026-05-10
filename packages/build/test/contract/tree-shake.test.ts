@@ -33,7 +33,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import type { Owner, StraysConfig } from '@strays/core/types';
+import type { Team, StraysConfig } from '@strays/core/types';
 import { strays } from '@strays/build/esbuildPlugin';
 import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess';
 
@@ -45,7 +45,7 @@ import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess'
 interface BundleArgs {
   readonly files: Readonly<Record<string, string>>;
   readonly entry: string;
-  readonly config: StraysConfig<Record<string, Owner>>;
+  readonly config: StraysConfig<Record<string, Team>>;
   readonly minify?: boolean;
   readonly treeShake?: boolean;
   readonly defines?: Readonly<Record<string, string>>;
@@ -102,14 +102,11 @@ async function bundleFixture(opts: BundleArgs): Promise<BundleArtefact> {
 // Shared config — Billing owns everything under src/.
 // ---------------------------------------------------------------------------
 
-const owners: Record<string, Owner> = {
-  Billing: { id: 'Billing', github: '@org/billing' },
+const teams: Record<string, Team> = {
+  Billing: { github: '@org/billing', owns: ['src/**'] },
 };
 
-const billingConfig: StraysConfig<Record<string, Owner>> = {
-  owners,
-  rules: [{ glob: 'src/**', owner: 'Billing' }],
-};
+const billingConfig: StraysConfig<Record<string, Team>> = { teams };
 
 // ---------------------------------------------------------------------------
 // Scenarios

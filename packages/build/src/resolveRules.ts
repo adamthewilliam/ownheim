@@ -1,4 +1,4 @@
-import type { ResolvedOwner, Rule, StraysConfig, Owner } from '@strays/core/types';
+import type { ResolvedOwnership, StraysConfig, Team } from '@strays/core/types';
 import { matches, compareSpecificity } from './globMatcher.ts';
 
 export interface ResolveInput {
@@ -6,24 +6,59 @@ export interface ResolveInput {
   readonly jsdocOwner?: string | undefined;
 }
 
-export function resolveOwnerForFile<TOwners extends Record<string, Owner>>(
-  config: StraysConfig<TOwners>,
+interface InternalRule {
+  readonly glob: string;
+  readonly teams: readonly string[];
+}
+
+function flattenRules<TTeams extends Record<string, Team>>(
+  config: StraysConfig<TTeams>,
+): readonly InternalRule[] {
+  const rules: InternalRule[] = [];
+
+  for (const [teamId, team] of Object.entries(config.teams)) {
+    if (team.owns) {
+      for (const glob of team.owns) {
+        rules.push({ glob, teams: [teamId] });
+      }
+    }
+  }
+
+  if (config.shared) {
+    for (const rule of config.shared) {
+      rules.push({ glob: rule.glob, teams: rule.owners });
+    }
+  }
+
+  return rules;
+}
+
+function getFallbackTeam<TTeams extends Record<string, Team>>(
+  config: StraysConfig<TTeams>,
+): string | undefined {
+  for (const [teamId, team] of Object.entries(config.teams)) {
+    if (team.fallback) return teamId;
+  }
+  return undefined;
+}
+
+export function resolveOwnerForFile<TTeams extends Record<string, Team>>(
+  config: StraysConfig<TTeams>,
   input: ResolveInput,
-): ResolvedOwner | undefined {
+): ResolvedOwnership | undefined {
   if (input.jsdocOwner) {
-    if (input.jsdocOwner in config.owners) {
+    if (input.jsdocOwner in config.teams) {
       return {
         file: input.filePath,
-        owners: [input.jsdocOwner],
+        teams: [input.jsdocOwner],
         source: 'jsdoc',
       };
     }
-    // JSDoc references unknown owner - treat as missing so the linter flags it
     return undefined;
   }
 
-  const matched = config.rules
-    .filter((r) => !r.fallback)
+  const rules = flattenRules(config);
+  const matched = rules
     .filter((r) => matches(r.glob, input.filePath))
     .sort((a, b) => compareSpecificity(b.glob, a.glob));
 
@@ -31,35 +66,29 @@ export function resolveOwnerForFile<TOwners extends Record<string, Owner>>(
     const best = matched[0]!;
     return {
       file: input.filePath,
-      owners: ownersOf(best),
+      teams: best.teams,
       source: 'rule',
       matchedGlob: best.glob,
     };
   }
 
-  const fallback = config.rules.find((r) => r.fallback);
-  if (fallback) {
+  const fallbackTeam = getFallbackTeam(config);
+  if (fallbackTeam) {
     return {
       file: input.filePath,
-      owners: ownersOf(fallback),
+      teams: [fallbackTeam],
       source: 'fallback',
-      matchedGlob: fallback.glob,
     };
   }
 
   return undefined;
 }
 
-export function resolveAll<TOwners extends Record<string, Owner>>(
-  config: StraysConfig<TOwners>,
+export function resolveAll<TTeams extends Record<string, Team>>(
+  config: StraysConfig<TTeams>,
   files: readonly ResolveInput[],
-): ResolvedOwner[] {
+): ResolvedOwnership[] {
   return files
     .map((f) => resolveOwnerForFile(config, f))
-    .filter((r): r is ResolvedOwner => r !== undefined);
-}
-
-function ownersOf(rule: Rule): readonly string[] {
-  const o = rule.owner;
-  return Array.isArray(o) ? (o as readonly string[]) : [o as string];
+    .filter((r): r is ResolvedOwnership => r !== undefined);
 }

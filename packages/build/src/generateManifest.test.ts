@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 import { generateManifest } from './generateManifest.ts';
-import type { ResolvedOwner } from '@strays/core/types';
+import type { ResolvedOwnership } from '@strays/core/types';
 
 describe('generateManifest', () => {
-  it('produces version 1 manifest with file -> primary owner mapping', () => {
-    const resolved: ResolvedOwner[] = [
-      { file: 'src/billing/charge.ts', owners: ['Billing'], source: 'rule' },
-      { file: 'src/auth/session.ts', owners: ['Identity'], source: 'rule' },
+  it('produces version 1 manifest with file -> primary team mapping', () => {
+    const resolved: ResolvedOwnership[] = [
+      { file: 'src/billing/charge.ts', teams: ['Billing'], source: 'rule' },
+      { file: 'src/auth/session.ts', teams: ['Identity'], source: 'rule' },
     ];
 
     const manifest = generateManifest(resolved);
@@ -18,18 +18,18 @@ describe('generateManifest', () => {
   });
 
   it('omits fallback-source files (they would mask coverage gaps)', () => {
-    const resolved: ResolvedOwner[] = [
-      { file: 'src/billing/charge.ts', owners: ['Billing'], source: 'rule' },
-      { file: 'tools/deploy.ts', owners: ['Platform'], source: 'fallback' },
+    const resolved: ResolvedOwnership[] = [
+      { file: 'src/billing/charge.ts', teams: ['Billing'], source: 'rule' },
+      { file: 'tools/deploy.ts', teams: ['Platform'], source: 'fallback' },
     ];
 
     const manifest = generateManifest(resolved);
     expect(manifest.files).toEqual({ 'src/billing/charge.ts': 'Billing' });
   });
 
-  it('uses the first owner for multi-team rules', () => {
-    const resolved: ResolvedOwner[] = [
-      { file: 'shared/util.ts', owners: ['Billing', 'Platform'], source: 'rule' },
+  it('uses the first team for shared rules', () => {
+    const resolved: ResolvedOwnership[] = [
+      { file: 'shared/util.ts', teams: ['Billing', 'Platform'], source: 'rule' },
     ];
 
     const manifest = generateManifest(resolved);
@@ -37,8 +37,8 @@ describe('generateManifest', () => {
   });
 
   it('normalises Windows path separators to forward slashes', () => {
-    const resolved: ResolvedOwner[] = [
-      { file: 'src\\billing\\charge.ts', owners: ['Billing'], source: 'rule' },
+    const resolved: ResolvedOwnership[] = [
+      { file: 'src\\billing\\charge.ts', teams: ['Billing'], source: 'rule' },
     ];
 
     const manifest = generateManifest(resolved);

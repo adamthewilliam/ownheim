@@ -1,20 +1,20 @@
 import { readFile } from 'node:fs/promises';
 import { extname, relative } from 'node:path';
 import type { Plugin } from 'esbuild';
-import type { Owner, StraysConfig } from '@strays/core/types';
+import type { Team, StraysConfig } from '@strays/core/types';
 import { analyzeSourceFile } from './analyzeSourceFile.ts';
 import { resolveOwnerForFile } from './resolveRules.ts';
 
-export interface StraysPluginOptions<TOwners extends Record<string, Owner>> {
-  readonly config: StraysConfig<TOwners>;
+export interface StraysPluginOptions<TTeams extends Record<string, Team>> {
+  readonly config: StraysConfig<TTeams>;
   readonly projectRoot: string;
   readonly extensions?: readonly string[];
 }
 
 const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mts', '.cts'] as const;
 
-export function strays<TOwners extends Record<string, Owner>>(
-  options: StraysPluginOptions<TOwners>,
+export function strays<TTeams extends Record<string, Team>>(
+  options: StraysPluginOptions<TTeams>,
 ): Plugin {
   const extensions = options.extensions ?? DEFAULT_EXTENSIONS;
 
@@ -36,7 +36,7 @@ export function strays<TOwners extends Record<string, Owner>>(
         if (!resolved) return undefined;
 
         return {
-          contents: analyzed.transform(resolved.owners[0] ?? ''),
+          contents: analyzed.transform(resolved.teams[0] ?? ''),
           loader: pickLoader(args.path),
         };
       });

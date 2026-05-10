@@ -26,18 +26,15 @@
 // dead code for these shapes. The team tag is whatever stack-based lookup
 // returns, NOT the `__OWNER__` literal that was injected.
 import { describe, expect, it } from 'bun:test';
-import type { Owner } from '@strays/core/types';
+import type { Team } from '@strays/core/types';
 import { buildBundleFixture } from '@strays/test-utils/buildBundleFixture';
 import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess';
 
-const owners: Record<string, Owner> = {
-  Billing: { id: 'Billing', github: '@org/billing' },
+const teams: Record<string, Team> = {
+  Billing: { github: '@org/billing', owns: ['src/**/*.ts'] },
 };
 
-const config = {
-  owners,
-  rules: [{ glob: 'src/**/*.ts', owner: 'Billing' as const }],
-};
+const config = { teams };
 
 // A virtual `@strays/core` package whose `logger.info` writes a uniquely
 // identifiable line to stdout, including a `_hasOwner` field that tells us

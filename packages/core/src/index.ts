@@ -1,7 +1,7 @@
 export { defineStrays } from './defineStrays.ts';
 export { OwnedError, isOwnedError, getErrorOwner } from './OwnedError.ts';
 export { OWNER_TAG, type OwnerTag } from './symbols.ts';
-export type { Owner, OwnerId, Rule, StraysConfig, ResolvedOwner } from './types.ts';
+export type { Team, TeamId, SharedRule, StraysConfig, ResolvedOwnership } from './types.ts';
 
 export {
   runWithOwner,

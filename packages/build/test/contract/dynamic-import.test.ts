@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { strays } from '@strays/build/esbuildPlugin';
 import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess';
-import type { Owner, StraysConfig } from '@strays/core/types';
+import type { Team, StraysConfig } from '@strays/core/types';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MONOREPO_ROOT = resolve(HERE, '../../../..');
@@ -47,9 +47,9 @@ interface FixtureFiles {
   readonly feature: string;
 }
 
-async function buildContractFixture<TOwners extends Record<string, Owner>>(
+async function buildContractFixture<TTeams extends Record<string, Team>>(
   files: FixtureFiles,
-  config: StraysConfig<TOwners>,
+  config: StraysConfig<TTeams>,
 ): Promise<BuiltFixture> {
   // realpath() collapses macOS's /var → /private/var symlink so that
   // `relative(projectRoot, args.path)` inside the strays plugin yields
@@ -90,14 +90,11 @@ async function buildContractFixture<TOwners extends Record<string, Owner>>(
   };
 }
 
-const owners: Record<string, Owner> = {
-  billing: { id: 'billing', github: '@org/billing' },
+const teams: Record<string, Team> = {
+  billing: { github: '@org/billing', owns: ['src/feature.ts'] },
 };
 
-const billingConfig: StraysConfig<typeof owners> = {
-  owners,
-  rules: [{ glob: 'src/feature.ts', owner: 'billing' }],
-};
+const billingConfig: StraysConfig<typeof teams> = { teams };
 
 /**
  * Assert that the bundle contains the rewritten factory binding originating
