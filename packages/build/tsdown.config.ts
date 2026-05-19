@@ -8,6 +8,7 @@ export default defineConfig({
     'src/resolveRules.ts',
     'src/generateCodeowners.ts',
     'src/generateManifest.ts',
+    'src/generateArtifacts.ts',
     'src/esbuildPlugin.ts'
 ],
   format: ['esm', 'cjs'],

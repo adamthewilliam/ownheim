@@ -1,7 +1,7 @@
 export { analyzeSourceFile, extractFromSourceText } from './analyzeSourceFile.ts';
 export type { AnalyzedFile, FileExtraction, SourceAnalysisFinding, SourceAnalysisFindingCode } from './analyzeSourceFile.ts';
-export { auditSourceFile } from './auditOwnership.ts';
-export type { OwnershipAudit, OwnershipAuditStatus, AuditSourceFileInput } from './auditOwnership.ts';
+export { auditSourceFile, auditSourceFiles, summarizeOwnershipAudits } from './auditOwnership.ts';
+export type { OwnershipAudit, OwnershipAuditReport, OwnershipAuditStatus, AuditSourceFileInput } from './auditOwnership.ts';
 export { resolveOwnerForFile, resolveAll } from './resolveRules.ts';
 export type { ResolveInput } from './resolveRules.ts';
 export { generateCodeowners } from './generateCodeowners.ts';

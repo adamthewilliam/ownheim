@@ -1,10 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { auditSourceFile } from '@ownheim/build/auditOwnership';
-import { generateCodeowners } from '@ownheim/build/generateCodeowners';
-import type { ResolvedOwner } from '@ownheim/core/types';
+import { compareGeneratedText, generateOwnershipArtifacts } from '@ownheim/build/generateArtifacts';
+import { auditProjectOwnership } from '../auditProject.ts';
 import type { LoadedConfig } from '../loadConfig.ts';
-import { walkSourceFiles } from '../walkFiles.ts';
 
 export interface CheckResult {
   readonly drift: boolean;
@@ -16,23 +14,11 @@ export interface CheckResult {
 export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
   const codeownersPath = join(loaded.projectRoot, '.github/CODEOWNERS');
 
-  const resolved: ResolvedOwner[] = [];
-  const ownheimFiles: string[] = [];
-
-  for await (const file of walkSourceFiles(loaded.projectRoot)) {
-    const audit = auditSourceFile(loaded.config, {
-      filePath: file.relative,
-      sourceText: file.source,
-    });
-    if (audit.needsAttention) {
-      ownheimFiles.push(file.relative);
-    }
-    if (audit.resolved !== undefined) {
-      resolved.push(audit.resolved);
-    }
-  }
-
-  const expected = generateCodeowners({ config: loaded.config, resolved });
+  const audit = await auditProjectOwnership(loaded);
+  const expected = generateOwnershipArtifacts({
+    config: loaded.config,
+    resolved: audit.resolved,
+  }).codeownersText;
   let actual: string | undefined;
   try {
     actual = await readFile(codeownersPath, 'utf8');
@@ -40,22 +26,17 @@ export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
     actual = undefined;
   }
 
-  const drift = actual !== expected;
-  return drift
-    ? { drift, diff: simpleDiff(actual ?? '', expected), ownheimCount: ownheimFiles.length, ownheimFiles }
-    : { drift, ownheimCount: ownheimFiles.length, ownheimFiles };
-}
-
-function simpleDiff(actual: string, expected: string): string {
-  const a = actual.split('\n');
-  const e = expected.split('\n');
-  const max = Math.max(a.length, e.length);
-  const lines: string[] = [];
-  for (let i = 0; i < max; i++) {
-    if (a[i] !== e[i]) {
-      if (a[i] !== undefined) lines.push(`- ${a[i]}`);
-      if (e[i] !== undefined) lines.push(`+ ${e[i]}`);
-    }
-  }
-  return lines.join('\n');
+  const drift = compareGeneratedText(actual, expected);
+  return drift.drift
+    ? {
+        drift: true,
+        ...(drift.diff === undefined ? {} : { diff: drift.diff }),
+        ownheimCount: audit.needsAttention,
+        ownheimFiles: audit.needsAttentionFiles,
+      }
+    : {
+        drift: false,
+        ownheimCount: audit.needsAttention,
+        ownheimFiles: audit.needsAttentionFiles,
+      };
 }

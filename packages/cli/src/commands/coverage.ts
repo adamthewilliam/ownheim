@@ -1,6 +1,5 @@
-import { auditSourceFile } from '@ownheim/build/auditOwnership';
+import { auditProjectOwnership } from '../auditProject.ts';
 import type { LoadedConfig } from '../loadConfig.ts';
-import { walkSourceFiles } from '../walkFiles.ts';
 
 export interface CoverageResult {
   readonly total: number;
@@ -13,36 +12,16 @@ export interface CoverageResult {
 }
 
 export async function runCoverage(loaded: LoadedConfig): Promise<CoverageResult> {
-  let total = 0;
-  let explicit = 0;
-  const fallbackFiles: string[] = [];
-  const unownedFiles: string[] = [];
-
-  for await (const file of walkSourceFiles(loaded.projectRoot)) {
-    total++;
-    const audit = auditSourceFile(loaded.config, {
-      filePath: file.relative,
-      sourceText: file.source,
-    });
-
-    if (audit.status === 'unowned' || audit.status === 'invalid-jsdoc-owner') {
-      unownedFiles.push(file.relative);
-    } else if (audit.status === 'fallback') {
-      fallbackFiles.push(file.relative);
-    } else {
-      explicit++;
-    }
-  }
-
-  const percent = total === 0 ? 100 : Math.round((explicit / total) * 1000) / 10;
+  const audit = await auditProjectOwnership(loaded);
+  const unownedFiles = [...audit.unownedFiles, ...audit.invalidOwnerFiles];
 
   return {
-    total,
-    explicit,
-    fallback: fallbackFiles.length,
-    unowned: unownedFiles.length,
-    percent,
-    fallbackFiles,
+    total: audit.total,
+    explicit: audit.explicit,
+    fallback: audit.fallback,
+    unowned: audit.unowned + audit.invalidOwner,
+    percent: audit.coveragePercent,
+    fallbackFiles: audit.fallbackFiles,
     unownedFiles,
   };
 }

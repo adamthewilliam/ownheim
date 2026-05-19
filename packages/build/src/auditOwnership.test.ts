@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { defineOwnheim } from '@ownheim/core/defineOwnheim';
-import { auditSourceFile } from './auditOwnership.ts';
+import { auditSourceFile, auditSourceFiles } from './auditOwnership.ts';
 
 const config = defineOwnheim({
   teams: {
@@ -69,5 +69,22 @@ describe('auditSourceFile', () => {
     expect(audit.status).toBe('invalid-jsdoc-owner');
     expect(audit.jsdocOwner).toBe('Nope');
     expect(audit.resolved).toBeUndefined();
+  });
+
+  it('summarizes project ownership audits for downstream callers', () => {
+    const report = auditSourceFiles(config, [
+      { filePath: 'packages/billing/charge.ts', sourceText: 'export const charge = true;' },
+      { filePath: 'tools/deploy.ts', sourceText: 'export const deploy = true;' },
+      { filePath: 'other.ts', sourceText: '/** @owner Nope */\nexport const other = true;' },
+    ]);
+
+    expect(report.total).toBe(3);
+    expect(report.explicit).toBe(1);
+    expect(report.fallback).toBe(1);
+    expect(report.invalidOwner).toBe(1);
+    expect(report.needsAttention).toBe(2);
+    expect(report.coveragePercent).toBe(33.3);
+    expect(report.resolved.map((r) => r.file)).toEqual(['packages/billing/charge.ts', 'tools/deploy.ts']);
+    expect(report.needsAttentionFiles).toEqual(['tools/deploy.ts', 'other.ts']);
   });
 });
