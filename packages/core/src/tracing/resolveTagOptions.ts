@@ -1,7 +1,7 @@
 export const DEFAULT_CODE_TEAM_FALLBACK = 'unowned';
-export const DEFAULT_ENTRYPOINT_TEAM_TAG = 'strays.entrypoint_team';
-export const DEFAULT_CODE_TEAM_TAG = 'strays.code_team';
-export const DEFAULT_RESPONDER_TEAM_TAG = 'strays.responder_team';
+export const DEFAULT_ENTRYPOINT_TEAM_TAG = 'ownheim.entrypoint_team';
+export const DEFAULT_CODE_TEAM_TAG = 'ownheim.code_team';
+export const DEFAULT_RESPONDER_TEAM_TAG = 'ownheim.responder_team';
 
 export interface TagOptions {
   readonly fallbackCodeTeam?: string;

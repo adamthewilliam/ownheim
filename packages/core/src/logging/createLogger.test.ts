@@ -15,8 +15,8 @@ describe('createLogger (wiring)', () => {
     });
 
     expect(lines).toHaveLength(1);
-    expect(lines[0]?.record.strays_entrypoint_team).toBe('Accounts');
-    expect(lines[0]?.record.strays_code_team).toBe('Billing');
+    expect(lines[0]?.record.ownheim_entrypoint_team).toBe('Accounts');
+    expect(lines[0]?.record.ownheim_code_team).toBe('Billing');
   });
 
   it('forwards moduleOwner as code ownership when no entrypoint is set', () => {
@@ -25,7 +25,7 @@ describe('createLogger (wiring)', () => {
 
     logger.info({ msg: 'no-scope' });
 
-    expect(lines[0]?.record.strays_code_team).toBe('Billing');
+    expect(lines[0]?.record.ownheim_code_team).toBe('Billing');
     expect(lines[0]?.record.msg).toBe('no-scope');
     expect(lines[0]?.record.level).toBe('info');
   });
@@ -40,14 +40,14 @@ describe('createLogger (wiring)', () => {
 
     logger.info({ msg: 'from-frame' });
 
-    expect(lines[0]?.record.strays_code_team).toBe('Frames');
+    expect(lines[0]?.record.ownheim_code_team).toBe('Frames');
   });
 
   it('calls sink.write once per call with the correct level', () => {
     const calls: Array<{ level: string; codeTeam: unknown }> = [];
     const sink = {
       write: (line: { record: Record<string, unknown> }, level: string) => {
-        calls.push({ level, codeTeam: line.record.strays_code_team });
+        calls.push({ level, codeTeam: line.record.ownheim_code_team });
       },
     };
     const logger = createLogger('Billing', { sink });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { runWithEntrypointOwner } from '@strays/core/ownership';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 import { OwnershipSpanProcessor, type OtelSpan } from './SpanProcessor.ts';
 
 function makeMockSpan(): { attributes: Record<string, unknown>; span: OtelSpan } {
@@ -19,8 +19,8 @@ describe('OwnershipSpanProcessor', () => {
 
     runWithEntrypointOwner('Billing', () => processor.onStart(span, undefined));
 
-    expect(attributes['strays.entrypoint_team']).toBe('Billing');
-    expect(attributes['strays.code_team']).toBe('unowned');
+    expect(attributes['ownheim.entrypoint_team']).toBe('Billing');
+    expect(attributes['ownheim.code_team']).toBe('unowned');
   });
 
   it('uses fallbackCodeTeam when no code owner resolves', () => {
@@ -29,7 +29,7 @@ describe('OwnershipSpanProcessor', () => {
 
     processor.onStart(span, undefined);
 
-    expect(attributes['strays.code_team']).toBe('platform-default');
+    expect(attributes['ownheim.code_team']).toBe('platform-default');
   });
 
   it('honours custom attribute keys', () => {

@@ -1,6 +1,6 @@
-import { defineStrays } from '@strays/core/defineStrays';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 
-export default defineStrays({
+export default defineOwnheim({
   teams: {
     Billing: {
       github: '@org/billing',

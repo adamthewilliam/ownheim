@@ -1,8 +1,8 @@
 // A4 — Tree-shake survival contract.
 //
-// The strays esbuild plugin (packages/build/src/esbuildPlugin.ts) injects
+// The ownheim esbuild plugin (packages/build/src/esbuildPlugin.ts) injects
 // per-file `__OWNER__` constants and rewrites `import { logger } from
-// '@strays/core'` into a `createLogger(<owner>)` factory call. Both of
+// '@ownheim/core'` into a `createLogger(<owner>)` factory call. Both of
 // these are top-level statements with apparent side effects (function
 // invocation, top-level binding) — but bundlers under aggressive
 // configuration (`minify: true, treeShaking: true, sideEffects: false`) may
@@ -19,12 +19,12 @@
 //   1. macOS `mkdtemp(tmpdir())` returns a path WITHOUT `/private`, while
 //      esbuild's `args.path` is realpath-resolved (`/private/var/...`).
 //      The harness uses the unresolved path as `projectRoot`, so the
-//      strays plugin computes a relative path that begins with `..` —
+//      ownheim plugin computes a relative path that begins with `..` —
 //      breaking glob matching.
 //   2. The harness does not expose `nodePaths`, so esbuild cannot resolve
-//      the workspace's `@strays/core` package from a tmp-dir entry.
+//      the workspace's `@ownheim/core` package from a tmp-dir entry.
 //
-// We do continue to use `runBundleInSubprocess` from `@strays/test-utils`
+// We do continue to use `runBundleInSubprocess` from `@ownheim/test-utils`
 // to keep execution-side semantics identical to the rest of the suite.
 
 import { describe, expect, it } from 'bun:test';
@@ -33,19 +33,19 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import type { Team, StraysConfig } from '@strays/core/types';
-import { strays } from '@strays/build/esbuildPlugin';
-import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess';
+import type { Team, OwnheimConfig } from '@ownheim/core/types';
+import { ownheim } from '@ownheim/build/esbuildPlugin';
+import { runBundleInSubprocess } from '@ownheim/test-utils/runBundleInSubprocess';
 
 // ---------------------------------------------------------------------------
 // Bundling helper — local replacement for `buildBundleFixture` that fixes
-// the macOS realpath issue and supplies `nodePaths` for `@strays/core`.
+// the macOS realpath issue and supplies `nodePaths` for `@ownheim/core`.
 // ---------------------------------------------------------------------------
 
 interface BundleArgs {
   readonly files: Readonly<Record<string, string>>;
   readonly entry: string;
-  readonly config: StraysConfig<Record<string, Team>>;
+  readonly config: OwnheimConfig<Record<string, Team>>;
   readonly minify?: boolean;
   readonly treeShake?: boolean;
   readonly defines?: Readonly<Record<string, string>>;
@@ -57,9 +57,9 @@ interface BundleArtefact {
 }
 
 async function bundleFixture(opts: BundleArgs): Promise<BundleArtefact> {
-  const raw = await mkdtemp(join(tmpdir(), 'strays-treeshake-'));
+  const raw = await mkdtemp(join(tmpdir(), 'ownheim-treeshake-'));
   // realpathSync collapses `/var -> /private/var` on macOS so the relative
-  // path computed inside the strays plugin matches the rule glob.
+  // path computed inside the ownheim plugin matches the rule glob.
   const root = realpathSync(raw);
 
   for (const [rel, contents] of Object.entries(opts.files)) {
@@ -86,7 +86,7 @@ async function bundleFixture(opts: BundleArgs): Promise<BundleArtefact> {
     ...(opts.minify === undefined ? {} : { minify: opts.minify }),
     ...(opts.treeShake === undefined ? {} : { treeShaking: opts.treeShake }),
     ...(opts.defines === undefined ? {} : { define: { ...opts.defines } }),
-    plugins: [strays({ config: opts.config, projectRoot: root })],
+    plugins: [ownheim({ config: opts.config, projectRoot: root })],
   });
 
   const out = result.outputFiles?.[0];
@@ -106,7 +106,7 @@ const teams: Record<string, Team> = {
   Billing: { github: '@org/billing', owns: ['src/**'] },
 };
 
-const billingConfig: StraysConfig<Record<string, Team>> = { teams };
+const billingConfig: OwnheimConfig<Record<string, Team>> = { teams };
 
 // ---------------------------------------------------------------------------
 // Scenarios
@@ -116,7 +116,7 @@ describe('A4 tree-shake survival contract', () => {
   it('Scenario 1: log call inside `process.env.NODE_ENV === "production"` branch survives with team tag', async () => {
     const fixture = await bundleFixture({
       files: {
-        'src/entry.ts': `import { logger } from '@strays/core';
+        'src/entry.ts': `import { logger } from '@ownheim/core';
 
 if (process.env.NODE_ENV === 'production') {
   logger.info({ msg: 'charging' });
@@ -151,7 +151,7 @@ if (process.env.NODE_ENV === 'production') {
   it('Scenario 2: exported-but-unused `billCustomer` — if retained, team tag is correct on execution', async () => {
     const fixture = await bundleFixture({
       files: {
-        'src/entry.ts': `import { logger } from '@strays/core';
+        'src/entry.ts': `import { logger } from '@ownheim/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });
@@ -184,7 +184,7 @@ console.log('hello-from-entry');
         // call site reachable from the entry.
         const invokerFixture = await bundleFixture({
           files: {
-            'src/lib/billCustomer.ts': `import { logger } from '@strays/core';
+            'src/lib/billCustomer.ts': `import { logger } from '@ownheim/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });
@@ -236,7 +236,7 @@ billCustomer();
           type: 'module',
           sideEffects: false,
         }),
-        'src/lib/billCustomer.ts': `import { logger } from '@strays/core';
+        'src/lib/billCustomer.ts': `import { logger } from '@ownheim/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });
@@ -282,7 +282,7 @@ void billCustomer;
           type: 'module',
           sideEffects: false,
         }),
-        'src/lib/billCustomer.ts': `import { logger } from '@strays/core';
+        'src/lib/billCustomer.ts': `import { logger } from '@ownheim/core';
 
 export function billCustomer() {
   logger.info({ msg: 'billing' });

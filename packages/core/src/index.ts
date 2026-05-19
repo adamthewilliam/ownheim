@@ -1,4 +1,4 @@
-export { defineStrays } from './defineStrays.ts';
+export { defineOwnheim } from './defineOwnheim.ts';
 export { OwnedError, isOwnedError, getResponderTeam, withResponderTeam } from './OwnedError.ts';
 export { OWNER_TAG, type OwnerTag } from './symbols.ts';
 export type {
@@ -6,7 +6,7 @@ export type {
   Owner,
   TeamId,
   SharedRule,
-  StraysConfig,
+  OwnheimConfig,
   ResolvedOwnership,
   ResolvedOwner,
 } from './types.ts';

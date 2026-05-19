@@ -1,4 +1,4 @@
-# @strays/hono
+# @ownheim/hono
 
 Tag every Hono route with the team that owns it.
 
@@ -7,16 +7,16 @@ This is a Hono middleware. It wraps the rest of the request chain in a `runWithE
 ## Install
 
 ```bash
-bun add @strays/hono @strays/runtime @strays/core
+bun add @ownheim/hono @ownheim/runtime @ownheim/core
 ```
 
-You also need `hono`. Strays doesn't pin a version. Anything with the standard `(c, next)` middleware shape works.
+You also need `hono`. Ownheim doesn't pin a version. Anything with the standard `(c, next)` middleware shape works.
 
 ## Per-route
 
 ```ts
 import { Hono } from 'hono';
-import { entrypointOwner } from '@strays/hono/entrypointOwner';
+import { entrypointOwner } from '@ownheim/hono/entrypointOwner';
 
 const app = new Hono();
 
@@ -45,7 +45,7 @@ This is the cleanest setup if your URL structure already mirrors ownership.
 (_c, next) => runWithEntrypointOwner(owner, () => next());
 ```
 
-That's it. AsyncLocalStorage holds the owner for the duration of `next()` and any async work it spawns. Anything downstream calling `currentEntrypointOwner()` — handlers, span processors, Sentry event processors — gets the owner back. On the wire (logs, spans, Sentry tags) it's emitted as `strays.entrypoint_team`.
+That's it. AsyncLocalStorage holds the owner for the duration of `next()` and any async work it spawns. Anything downstream calling `currentEntrypointOwner()` — handlers, span processors, Sentry event processors — gets the owner back. On the wire (logs, spans, Sentry tags) it's emitted as `ownheim.entrypoint_team`.
 
 ## Pairing with `hono/context-storage`
 
@@ -60,7 +60,7 @@ app.use(entrypointOwner('Billing'));
 
 Order doesn't really matter for correctness, but registering `contextStorage()` first means it sees every request including ones that get short-circuited by tagged middleware (none of those exist by default, but it's the safer default).
 
-## Pairing with `@strays/sentry` and `@strays/datadog`
+## Pairing with `@ownheim/sentry` and `@ownheim/datadog`
 
 Nothing extra to wire up. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the owner from the scope:
 

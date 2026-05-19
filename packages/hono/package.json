@@ -1,7 +1,7 @@
 {
-  "name": "@strays/hono",
+  "name": "@ownheim/hono",
   "version": "0.1.0",
-  "description": "strays — Hono middleware for per-route team tagging",
+  "description": "ownheim — Hono middleware for per-route team tagging",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -17,6 +17,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*"
+    "@ownheim/core": "workspace:*"
   }
 }

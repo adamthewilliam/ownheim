@@ -1,7 +1,7 @@
 {
-  "name": "@strays/core",
+  "name": "@ownheim/core",
   "version": "0.1.0",
-  "description": "strays — ownership resolution, scope propagation, logging, and tracing",
+  "description": "ownheim — ownership resolution, scope propagation, logging, and tracing",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -10,7 +10,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./defineStrays": "./src/defineStrays.ts",
+    "./defineOwnheim": "./src/defineOwnheim.ts",
     "./OwnedError": "./src/OwnedError.ts",
     "./symbols": "./src/symbols.ts",
     "./types": "./src/types.ts",

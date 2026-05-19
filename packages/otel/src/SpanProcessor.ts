@@ -1,5 +1,5 @@
-import { resolveOwnership } from '@strays/core/ownership';
-import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
+import { resolveOwnership } from '@ownheim/core/ownership';
+import { resolveTagOptions, type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface OtelSpan {
   setAttribute(key: string, value: string | number | boolean): void;

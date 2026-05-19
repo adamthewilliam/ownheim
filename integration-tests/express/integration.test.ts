@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import express, { type NextFunction, type Request, type Response, Router } from 'express';
 import request from 'supertest';
-import { captureStructuredLogs, type CapturedLogs } from '@strays/test-utils/captureStructuredLogs';
-import { createLogger } from '@strays/core/logging/createLogger';
-import { currentEntrypointOwner } from '@strays/core/ownership';
-import { entrypointOwner } from '@strays/express/ownerMiddleware';
+import { captureStructuredLogs, type CapturedLogs } from '@ownheim/test-utils/captureStructuredLogs';
+import { createLogger } from '@ownheim/core/logging/createLogger';
+import { currentEntrypointOwner } from '@ownheim/core/ownership';
+import { entrypointOwner } from '@ownheim/express/ownerMiddleware';
 
 // Each handler logs once with `msg` echoing the per-request marker so the test
 // can correlate logs to the request that emitted them. The `team` field on the
@@ -16,7 +16,7 @@ import { entrypointOwner } from '@strays/express/ownerMiddleware';
 // We rebuild it per test in `beforeEach`.
 let logger: ReturnType<typeof createLogger>;
 
-describe('@strays/express integration (real Express + supertest)', () => {
+describe('@ownheim/express integration (real Express + supertest)', () => {
   let logs: CapturedLogs;
 
   beforeEach(() => {

@@ -1,7 +1,7 @@
 {
-  "name": "@strays/oxlint",
+  "name": "@ownheim/oxlint",
   "version": "0.1.0",
-  "description": "strays — oxlint custom plugin (no-strays + no-codeowners-edit)",
+  "description": "ownheim — oxlint custom plugin (no-ownheim + no-codeowners-edit)",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -18,8 +18,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
-    "@strays/lint-core": "workspace:*"
+    "@ownheim/core": "workspace:*",
+    "@ownheim/lint-core": "workspace:*"
   },
   "peerDependencies": {
     "oxlint": ">=0.15.0"

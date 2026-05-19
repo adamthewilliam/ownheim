@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "strays-monorepo",
+      "name": "ownheim-monorepo",
       "devDependencies": {
         "@types/bun": "^1.3.0",
         "@types/node": "^25.6.0",
@@ -16,46 +16,46 @@
       },
     },
     "examples/bun-effect-http": {
-      "name": "@strays/example-bun-effect-http",
+      "name": "@ownheim/example-bun-effect-http",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/datadog": "workspace:*",
-        "@strays/effect": "workspace:*",
-        "@strays/otel": "workspace:*",
-        "@strays/sentry": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/datadog": "workspace:*",
+        "@ownheim/effect": "workspace:*",
+        "@ownheim/otel": "workspace:*",
+        "@ownheim/sentry": "workspace:*",
         "effect": "^3.10.0",
       },
     },
     "integration-tests/datadog": {
-      "name": "@strays-it/datadog",
+      "name": "@ownheim-it/datadog",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/datadog": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/datadog": "workspace:*",
       },
       "optionalDependencies": {
         "dd-trace": "^5.99.1",
       },
     },
     "integration-tests/effect": {
-      "name": "@strays-it/effect",
+      "name": "@ownheim-it/effect",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/effect": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/effect": "workspace:*",
       },
       "optionalDependencies": {
         "effect": "^3.21.2",
       },
     },
     "integration-tests/express": {
-      "name": "@strays-it/express",
+      "name": "@ownheim-it/express",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/express": "workspace:*",
-        "@strays/test-utils": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/express": "workspace:*",
+        "@ownheim/test-utils": "workspace:*",
       },
       "optionalDependencies": {
         "@types/express": "^5.0.6",
@@ -65,24 +65,24 @@
       },
     },
     "integration-tests/hono": {
-      "name": "@strays-it/hono",
+      "name": "@ownheim-it/hono",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/hono": "workspace:*",
-        "@strays/test-utils": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/hono": "workspace:*",
+        "@ownheim/test-utils": "workspace:*",
       },
       "optionalDependencies": {
         "hono": "^4.12.16",
       },
     },
     "integration-tests/orpc": {
-      "name": "@strays-it/orpc",
+      "name": "@ownheim-it/orpc",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/orpc": "workspace:*",
-        "@strays/test-utils": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/orpc": "workspace:*",
+        "@ownheim/test-utils": "workspace:*",
       },
       "optionalDependencies": {
         "@orpc/client": "^1.14.0",
@@ -90,11 +90,11 @@
       },
     },
     "integration-tests/otel": {
-      "name": "@strays-it/otel",
+      "name": "@ownheim-it/otel",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/otel": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/otel": "workspace:*",
       },
       "optionalDependencies": {
         "@opentelemetry/api": "^1.9.1",
@@ -102,23 +102,23 @@
       },
     },
     "integration-tests/sentry": {
-      "name": "@strays-it/sentry",
+      "name": "@ownheim-it/sentry",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/sentry": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/sentry": "workspace:*",
       },
       "optionalDependencies": {
         "@sentry/node": "^10.51.0",
       },
     },
     "integration-tests/trpc": {
-      "name": "@strays-it/trpc",
+      "name": "@ownheim-it/trpc",
       "version": "0.0.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/test-utils": "workspace:*",
-        "@strays/trpc": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/test-utils": "workspace:*",
+        "@ownheim/trpc": "workspace:*",
       },
       "optionalDependencies": {
         "@trpc/client": "^11.17.0",
@@ -126,10 +126,10 @@
       },
     },
     "packages/build": {
-      "name": "@strays/build",
+      "name": "@ownheim/build",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
         "picomatch": "^4.0.2",
         "ts-morph": "^24.0.0",
       },
@@ -141,100 +141,100 @@
       },
     },
     "packages/cli": {
-      "name": "@strays/cli",
+      "name": "@ownheim/cli",
       "version": "0.1.0",
       "bin": {
-        "strays": "./src/index.ts",
+        "ownheim": "./src/index.ts",
       },
       "dependencies": {
-        "@strays/build": "workspace:*",
-        "@strays/core": "workspace:*",
+        "@ownheim/build": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/core": {
-      "name": "@strays/core",
+      "name": "@ownheim/core",
       "version": "0.1.0",
     },
     "packages/datadog": {
-      "name": "@strays/datadog",
+      "name": "@ownheim/datadog",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/effect": {
-      "name": "@strays/effect",
+      "name": "@ownheim/effect",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
       "peerDependencies": {
         "effect": "^3.10.0",
       },
     },
     "packages/eslint": {
-      "name": "@strays/eslint",
+      "name": "@ownheim/eslint",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/lint-core": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/lint-core": "workspace:*",
       },
       "peerDependencies": {
         "eslint": ">=8.0.0",
       },
     },
     "packages/express": {
-      "name": "@strays/express",
+      "name": "@ownheim/express",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/hono": {
-      "name": "@strays/hono",
+      "name": "@ownheim/hono",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/lint-core": {
-      "name": "@strays/lint-core",
+      "name": "@ownheim/lint-core",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/build": "workspace:*",
-        "@strays/core": "workspace:*",
+        "@ownheim/build": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/orpc": {
-      "name": "@strays/orpc",
+      "name": "@ownheim/orpc",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/otel": {
-      "name": "@strays/otel",
+      "name": "@ownheim/otel",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/oxlint": {
-      "name": "@strays/oxlint",
+      "name": "@ownheim/oxlint",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
-        "@strays/lint-core": "workspace:*",
+        "@ownheim/core": "workspace:*",
+        "@ownheim/lint-core": "workspace:*",
       },
       "peerDependencies": {
         "oxlint": ">=0.15.0",
       },
     },
     "packages/pino": {
-      "name": "@strays/pino",
+      "name": "@ownheim/pino",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
       "devDependencies": {
         "pino": "^9.0.0",
@@ -247,28 +247,28 @@
       ],
     },
     "packages/sentry": {
-      "name": "@strays/sentry",
+      "name": "@ownheim/sentry",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
     "packages/test-utils": {
-      "name": "@strays/test-utils",
+      "name": "@ownheim/test-utils",
       "version": "0.1.0",
       "devDependencies": {
-        "@strays/build": "workspace:*",
-        "@strays/core": "workspace:*",
+        "@ownheim/build": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
       "peerDependencies": {
         "esbuild": "^0.28.0",
       },
     },
     "packages/trpc": {
-      "name": "@strays/trpc",
+      "name": "@ownheim/trpc",
       "version": "0.1.0",
       "dependencies": {
-        "@strays/core": "workspace:*",
+        "@ownheim/core": "workspace:*",
       },
     },
   },
@@ -539,55 +539,55 @@
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
 
-    "@strays-it/datadog": ["@strays-it/datadog@workspace:integration-tests/datadog"],
+    "@ownheim-it/datadog": ["@ownheim-it/datadog@workspace:integration-tests/datadog"],
 
-    "@strays-it/effect": ["@strays-it/effect@workspace:integration-tests/effect"],
+    "@ownheim-it/effect": ["@ownheim-it/effect@workspace:integration-tests/effect"],
 
-    "@strays-it/express": ["@strays-it/express@workspace:integration-tests/express"],
+    "@ownheim-it/express": ["@ownheim-it/express@workspace:integration-tests/express"],
 
-    "@strays-it/hono": ["@strays-it/hono@workspace:integration-tests/hono"],
+    "@ownheim-it/hono": ["@ownheim-it/hono@workspace:integration-tests/hono"],
 
-    "@strays-it/orpc": ["@strays-it/orpc@workspace:integration-tests/orpc"],
+    "@ownheim-it/orpc": ["@ownheim-it/orpc@workspace:integration-tests/orpc"],
 
-    "@strays-it/otel": ["@strays-it/otel@workspace:integration-tests/otel"],
+    "@ownheim-it/otel": ["@ownheim-it/otel@workspace:integration-tests/otel"],
 
-    "@strays-it/sentry": ["@strays-it/sentry@workspace:integration-tests/sentry"],
+    "@ownheim-it/sentry": ["@ownheim-it/sentry@workspace:integration-tests/sentry"],
 
-    "@strays-it/trpc": ["@strays-it/trpc@workspace:integration-tests/trpc"],
+    "@ownheim-it/trpc": ["@ownheim-it/trpc@workspace:integration-tests/trpc"],
 
-    "@strays/build": ["@strays/build@workspace:packages/build"],
+    "@ownheim/build": ["@ownheim/build@workspace:packages/build"],
 
-    "@strays/cli": ["@strays/cli@workspace:packages/cli"],
+    "@ownheim/cli": ["@ownheim/cli@workspace:packages/cli"],
 
-    "@strays/core": ["@strays/core@workspace:packages/core"],
+    "@ownheim/core": ["@ownheim/core@workspace:packages/core"],
 
-    "@strays/datadog": ["@strays/datadog@workspace:packages/datadog"],
+    "@ownheim/datadog": ["@ownheim/datadog@workspace:packages/datadog"],
 
-    "@strays/effect": ["@strays/effect@workspace:packages/effect"],
+    "@ownheim/effect": ["@ownheim/effect@workspace:packages/effect"],
 
-    "@strays/eslint": ["@strays/eslint@workspace:packages/eslint"],
+    "@ownheim/eslint": ["@ownheim/eslint@workspace:packages/eslint"],
 
-    "@strays/example-bun-effect-http": ["@strays/example-bun-effect-http@workspace:examples/bun-effect-http"],
+    "@ownheim/example-bun-effect-http": ["@ownheim/example-bun-effect-http@workspace:examples/bun-effect-http"],
 
-    "@strays/express": ["@strays/express@workspace:packages/express"],
+    "@ownheim/express": ["@ownheim/express@workspace:packages/express"],
 
-    "@strays/hono": ["@strays/hono@workspace:packages/hono"],
+    "@ownheim/hono": ["@ownheim/hono@workspace:packages/hono"],
 
-    "@strays/lint-core": ["@strays/lint-core@workspace:packages/lint-core"],
+    "@ownheim/lint-core": ["@ownheim/lint-core@workspace:packages/lint-core"],
 
-    "@strays/orpc": ["@strays/orpc@workspace:packages/orpc"],
+    "@ownheim/orpc": ["@ownheim/orpc@workspace:packages/orpc"],
 
-    "@strays/otel": ["@strays/otel@workspace:packages/otel"],
+    "@ownheim/otel": ["@ownheim/otel@workspace:packages/otel"],
 
-    "@strays/oxlint": ["@strays/oxlint@workspace:packages/oxlint"],
+    "@ownheim/oxlint": ["@ownheim/oxlint@workspace:packages/oxlint"],
 
-    "@strays/pino": ["@strays/pino@workspace:packages/pino"],
+    "@ownheim/pino": ["@ownheim/pino@workspace:packages/pino"],
 
-    "@strays/sentry": ["@strays/sentry@workspace:packages/sentry"],
+    "@ownheim/sentry": ["@ownheim/sentry@workspace:packages/sentry"],
 
-    "@strays/test-utils": ["@strays/test-utils@workspace:packages/test-utils"],
+    "@ownheim/test-utils": ["@ownheim/test-utils@workspace:packages/test-utils"],
 
-    "@strays/trpc": ["@strays/trpc@workspace:packages/trpc"],
+    "@ownheim/trpc": ["@ownheim/trpc@workspace:packages/trpc"],
 
     "@trpc/client": ["@trpc/client@11.17.0", "", { "peerDependencies": { "@trpc/server": "11.17.0", "typescript": ">=5.7.2" }, "bin": { "intent": "bin/intent.js" } }, "sha512-KpJBFrbKTDeVCFv/3ckL1XBBH5Yssn8hethI/rUy7GIpTj+VzjtPjykDqJpzobuVOz+d26cXCSu1t4I6MYI5Zg=="],
 
@@ -1049,7 +1049,7 @@
 
     "@prisma/instrumentation/@opentelemetry/instrumentation": ["@opentelemetry/instrumentation@0.207.0", "", { "dependencies": { "@opentelemetry/api-logs": "0.207.0", "import-in-the-middle": "^2.0.0", "require-in-the-middle": "^8.0.0" }, "peerDependencies": { "@opentelemetry/api": "^1.3.0" } }, "sha512-y6eeli9+TLKnznrR8AZlQMSJT7wILpXH+6EYq5Vf/4Ao+huI7EedxQHwRgVUOMLFbe7VFDvHJrX9/f4lcwnJsA=="],
 
-    "@strays/build/@types/picomatch": ["@types/picomatch@3.0.2", "", {}, "sha512-n0i8TD3UDB7paoMMxA3Y65vUncFJXjcUf7lQY7YyKGl6031FNjfsLs6pdLFCy2GNFxItPJG8GvvpbZc2skH7WA=="],
+    "@ownheim/build/@types/picomatch": ["@types/picomatch@3.0.2", "", {}, "sha512-n0i8TD3UDB7paoMMxA3Y65vUncFJXjcUf7lQY7YyKGl6031FNjfsLs6pdLFCy2GNFxItPJG8GvvpbZc2skH7WA=="],
 
     "@ts-morph/common/minimatch": ["minimatch@9.0.9", "", { "dependencies": { "brace-expansion": "^2.0.2" } }, "sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg=="],
 

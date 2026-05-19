@@ -1,12 +1,12 @@
 # Ownership model
 
-Strays tracks ownership at three different layers because large TypeScript monorepos often need to answer three different operational questions.
+Ownheim tracks ownership at three different layers because large TypeScript monorepos often need to answer three different operational questions.
 
 | Concept | Question it answers | Set by | Telemetry tag |
 |---|---|---|---|
-| Entrypoint owner | Who owns the operation that started this work? | HTTP/RPC/job/event entrypoint wrappers | `strays.entrypoint_team` |
-| Code owner | Who owns the source file or package emitting telemetry? | `strays.config.ts` + generated ownership manifest | `strays.code_team` |
-| Responder | Who should investigate, mitigate, or remediate this failure? | Explicit error annotation | `strays.responder_team` |
+| Entrypoint owner | Who owns the operation that started this work? | HTTP/RPC/job/event entrypoint wrappers | `ownheim.entrypoint_team` |
+| Code owner | Who owns the source file or package emitting telemetry? | `ownheim.config.ts` + generated ownership manifest | `ownheim.code_team` |
+| Responder | Who should investigate, mitigate, or remediate this failure? | Explicit error annotation | `ownheim.responder_team` |
 
 ## Entrypoint owner
 
@@ -32,17 +32,17 @@ app.use('/api/accounts', entrypointOwner('Accounts'));
 Telemetry emitted during that request includes:
 
 ```txt
-strays.entrypoint_team=Accounts
+ownheim.entrypoint_team=Accounts
 ```
 
 ## Code owner
 
-The code owner is the team accountable for the source file or package emitting telemetry. Code ownership comes from `strays.config.ts` and the generated ownership manifest. It is also used to generate `.github/CODEOWNERS`.
+The code owner is the team accountable for the source file or package emitting telemetry. Code ownership comes from `ownheim.config.ts` and the generated ownership manifest. It is also used to generate `.github/CODEOWNERS`.
 
 Example:
 
 ```ts
-export default defineStrays({
+export default defineOwnheim({
   teams: {
     Billing: {
       github: '@acme/billing',
@@ -55,7 +55,7 @@ export default defineStrays({
 Telemetry emitted from `packages/billing/**` includes:
 
 ```txt
-strays.code_team=Billing
+ownheim.code_team=Billing
 ```
 
 ## Responder
@@ -75,7 +75,7 @@ throw new OwnedError('Ledger write failed', {
 Telemetry for that error includes:
 
 ```txt
-strays.responder_team=Billing
+ownheim.responder_team=Billing
 ```
 
 ## Cross-team example
@@ -88,13 +88,13 @@ POST /api/accounts/update
   -> ledger write fails
 ```
 
-Strays emits:
+Ownheim emits:
 
 ```json
 {
-  "strays.entrypoint_team": "Accounts",
-  "strays.code_team": "Billing",
-  "strays.responder_team": "Billing"
+  "ownheim.entrypoint_team": "Accounts",
+  "ownheim.code_team": "Billing",
+  "ownheim.responder_team": "Billing"
 }
 ```
 

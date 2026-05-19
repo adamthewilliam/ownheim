@@ -1,5 +1,5 @@
-import { runWithOwner } from '@strays/core/ownership';
-import { createLogger } from '@strays/core/logging/createLogger';
+import { runWithOwner } from '@ownheim/core/ownership';
+import { createLogger } from '@ownheim/core/logging/createLogger';
 import { adminRefund } from './billing/admin/refund.ts';
 import { chargeInvoice } from './billing/charge.ts';
 import { requireSession } from './auth/session.ts';
@@ -49,4 +49,4 @@ const server = Bun.serve({
   },
 });
 
-console.log(`strays example listening on :${server.port}`);
+console.log(`ownheim example listening on :${server.port}`);

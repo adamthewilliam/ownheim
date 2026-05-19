@@ -1,7 +1,7 @@
 import { Logger as EffectLogger } from 'effect';
-import { formatOwnedLogEntry, type LogLevel } from '@strays/core/logging/formatOwnedLogEntry';
-import { stdoutJsonSink, type LogSink } from '@strays/core/logging/LogSink';
-import { resolveOwnership } from '@strays/core/ownership';
+import { formatOwnedLogEntry, type LogLevel } from '@ownheim/core/logging/formatOwnedLogEntry';
+import { stdoutJsonSink, type LogSink } from '@ownheim/core/logging/LogSink';
+import { resolveOwnership } from '@ownheim/core/ownership';
 
 const LOG_LEVELS = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 

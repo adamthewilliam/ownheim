@@ -1,4 +1,4 @@
-import { withEntrypointOwnerScope } from '@strays/core/ownership';
+import { withEntrypointOwnerScope } from '@ownheim/core/ownership';
 
 export const entrypointOwner = withEntrypointOwnerScope<
   [{ next: () => Promise<unknown> }],

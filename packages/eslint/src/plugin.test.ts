@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'bun:test';
-import { defineStrays } from '@strays/core/defineStrays';
-import type { Team, StraysConfig } from '@strays/core/types';
-import { rules } from '@strays/lint-core/rules/registry';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
+import type { Team, OwnheimConfig } from '@ownheim/core/types';
+import { rules } from '@ownheim/lint-core/rules/registry';
 import { plugin as eslintPlugin } from './plugin.ts';
 import type { EslintRuleContext } from './adapter.ts';
 
-const config = defineStrays({
+const config = defineOwnheim({
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Platform: { github: '@org/platform', fallback: true },
   },
-}) as unknown as StraysConfig<Record<string, Team>>;
+}) as unknown as OwnheimConfig<Record<string, Team>>;
 
 describe('eslint plugin', () => {
   it('plugin.rules keys equal registry ids', () => {
@@ -19,7 +19,7 @@ describe('eslint plugin', () => {
     );
   });
 
-  it('no-strays smoke-test fires for fallback-only files', () => {
+  it('no-ownheim smoke-test fires for fallback-only files', () => {
     const reports: Array<{ message: string }> = [];
     const ctx: EslintRuleContext = {
       getFilename: () => 'tools/deploy.ts',
@@ -28,7 +28,7 @@ describe('eslint plugin', () => {
       report: (r) => reports.push({ message: r.message }),
     };
 
-    eslintPlugin.rules['no-strays']!.create(ctx).Program();
+    eslintPlugin.rules['no-ownheim']!.create(ctx).Program();
     expect(reports).toHaveLength(1);
     expect(reports[0]?.message).toContain('fallback');
   });

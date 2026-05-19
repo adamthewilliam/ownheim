@@ -1,6 +1,6 @@
-import { runRule, type LintAdapter } from '@strays/lint-core/adapter';
-import type { Diagnostic } from '@strays/lint-core/types';
-import type { RegisteredRule, RuleMeta } from '@strays/lint-core/rules/registry';
+import { runRule, type LintAdapter } from '@ownheim/lint-core/adapter';
+import type { Diagnostic } from '@ownheim/lint-core/types';
+import type { RegisteredRule, RuleMeta } from '@ownheim/lint-core/rules/registry';
 
 export interface EslintFixer {
   insertTextAfterRange(

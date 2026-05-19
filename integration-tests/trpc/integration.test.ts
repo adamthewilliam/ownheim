@@ -1,27 +1,27 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { initTRPC, TRPCError } from '@trpc/server';
 import type { AnyTRPCMiddlewareFunction, TRPCProcedureBuilder } from '@trpc/server';
-import { createLogger } from '@strays/core/logging/createLogger';
-import { currentEntrypointOwner } from '@strays/core/ownership';
+import { createLogger } from '@ownheim/core/logging/createLogger';
+import { currentEntrypointOwner } from '@ownheim/core/ownership';
 import {
   captureStructuredLogs,
   type CapturedLogs,
-} from '@strays/test-utils/captureStructuredLogs';
-import { entrypointProcedure } from '@strays/trpc/ownedProcedure';
-import { entrypointOwner } from '@strays/trpc/ownerMiddleware';
+} from '@ownheim/test-utils/captureStructuredLogs';
+import { entrypointProcedure } from '@ownheim/trpc/ownedProcedure';
+import { entrypointOwner } from '@ownheim/trpc/ownerMiddleware';
 
 // A real tRPC server / caller harness. We exercise the middleware through the
 // public procedure builder API the README documents (`entrypointProcedure(builder,
 // owner)`), then assert that logs emitted from inside the handler carry the
 // procedure's owner as the `team` field.
 //
-// Type note: `@strays/trpc`'s `entrypointOwner` is structurally typed against
+// Type note: `@ownheim/trpc`'s `entrypointOwner` is structurally typed against
 // any framework whose middleware shape is `({ next }) => Promise<unknown>`.
 // tRPC v11's `MiddlewareFunction` has a stricter return type
 // (`Promise<MiddlewareResult>`), so we cast at the boundary. At runtime tRPC
 // just awaits the value `next()` returns, which is exactly what our wrapper
 // forwards through `runWithEntrypointOwner`. The cast is the price of keeping the
-// strays middleware framework-agnostic.
+// ownheim middleware framework-agnostic.
 
 const t = initTRPC.create();
 

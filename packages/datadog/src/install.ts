@@ -1,5 +1,5 @@
-import { resolveOwnership } from '@strays/core/ownership';
-import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
+import { resolveOwnership } from '@ownheim/core/ownership';
+import { resolveTagOptions, type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface DatadogSpan {
   setTag(key: string, value: string): void;
@@ -11,7 +11,7 @@ export interface DatadogTracer {
 
 export type InstrumentOptions = TagOptions;
 
-const INSTRUMENTED = Symbol.for('strays.datadog.instrumented');
+const INSTRUMENTED = Symbol.for('ownheim.datadog.instrumented');
 
 type InstrumentedDatadogTracer = DatadogTracer & { [INSTRUMENTED]?: true };
 

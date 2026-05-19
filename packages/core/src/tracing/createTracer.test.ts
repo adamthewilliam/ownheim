@@ -27,7 +27,7 @@ describe('createTracer', () => {
 
     tracer.startSpan('db.query');
 
-    expect(spans[0]?.attributes['strays.code_team']).toBe('Billing');
+    expect(spans[0]?.attributes['ownheim.code_team']).toBe('Billing');
   });
 
   it('emits entrypoint and code ownership independently', () => {
@@ -38,8 +38,8 @@ describe('createTracer', () => {
       tracer.startSpan('http.request');
     });
 
-    expect(spans[0]?.attributes['strays.entrypoint_team']).toBe('Accounts');
-    expect(spans[0]?.attributes['strays.code_team']).toBe('Billing');
+    expect(spans[0]?.attributes['ownheim.entrypoint_team']).toBe('Accounts');
+    expect(spans[0]?.attributes['ownheim.code_team']).toBe('Billing');
   });
 
   it('falls back code ownership when no module owner and no scope', () => {
@@ -48,6 +48,6 @@ describe('createTracer', () => {
 
     tracer.startSpan('orphan');
 
-    expect(spans[0]?.attributes['strays.code_team']).toBe('unowned');
+    expect(spans[0]?.attributes['ownheim.code_team']).toBe('unowned');
   });
 });

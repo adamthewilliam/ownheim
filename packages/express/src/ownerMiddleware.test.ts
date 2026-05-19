@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { currentEntrypointOwner } from '@strays/core/ownership';
+import { currentEntrypointOwner } from '@ownheim/core/ownership';
 import { entrypointOwner } from './ownerMiddleware.ts';
 
 describe('express entrypointOwner shape', () => {

@@ -2,7 +2,7 @@ import { stdoutJsonSink, type LogSink } from './LogSink.ts';
 
 // Process-wide default sink consulted by `createLogger` when the caller does
 // not pass an explicit `sink` option. The factory-rewriter (see
-// `@strays/build/esbuildPlugin`) emits `createLogger("Owner")` with no
+// `@ownheim/build/esbuildPlugin`) emits `createLogger("Owner")` with no
 // options, so tests need a single seam to capture those emissions without
 // monkey-patching every call site.
 //

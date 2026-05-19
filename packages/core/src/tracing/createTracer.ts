@@ -32,9 +32,9 @@ export function createTracer(moduleOwner: string, options: CreateTracerOptions):
         ...(options.registry === undefined ? {} : { registry: options.registry }),
         fallbackCodeTeam,
       });
-      if (ownership.entrypointTeam !== undefined) span.setAttribute('strays.entrypoint_team', ownership.entrypointTeam);
-      if (ownership.codeTeam !== undefined) span.setAttribute('strays.code_team', ownership.codeTeam);
-      if (ownership.responderTeam !== undefined) span.setAttribute('strays.responder_team', ownership.responderTeam);
+      if (ownership.entrypointTeam !== undefined) span.setAttribute('ownheim.entrypoint_team', ownership.entrypointTeam);
+      if (ownership.codeTeam !== undefined) span.setAttribute('ownheim.code_team', ownership.codeTeam);
+      if (ownership.responderTeam !== undefined) span.setAttribute('ownheim.responder_team', ownership.responderTeam);
       return span;
     },
   };

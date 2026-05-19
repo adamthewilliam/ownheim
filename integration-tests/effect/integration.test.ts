@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Fiber, Layer, Logger as EffectLogger, Schema } from 'effect';
-import { OwnedError } from '@strays/core/OwnedError';
-import { makeMemorySink } from '@strays/core/logging/LogSink';
-import { walkResponderTeamChain } from '@strays/core/resolution/walkOwnedErrorChain';
-import { Owner, withOwner } from '@strays/effect/Owner';
-import { ownedBy } from '@strays/effect/ownedBy';
-import { makeOwnershipLogger } from '@strays/effect/Logger';
+import { OwnedError } from '@ownheim/core/OwnedError';
+import { makeMemorySink } from '@ownheim/core/logging/LogSink';
+import { walkResponderTeamChain } from '@ownheim/core/resolution/walkOwnedErrorChain';
+import { Owner, withOwner } from '@ownheim/effect/Owner';
+import { ownedBy } from '@ownheim/effect/ownedBy';
+import { makeOwnershipLogger } from '@ownheim/effect/Logger';
 
 const provideTestLogger = (sink: ReturnType<typeof makeMemorySink>['sink']) =>
   EffectLogger.replace(EffectLogger.defaultLogger, makeOwnershipLogger(sink));

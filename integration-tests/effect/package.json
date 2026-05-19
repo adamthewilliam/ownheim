@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/effect",
+  "name": "@ownheim-it/effect",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
-    "@strays/effect": "workspace:*"
+    "@ownheim/core": "workspace:*",
+    "@ownheim/effect": "workspace:*"
   },
   "optionalDependencies": {
     "effect": "^3.21.2"

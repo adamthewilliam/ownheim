@@ -1,23 +1,23 @@
 import { describe, expect, it } from 'bun:test';
 import { readFile, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { runCheck } from '@strays/cli/commands/check';
-import { runCoverage } from '@strays/cli/commands/coverage';
-import { runGenerate } from '@strays/cli/commands/generate';
-import { runTrace } from '@strays/cli/commands/trace';
-import straysConfig from './strays.config.ts';
+import { runCheck } from '@ownheim/cli/commands/check';
+import { runCoverage } from '@ownheim/cli/commands/coverage';
+import { runGenerate } from '@ownheim/cli/commands/generate';
+import { runTrace } from '@ownheim/cli/commands/trace';
+import ownheimConfig from './ownheim.config.ts';
 
 const projectRoot = resolve(import.meta.dir);
 const loaded = {
-  config: straysConfig as unknown as Parameters<typeof runGenerate>[0]['config'],
-  path: join(projectRoot, 'strays.config.ts'),
+  config: ownheimConfig as unknown as Parameters<typeof runGenerate>[0]['config'],
+  path: join(projectRoot, 'ownheim.config.ts'),
   projectRoot,
 };
 
 describe('bun-effect-http example end-to-end', () => {
-  it('strays generate writes CODEOWNERS and manifest', async () => {
+  it('ownheim generate writes CODEOWNERS and manifest', async () => {
     await rm(join(projectRoot, '.github/CODEOWNERS'), { force: true });
-    await rm(join(projectRoot, 'dist/strays-manifest.json'), { force: true });
+    await rm(join(projectRoot, 'dist/ownheim-manifest.json'), { force: true });
 
     const result = await runGenerate(loaded);
 
@@ -37,7 +37,7 @@ describe('bun-effect-http example end-to-end', () => {
     expect(manifest.files['src/billing/admin/refund.ts']).toBe('Platform');
   });
 
-  it('strays trace explains why src/billing/admin/refund.ts is Platform-owned', async () => {
+  it('ownheim trace explains why src/billing/admin/refund.ts is Platform-owned', async () => {
     const result = await runTrace(loaded, 'src/billing/admin/refund.ts');
     expect(result.resolved?.teams).toEqual(['Platform']);
     expect(result.resolved?.matchedGlob).toBe('src/billing/admin/**');
@@ -45,13 +45,13 @@ describe('bun-effect-http example end-to-end', () => {
     expect(result.explanation).toContain('src/billing/admin/**');
   });
 
-  it('strays trace identifies a fallback-only file as a stray', async () => {
+  it('ownheim trace identifies a fallback-only file as a stray', async () => {
     const result = await runTrace(loaded, 'src/start.ts');
     expect(result.resolved?.source).toBe('fallback');
     expect(result.explanation).toContain('FALLBACK');
   });
 
-  it('strays coverage reports the example layout correctly', async () => {
+  it('ownheim coverage reports the example layout correctly', async () => {
     const result = await runCoverage(loaded);
     expect(result.total).toBeGreaterThanOrEqual(4);
     expect(result.unowned).toBe(0);
@@ -59,13 +59,13 @@ describe('bun-effect-http example end-to-end', () => {
     expect(result.explicit).toBeGreaterThanOrEqual(3);
   });
 
-  it('strays check passes after generate', async () => {
+  it('ownheim check passes after generate', async () => {
     await runGenerate(loaded);
     const result = await runCheck(loaded);
     expect(result.drift).toBe(false);
   });
 
-  it('strays check detects drift after a hand-edit', async () => {
+  it('ownheim check detects drift after a hand-edit', async () => {
     await runGenerate(loaded);
     const codeownersPath = join(projectRoot, '.github/CODEOWNERS');
     const original = await readFile(codeownersPath, 'utf8');

@@ -5,11 +5,11 @@ import { BatchHandlerPlugin } from '@orpc/server/plugins';
 import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
 import { BatchLinkPlugin } from '@orpc/client/plugins';
-import { createLogger } from '@strays/core/logging/createLogger';
-import { currentEntrypointOwner } from '@strays/core/ownership';
-import { captureStructuredLogs, type CapturedLogs } from '@strays/test-utils/captureStructuredLogs';
-import { entrypointProcedure } from '@strays/orpc/ownedProcedure';
-import { entrypointOwner } from '@strays/orpc/ownerMiddleware';
+import { createLogger } from '@ownheim/core/logging/createLogger';
+import { currentEntrypointOwner } from '@ownheim/core/ownership';
+import { captureStructuredLogs, type CapturedLogs } from '@ownheim/test-utils/captureStructuredLogs';
+import { entrypointProcedure } from '@ownheim/orpc/ownedProcedure';
+import { entrypointOwner } from '@ownheim/orpc/ownerMiddleware';
 
 // oRPC's `Builder.use` and `Builder.middleware` accept the rich
 // `Middleware<TInContext, TOutContext, TInput, TOutput, ...>` signature, but
@@ -59,7 +59,7 @@ afterEach(() => {
   captured.restore();
 });
 
-describe('@strays/orpc — real oRPC integration', () => {
+describe('@ownheim/orpc — real oRPC integration', () => {
   it('procedure middleware tags logs from the handler (in-memory router client)', async () => {
     const router = {
       charge: taggedOs(os, 'Billing').handler(() => {

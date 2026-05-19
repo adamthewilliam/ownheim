@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/trpc",
+  "name": "@ownheim-it/trpc",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,9 +8,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
-    "@strays/test-utils": "workspace:*",
-    "@strays/trpc": "workspace:*"
+    "@ownheim/core": "workspace:*",
+    "@ownheim/test-utils": "workspace:*",
+    "@ownheim/trpc": "workspace:*"
   },
   "optionalDependencies": {
     "@trpc/client": "^11.17.0",

@@ -1,6 +1,6 @@
-import { fromSentryFrames, type SentryStacktrace } from '@strays/core/resolution/frames';
-import { resolveOwnership } from '@strays/core/ownership';
-import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
+import { fromSentryFrames, type SentryStacktrace } from '@ownheim/core/resolution/frames';
+import { resolveOwnership } from '@ownheim/core/ownership';
+import { resolveTagOptions, type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface SentryEvent {
   tags?: Record<string, string>;
@@ -22,7 +22,7 @@ export interface SentryClient {
 
 export type InstallOptions = TagOptions;
 
-const INSTALLED = Symbol.for('strays.sentry.installed');
+const INSTALLED = Symbol.for('ownheim.sentry.installed');
 
 type InstalledSentryClient = SentryClient & { [INSTALLED]?: true };
 

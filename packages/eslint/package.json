@@ -1,7 +1,7 @@
 {
-  "name": "@strays/eslint",
+  "name": "@ownheim/eslint",
   "version": "0.1.0",
-  "description": "strays — eslint plugin (no-strays + no-codeowners-edit)",
+  "description": "ownheim — eslint plugin (no-ownheim + no-codeowners-edit)",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -18,8 +18,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
-    "@strays/lint-core": "workspace:*"
+    "@ownheim/core": "workspace:*",
+    "@ownheim/lint-core": "workspace:*"
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"

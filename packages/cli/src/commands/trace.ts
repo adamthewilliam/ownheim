@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join, relative } from 'node:path';
-import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
-import { resolveOwnerForFile } from '@strays/build/resolveRules';
-import type { ResolvedOwner } from '@strays/core/types';
+import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
+import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
+import type { ResolvedOwner } from '@ownheim/core/types';
 import type { LoadedConfig } from '../loadConfig.ts';
 
 export interface TraceResult {

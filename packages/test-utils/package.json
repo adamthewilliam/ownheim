@@ -1,7 +1,7 @@
 {
-  "name": "@strays/test-utils",
+  "name": "@ownheim/test-utils",
   "version": "0.1.0",
-  "description": "strays — shared in-memory bundle, subprocess, log, and OTel exporter helpers for the test suite",
+  "description": "ownheim — shared in-memory bundle, subprocess, log, and OTel exporter helpers for the test suite",
   "type": "module",
   "private": true,
   "license": "MIT",
@@ -22,8 +22,8 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@strays/build": "workspace:*",
-    "@strays/core": "workspace:*"
+    "@ownheim/build": "workspace:*",
+    "@ownheim/core": "workspace:*"
   },
   "peerDependencies": {
     "esbuild": "^0.28.0"

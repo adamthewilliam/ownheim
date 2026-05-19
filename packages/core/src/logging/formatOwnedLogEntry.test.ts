@@ -11,18 +11,18 @@ describe('formatOwnedLogEntry', () => {
       responderTeam: 'Billing',
     });
 
-    expect(line.record.strays_entrypoint_team).toBe('Accounts');
-    expect(line.record.strays_code_team).toBe('Billing');
-    expect(line.record.strays_responder_team).toBe('Billing');
+    expect(line.record.ownheim_entrypoint_team).toBe('Accounts');
+    expect(line.record.ownheim_code_team).toBe('Billing');
+    expect(line.record.ownheim_responder_team).toBe('Billing');
     expect(line.team).toBe('Billing');
   });
 
   it('omits unknown ownership layers', () => {
     const line = formatOwnedLogEntry({ level: 'info', message: 'hi', codeTeam: 'Platform' });
 
-    expect(line.record.strays_entrypoint_team).toBeUndefined();
-    expect(line.record.strays_code_team).toBe('Platform');
-    expect(line.record.strays_responder_team).toBeUndefined();
+    expect(line.record.ownheim_entrypoint_team).toBeUndefined();
+    expect(line.record.ownheim_code_team).toBe('Platform');
+    expect(line.record.ownheim_responder_team).toBeUndefined();
   });
 
   it('record and parsed json agree', () => {
@@ -33,7 +33,7 @@ describe('formatOwnedLogEntry', () => {
     });
     const parsed = JSON.parse(line.json) as Record<string, unknown>;
 
-    expect(parsed.strays_entrypoint_team).toBe(line.record.strays_entrypoint_team);
+    expect(parsed.ownheim_entrypoint_team).toBe(line.record.ownheim_entrypoint_team);
   });
 
   it('serialises an Error to {name, message, stack}', () => {

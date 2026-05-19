@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'bun:test';
-import { defineStrays } from '@strays/core/defineStrays';
-import type { Team, StraysConfig } from '@strays/core/types';
-import { rules } from '@strays/lint-core/rules/registry';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
+import type { Team, OwnheimConfig } from '@ownheim/core/types';
+import { rules } from '@ownheim/lint-core/rules/registry';
 import { projectEslintRule, schemaFor, type EslintRuleContext } from './adapter.ts';
 
-const config = defineStrays({
+const config = defineOwnheim({
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Platform: { github: '@org/platform', fallback: true },
   },
-}) as unknown as StraysConfig<Record<string, Team>>;
+}) as unknown as OwnheimConfig<Record<string, Team>>;
 
 describe('projectEslintRule', () => {
   it('produces a valid EslintRule shape for every registered rule', () => {
@@ -43,9 +43,9 @@ describe('projectEslintRule', () => {
   });
 
   it('end-to-end Program() propagates diagnostics from validateFileOwnership', () => {
-    const noStrays = rules.find((r) => r.meta.id === 'no-strays');
-    expect(noStrays).toBeDefined();
-    const projected = projectEslintRule(noStrays!);
+    const noOwnheim = rules.find((r) => r.meta.id === 'no-ownheim');
+    expect(noOwnheim).toBeDefined();
+    const projected = projectEslintRule(noOwnheim!);
 
     const reports: Array<{ message: string }> = [];
     const ctx: EslintRuleContext = {

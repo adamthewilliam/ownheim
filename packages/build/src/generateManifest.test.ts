@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { generateManifest } from './generateManifest.ts';
-import type { ResolvedOwnership } from '@strays/core/types';
+import type { ResolvedOwnership } from '@ownheim/core/types';
 
 describe('generateManifest', () => {
   it('produces version 1 manifest with file -> primary team mapping', () => {

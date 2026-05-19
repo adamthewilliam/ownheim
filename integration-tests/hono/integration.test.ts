@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import { createLogger } from '@strays/core/logging/createLogger';
-import { currentEntrypointOwner } from '@strays/core/ownership';
-import { captureStructuredLogs } from '@strays/test-utils/captureStructuredLogs';
+import { createLogger } from '@ownheim/core/logging/createLogger';
+import { currentEntrypointOwner } from '@ownheim/core/ownership';
+import { captureStructuredLogs } from '@ownheim/test-utils/captureStructuredLogs';
 import { Hono } from 'hono';
-import { entrypointOwner } from '@strays/hono/ownerMiddleware';
+import { entrypointOwner } from '@ownheim/hono/ownerMiddleware';
 
 // The middleware factory in src/entrypointOwner.ts is typed against an arbitrary
 // `(c, next) => Promise<void>` shape; Hono's actual middleware signature is the
@@ -12,7 +12,7 @@ type HonoMiddleware = Parameters<Hono['use']>[1];
 const honoOwnerMiddleware = (owner: string): HonoMiddleware =>
   entrypointOwner(owner) as unknown as HonoMiddleware;
 
-// Per @strays/core/logging/formatOwnedLogEntry the `team` field is the OwnerId
+// Per @ownheim/core/logging/formatOwnedLogEntry the `team` field is the OwnerId
 // verbatim (e.g. 'Billing'), not lowercased — the prompt's `'billing'`
 // expectation predates that rename.
 

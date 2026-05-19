@@ -1,4 +1,4 @@
-import type { ResolvedOwnership, StraysConfig, Team } from '@strays/core/types';
+import type { ResolvedOwnership, OwnheimConfig, Team } from '@ownheim/core/types';
 import { matches, compareSpecificity } from './globMatcher.ts';
 
 export interface ResolveInput {
@@ -12,7 +12,7 @@ interface InternalRule {
 }
 
 function flattenRules<TTeams extends Record<string, Team>>(
-  config: StraysConfig<TTeams>,
+  config: OwnheimConfig<TTeams>,
 ): readonly InternalRule[] {
   const rules: InternalRule[] = [];
 
@@ -34,7 +34,7 @@ function flattenRules<TTeams extends Record<string, Team>>(
 }
 
 function getFallbackTeam<TTeams extends Record<string, Team>>(
-  config: StraysConfig<TTeams>,
+  config: OwnheimConfig<TTeams>,
 ): string | undefined {
   for (const [teamId, team] of Object.entries(config.teams)) {
     if (team.fallback) return teamId;
@@ -43,7 +43,7 @@ function getFallbackTeam<TTeams extends Record<string, Team>>(
 }
 
 export function resolveOwnerForFile<TTeams extends Record<string, Team>>(
-  config: StraysConfig<TTeams>,
+  config: OwnheimConfig<TTeams>,
   input: ResolveInput,
 ): ResolvedOwnership | undefined {
   if (input.jsdocOwner) {
@@ -85,7 +85,7 @@ export function resolveOwnerForFile<TTeams extends Record<string, Team>>(
 }
 
 export function resolveAll<TTeams extends Record<string, Team>>(
-  config: StraysConfig<TTeams>,
+  config: OwnheimConfig<TTeams>,
   files: readonly ResolveInput[],
 ): ResolvedOwnership[] {
   return files

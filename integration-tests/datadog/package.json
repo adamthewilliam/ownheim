@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/datadog",
+  "name": "@ownheim-it/datadog",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/datadog": "workspace:*",
-    "@strays/core": "workspace:*"
+    "@ownheim/datadog": "workspace:*",
+    "@ownheim/core": "workspace:*"
   },
   "optionalDependencies": {
     "dd-trace": "^5.99.1"

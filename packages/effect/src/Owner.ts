@@ -1,6 +1,6 @@
 import { Context, Effect, Layer } from 'effect';
 
-export class Owner extends Context.Tag('@strays/Owner')<Owner, string>() {
+export class Owner extends Context.Tag('@ownheim/Owner')<Owner, string>() {
   static layer(owner: string): Layer.Layer<Owner> {
     return Layer.succeed(Owner, owner);
   }

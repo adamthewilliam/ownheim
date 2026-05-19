@@ -1,11 +1,11 @@
-import { resolveOwnership } from '@strays/core/ownership';
+import { resolveOwnership } from '@ownheim/core/ownership';
 
 export interface DatadogRumLike {
   addError(error: unknown, context?: Record<string, unknown>): void;
   setGlobalContextProperty(key: string, value: unknown): void;
 }
 
-const INSTALLED = Symbol.for('strays.datadog-rum.installed');
+const INSTALLED = Symbol.for('ownheim.datadog-rum.installed');
 
 type InstalledDatadogRumLike = DatadogRumLike & { [INSTALLED]?: true };
 
@@ -19,9 +19,9 @@ export function installDatadogRum(rum: DatadogRumLike, fallbackCodeTeam = 'unown
     const { ownership } = resolveOwnership({ error, fallbackCodeTeam });
     original(error, {
       ...context,
-      ...(ownership.entrypointTeam === undefined ? {} : { 'strays.entrypoint_team': ownership.entrypointTeam }),
-      ...(ownership.codeTeam === undefined ? {} : { 'strays.code_team': ownership.codeTeam }),
-      ...(ownership.responderTeam === undefined ? {} : { 'strays.responder_team': ownership.responderTeam }),
+      ...(ownership.entrypointTeam === undefined ? {} : { 'ownheim.entrypoint_team': ownership.entrypointTeam }),
+      ...(ownership.codeTeam === undefined ? {} : { 'ownheim.code_team': ownership.codeTeam }),
+      ...(ownership.responderTeam === undefined ? {} : { 'ownheim.responder_team': ownership.responderTeam }),
     });
   };
 }

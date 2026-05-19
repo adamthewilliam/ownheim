@@ -1,4 +1,4 @@
-# @strays/express
+# @ownheim/express
 
 Tag every Express route with the team that owns it.
 
@@ -7,16 +7,16 @@ This is an Express middleware factory. It wraps the rest of the request chain in
 ## Install
 
 ```bash
-bun add @strays/express @strays/runtime @strays/core
+bun add @ownheim/express @ownheim/runtime @ownheim/core
 ```
 
-You also need `express`. Strays doesn't pin a version. Anything with the standard `(req, res, next)` middleware shape works — including Express 4 and 5.
+You also need `express`. Ownheim doesn't pin a version. Anything with the standard `(req, res, next)` middleware shape works — including Express 4 and 5.
 
 ## Per-route
 
 ```ts
 import express from 'express';
-import { entrypointOwner } from '@strays/express/entrypointOwner';
+import { entrypointOwner } from '@ownheim/express/entrypointOwner';
 
 const app = express();
 
@@ -69,7 +69,7 @@ Express 5 supports promises returned from handlers. The team scope still applies
 
 Express 4 works too, but if your handlers return promises and you don't `.catch` them, errors won't be tagged correctly because they bypass the chain. Use [`express-async-errors`](https://www.npmjs.com/package/express-async-errors) or wrap manually.
 
-## Pairing with `@strays/sentry` and `@strays/datadog`
+## Pairing with `@ownheim/sentry` and `@ownheim/datadog`
 
 Nothing extra to wire up. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the team from the scope:
 

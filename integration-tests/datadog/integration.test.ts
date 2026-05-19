@@ -1,9 +1,9 @@
-// Integration test for `@strays/datadog` against the real `dd-trace`
+// Integration test for `@ownheim/datadog` against the real `dd-trace`
 // package. We want to prove three things end-to-end:
 //
 //   1. After `instrumentDatadog(tracer)`, every `tracer.startSpan` call
 //      attaches a `team` tag derived from `runWithEntrypointOwner` scope.
-//   2. The patch survives across both import orders (strays first vs.
+//   2. The patch survives across both import orders (ownheim first vs.
 //      dd-trace first), and we document any constraint we find.
 //   3. AsyncLocalStorage propagation works across an async hop.
 //
@@ -57,8 +57,8 @@ process.env.DD_TELEMETRY_HEARTBEAT_INTERVAL = '0';
 process.env.DD_REMOTE_CONFIGURATION_ENABLED = 'false';
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import { runWithEntrypointOwner } from '@strays/core/ownership';
-import { instrumentDatadog, type DatadogTracer } from '@strays/datadog/install';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
+import { instrumentDatadog, type DatadogTracer } from '@ownheim/datadog/install';
 
 // dd-trace's runtime types are not exported for our adapter shape, so
 // we type the imported tracer through our adapter's structural
@@ -108,16 +108,16 @@ function loadRealDdTrace(): DdTraceTracer {
   return cjsRequire('dd-trace') as DdTraceTracer;
 }
 
-describe('@strays/datadog + real dd-trace (import order: strays-first)', () => {
+describe('@ownheim/datadog + real dd-trace (import order: ownheim-first)', () => {
   let tracer: DdTraceTracer;
 
   beforeAll(() => {
-    // The strays modules are already imported above. Now bring dd-trace
+    // The ownheim modules are already imported above. Now bring dd-trace
     // in via our cache-trick loader and initialize it, then install our
     // patch on top.
     tracer = loadRealDdTrace();
     tracer.init({
-      service: 'strays-datadog-integration-test',
+      service: 'ownheim-datadog-integration-test',
       plugins: false,
       logInjection: false,
     });
@@ -169,10 +169,10 @@ describe('@strays/datadog + real dd-trace (import order: strays-first)', () => {
   });
 });
 
-describe('@strays/datadog + real dd-trace (import order: dd-trace-first)', () => {
+describe('@ownheim/datadog + real dd-trace (import order: dd-trace-first)', () => {
   // dd-trace was already imported by the previous describe block (its
   // module state is process-global). To exercise the "dd-trace import
-  // happened first, then we install strays" code path we re-resolve
+  // happened first, then we install ownheim" code path we re-resolve
   // the same tracer instance and re-apply instrumentDatadog.
   //
   // Note: the dd-trace shimmer monkey-patches Module._compile at
@@ -191,7 +191,7 @@ describe('@strays/datadog + real dd-trace (import order: dd-trace-first)', () =>
     // The previous describe's instrumentDatadog already wrapped startSpan
     // on this singleton. Snapshot the wrapped version so we can restore
     // it after this block, then install AGAIN to model "user installs
-    // strays after dd-trace was already initialized elsewhere".
+    // ownheim after dd-trace was already initialized elsewhere".
     stackedStartSpan = tracer.startSpan.bind(tracer);
     instrumentDatadog(tracer as unknown as DatadogTracer);
   });
@@ -201,7 +201,7 @@ describe('@strays/datadog + real dd-trace (import order: dd-trace-first)', () =>
     (tracer as unknown as { startSpan: unknown }).startSpan = stackedStartSpan;
   });
 
-  it('still tags spans when strays is installed AFTER dd-trace.init', () => {
+  it('still tags spans when ownheim is installed AFTER dd-trace.init', () => {
     let span: DdTraceSpan | undefined;
     runWithEntrypointOwner('Billing', () => {
       span = tracer.startSpan('http.request');

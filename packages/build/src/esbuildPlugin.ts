@@ -1,25 +1,25 @@
 import { readFile } from 'node:fs/promises';
 import { extname, relative } from 'node:path';
 import type { Plugin } from 'esbuild';
-import type { Team, StraysConfig } from '@strays/core/types';
+import type { Team, OwnheimConfig } from '@ownheim/core/types';
 import { analyzeSourceFile } from './analyzeSourceFile.ts';
 import { resolveOwnerForFile } from './resolveRules.ts';
 
-export interface StraysPluginOptions<TTeams extends Record<string, Team>> {
-  readonly config: StraysConfig<TTeams>;
+export interface OwnheimPluginOptions<TTeams extends Record<string, Team>> {
+  readonly config: OwnheimConfig<TTeams>;
   readonly projectRoot: string;
   readonly extensions?: readonly string[];
 }
 
 const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mts', '.cts'] as const;
 
-export function strays<TTeams extends Record<string, Team>>(
-  options: StraysPluginOptions<TTeams>,
+export function ownheim<TTeams extends Record<string, Team>>(
+  options: OwnheimPluginOptions<TTeams>,
 ): Plugin {
   const extensions = options.extensions ?? DEFAULT_EXTENSIONS;
 
   return {
-    name: '@strays/build',
+    name: '@ownheim/build',
     setup(build) {
       build.onLoad({ filter: /.*/ }, async (args) => {
         if (!extensions.includes(extname(args.path))) return undefined;

@@ -1,7 +1,7 @@
 {
-  "name": "@strays/pino",
+  "name": "@ownheim/pino",
   "version": "0.1.0",
-  "description": "strays — pino mixin for automatic team ownership tagging",
+  "description": "ownheim — pino mixin for automatic team ownership tagging",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*"
+    "@ownheim/core": "workspace:*"
   },
   "peerDependencies": {
     "pino": ">=8.0.0"

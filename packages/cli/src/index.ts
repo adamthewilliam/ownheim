@@ -36,8 +36,8 @@ async function cmdGenerate(projectRoot: string): Promise<number> {
   const result = await runGenerate(loaded);
   console.log(`Wrote ${result.codeownersPath}`);
   console.log(`Wrote ${result.manifestPath}`);
-  console.log(`Strays detected: ${result.straysCount}`);
-  return result.straysCount > 0 ? 1 : 0;
+  console.log(`Ownheim detected: ${result.ownheimCount}`);
+  return result.ownheimCount > 0 ? 1 : 0;
 }
 
 async function cmdCheck(projectRoot: string): Promise<number> {
@@ -45,19 +45,19 @@ async function cmdCheck(projectRoot: string): Promise<number> {
   const result = await runCheck(loaded);
 
   if (result.drift) {
-    console.error('CODEOWNERS is out of date. Run `strays generate` to update.');
+    console.error('CODEOWNERS is out of date. Run `ownheim generate` to update.');
     if (result.diff) console.error('\n' + result.diff);
   }
 
-  if (result.straysCount > 0) {
-    console.error(`\nStrays detected (${result.straysCount}):`);
-    for (const file of result.straysFiles.slice(0, 20)) console.error(`  ${file}`);
-    if (result.straysFiles.length > 20) {
-      console.error(`  ... and ${result.straysFiles.length - 20} more`);
+  if (result.ownheimCount > 0) {
+    console.error(`\nOwnheim detected (${result.ownheimCount}):`);
+    for (const file of result.ownheimFiles.slice(0, 20)) console.error(`  ${file}`);
+    if (result.ownheimFiles.length > 20) {
+      console.error(`  ... and ${result.ownheimFiles.length - 20} more`);
     }
   }
 
-  return result.drift || result.straysCount > 0 ? 1 : 0;
+  return result.drift || result.ownheimCount > 0 ? 1 : 0;
 }
 
 async function cmdCoverage(projectRoot: string): Promise<number> {
@@ -74,7 +74,7 @@ async function cmdCoverage(projectRoot: string): Promise<number> {
 
 async function cmdTrace(projectRoot: string, file: string | undefined): Promise<number> {
   if (!file) {
-    console.error('Usage: strays trace <file>');
+    console.error('Usage: ownheim trace <file>');
     return 1;
   }
   const loaded = await loadConfig(projectRoot);
@@ -84,13 +84,13 @@ async function cmdTrace(projectRoot: string, file: string | undefined): Promise<
 }
 
 function printUsage(): void {
-  console.log(`strays - find a home for every line of code
+  console.log(`ownheim - find a home for every line of code
 
 Usage:
-  strays generate           Regenerate CODEOWNERS + manifest from strays.config.ts
-  strays check              Fail if generated CODEOWNERS differs from committed
-  strays coverage           Report % of files with explicit (non-fallback) owner
-  strays trace <file>       Show resolved owner for a path with rule trace
+  ownheim generate           Regenerate CODEOWNERS + manifest from ownheim.config.ts
+  ownheim check              Fail if generated CODEOWNERS differs from committed
+  ownheim coverage           Report % of files with explicit (non-fallback) owner
+  ownheim trace <file>       Show resolved owner for a path with rule trace
 `);
 }
 

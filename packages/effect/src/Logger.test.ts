@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Logger as EffectLogger } from 'effect';
-import { OwnedError } from '@strays/core/OwnedError';
-import { makeMemorySink } from '@strays/core/logging/LogSink';
+import { OwnedError } from '@ownheim/core/OwnedError';
+import { makeMemorySink } from '@ownheim/core/logging/LogSink';
 import { makeOwnershipLogger } from './Logger.ts';
 
 const provideTestLogger = (sink: ReturnType<typeof makeMemorySink>['sink']) =>

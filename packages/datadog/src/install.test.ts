@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { runWithEntrypointOwner } from '@strays/core/ownership';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 import { instrumentDatadog, type DatadogSpan, type DatadogTracer } from './install.ts';
 
 function makeMockTracer() {
@@ -28,8 +28,8 @@ describe('instrumentDatadog', () => {
       tracer.startSpan('http.request');
     });
 
-    expect(spans[0]?.tags['strays.entrypoint_team']).toBe('Billing');
-    expect(spans[0]?.tags['strays.code_team']).toBe('unowned');
+    expect(spans[0]?.tags['ownheim.entrypoint_team']).toBe('Billing');
+    expect(spans[0]?.tags['ownheim.code_team']).toBe('unowned');
   });
 
   it('uses a custom fallback code team', () => {
@@ -38,7 +38,7 @@ describe('instrumentDatadog', () => {
 
     tracer.startSpan('background.job');
 
-    expect(spans[0]?.tags['strays.code_team']).toBe('platform-default');
+    expect(spans[0]?.tags['ownheim.code_team']).toBe('platform-default');
   });
 
   it('uses custom tag keys when provided', () => {
@@ -60,6 +60,6 @@ describe('instrumentDatadog', () => {
 
     tracer.startSpan('background.job');
 
-    expect(Object.keys(spans[0]!.tags).sort()).toEqual(['strays.code_team']);
+    expect(Object.keys(spans[0]!.tags).sort()).toEqual(['ownheim.code_team']);
   });
 });

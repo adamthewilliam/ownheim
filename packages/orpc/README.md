@@ -1,4 +1,4 @@
-# @strays/orpc
+# @ownheim/orpc
 
 Tag every oRPC procedure with the team that owns it.
 
@@ -7,10 +7,10 @@ This is an oRPC middleware. It wraps the procedure's handler in a `runWithEntryp
 ## Install
 
 ```bash
-bun add @strays/orpc @strays/runtime @strays/core
+bun add @ownheim/orpc @ownheim/runtime @ownheim/core
 ```
 
-You also need `@orpc/server`. Strays doesn't pin a version. Anything with the standard `.use(middleware)` builder API works.
+You also need `@orpc/server`. Ownheim doesn't pin a version. Anything with the standard `.use(middleware)` builder API works.
 
 ## Two ways to use it
 
@@ -20,7 +20,7 @@ You also need `@orpc/server`. Strays doesn't pin a version. Anything with the st
 
 ```ts
 import { os } from '@orpc/server';
-import { entrypointProcedure } from '@strays/orpc/entrypointProcedure';
+import { entrypointProcedure } from '@ownheim/orpc/entrypointProcedure';
 
 const billing = entrypointProcedure(os, 'Billing');
 const identity = entrypointProcedure(os, 'Identity');
@@ -42,7 +42,7 @@ const billingAuthed = entrypointProcedure(protectedProcedure, 'Billing');
 If you'd rather use `.use()` yourself, `entrypointOwner(owner)` returns the bare middleware function:
 
 ```ts
-import { entrypointOwner } from '@strays/orpc/entrypointOwner';
+import { entrypointOwner } from '@ownheim/orpc/entrypointOwner';
 
 const billing = os
   .use(authMiddleware)
@@ -58,13 +58,13 @@ Order matters here only if other middlewares read `currentEntrypointOwner()`. An
 ({ next }) => runWithEntrypointOwner(owner, () => next());
 ```
 
-That's the whole thing. AsyncLocalStorage holds the owner for the duration of `next()` and any async work the handler spawns. The next time something downstream calls `currentEntrypointOwner()` — inside the handler, inside a span processor, inside an event processor — it gets the owner back. On the wire (logs, spans, Sentry tags) it's emitted as `strays.entrypoint_team`.
+That's the whole thing. AsyncLocalStorage holds the owner for the duration of `next()` and any async work the handler spawns. The next time something downstream calls `currentEntrypointOwner()` — inside the handler, inside a span processor, inside an event processor — it gets the owner back. On the wire (logs, spans, Sentry tags) it's emitted as `ownheim.entrypoint_team`.
 
 ## Why a builder helper *and* a middleware?
 
 oRPC supports both shapes natively. `os.use(...)` is the single-line case; defining `publicProcedure = os.use(...)` once and reusing it is the [recommended pattern](https://orpc.unnoq.com) for things like auth. The builder helper just makes it ergonomic to derive an owner-tagged variant from any existing builder.
 
-## Pairing it with `@strays/sentry` and `@strays/datadog`
+## Pairing it with `@ownheim/sentry` and `@ownheim/datadog`
 
 Nothing extra to do. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope:
 

@@ -4,7 +4,7 @@ import type { RecordedSpan } from './RecordedSpan.ts';
 // `SpanExporter` that contract tests need. Wave 2's otel agent will write a
 // thin adapter that converts a real `ReadableSpan` to `RecordedSpan` and
 // delegates here. Keeping the surface tiny avoids leaking SDK types into
-// `@strays/test-utils`.
+// `@ownheim/test-utils`.
 export interface InMemoryOtelExporter {
   readonly export: (spans: readonly RecordedSpan[]) => void;
   readonly shutdown: () => Promise<void>;

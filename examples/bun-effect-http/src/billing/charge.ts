@@ -1,4 +1,4 @@
-import { OwnedError } from '@strays/core/OwnedError';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 export class BillingError extends OwnedError {
   constructor(message: string, public code: string) {

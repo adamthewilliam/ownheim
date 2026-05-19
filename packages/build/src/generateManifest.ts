@@ -1,4 +1,4 @@
-import type { ResolvedOwnership } from '@strays/core/types';
+import type { ResolvedOwnership } from '@ownheim/core/types';
 
 export interface ManifestOutput {
   readonly version: 1;

@@ -14,7 +14,7 @@ export interface SharedRule<TKey extends string = string> {
   readonly owners: readonly TKey[];
 }
 
-export interface StraysConfig<TTeams extends Record<string, Team>> {
+export interface OwnheimConfig<TTeams extends Record<string, Team>> {
   readonly teams: TTeams;
   readonly shared?: readonly SharedRule<TeamId<TTeams>>[];
 }

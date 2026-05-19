@@ -1,4 +1,4 @@
-import { OWNER_TAG } from '@strays/core/symbols';
+import { OWNER_TAG } from '@ownheim/core/symbols';
 
 /**
  * Marks an error class as owned by a team. Sets `[OWNER_TAG]` on the prototype
@@ -8,7 +8,7 @@ import { OWNER_TAG } from '@strays/core/symbols';
  * Usage with Schema.TaggedError:
  *
  *   import { Schema } from 'effect'
- *   import { ownedBy } from '@strays/effect/ownedBy'
+ *   import { ownedBy } from '@ownheim/effect/ownedBy'
  *
  *   class BillingError extends Schema.TaggedError<BillingError>('BillingError')(
  *     'BillingError',

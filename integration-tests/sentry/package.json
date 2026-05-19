@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/sentry",
+  "name": "@ownheim-it/sentry",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
-    "@strays/sentry": "workspace:*"
+    "@ownheim/core": "workspace:*",
+    "@ownheim/sentry": "workspace:*"
   },
   "optionalDependencies": {
     "@sentry/node": "^10.51.0"

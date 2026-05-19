@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
-import { OwnedError } from '@strays/core/OwnedError';
-import { resetDefaultRegistry } from '@strays/core/manifest/defaultRegistry';
-import { runWithEntrypointOwner } from '@strays/core/ownership';
+import { OwnedError } from '@ownheim/core/OwnedError';
+import { resetDefaultRegistry } from '@ownheim/core/manifest/defaultRegistry';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 import * as Sentry from '@sentry/node';
 import { parseEnvelope } from '@sentry/core';
 import type {
@@ -13,7 +13,7 @@ import type {
   Transport,
   TransportMakeRequestResponse,
 } from '@sentry/core';
-import { installSentry, type SentryClient } from '@strays/sentry/install';
+import { installSentry, type SentryClient } from '@ownheim/sentry/install';
 
 // In-memory transport: capture every envelope the SDK tries to flush.
 interface CapturedEnvelope {
@@ -52,12 +52,12 @@ function eventsFromEnvelopes(captured: CapturedEnvelope[]): Event[] {
   return events;
 }
 
-// Bridge the real Sentry Client to the strays SentryClient interface.
+// Bridge the real Sentry Client to the ownheim SentryClient interface.
 // `installSentry` only needs `addEventProcessor`. The real Event type has
-// `tags: { [key: string]: Primitive }` which is wider than the strays
+// `tags: { [key: string]: Primitive }` which is wider than the ownheim
 // SentryEvent's `Record<string, string>` — we coerce both directions via the
-// wrapper since strays only writes string values for the team tag.
-function asStraysClient(client: Client): SentryClient {
+// wrapper since ownheim only writes string values for the team tag.
+function asOwnheimClient(client: Client): SentryClient {
   return {
     addEventProcessor(processor) {
       const wrapped: EventProcessor = (event, hint) => {
@@ -88,11 +88,11 @@ afterEach(async () => {
   resetDefaultRegistry();
 });
 
-describe('@strays/sentry integration with real @sentry/node', () => {
+describe('@ownheim/sentry integration with real @sentry/node', () => {
   it('tags captured events with the active runWithEntrypointOwner team', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
-    installSentry(asStraysClient(client));
+    installSentry(asOwnheimClient(client));
 
     runWithEntrypointOwner('Billing', () => {
       Sentry.captureException(new Error('boom'));
@@ -109,7 +109,7 @@ describe('@strays/sentry integration with real @sentry/node', () => {
   it('honours OwnedError owner over the active scope', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
-    installSentry(asStraysClient(client));
+    installSentry(asOwnheimClient(client));
 
     const owned = new OwnedError('explicit', { responderTeam: 'Payments' });
 
@@ -127,7 +127,7 @@ describe('@strays/sentry integration with real @sentry/node', () => {
   it('falls back when capturing outside any owner scope', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
-    installSentry(asStraysClient(client), { fallbackCodeTeam: 'platform-default' });
+    installSentry(asOwnheimClient(client), { fallbackCodeTeam: 'platform-default' });
 
     Sentry.captureException(new Error('orphan'));
 
@@ -138,7 +138,7 @@ describe('@strays/sentry integration with real @sentry/node', () => {
     expect(event.tags?.team).toBe('platform-default');
   });
 
-  it('strays processor wins when installed after a processor that sets team', async () => {
+  it('ownheim processor wins when installed after a processor that sets team', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
 
@@ -148,9 +148,9 @@ describe('@strays/sentry integration with real @sentry/node', () => {
       return event;
     }) as EventProcessor);
 
-    // Install strays AFTER — should win because Sentry runs processors
+    // Install ownheim AFTER — should win because Sentry runs processors
     // in registration order and the last writer to `event.tags.team` wins.
-    installSentry(asStraysClient(client));
+    installSentry(asOwnheimClient(client));
 
     runWithEntrypointOwner('Billing', () => {
       Sentry.captureException(new Error('order matters'));
@@ -167,10 +167,10 @@ describe('@strays/sentry integration with real @sentry/node', () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
 
-    // Strays goes FIRST.
-    installSentry(asStraysClient(client));
+    // Ownheim goes FIRST.
+    installSentry(asOwnheimClient(client));
 
-    // Foreign processor runs after strays and clobbers the tag.
+    // Foreign processor runs after ownheim and clobbers the tag.
     client.addEventProcessor(((event) => {
       event.tags = { ...event.tags, team: 'usurper' };
       return event;
@@ -184,7 +184,7 @@ describe('@strays/sentry integration with real @sentry/node', () => {
 
     const events = eventsFromEnvelopes(captured);
     const event = events[events.length - 1]!;
-    // Documents the requirement: install strays last.
+    // Documents the requirement: install ownheim last.
     expect(event.tags?.team).toBe('usurper');
   });
 });

@@ -1,5 +1,5 @@
 {
-  "name": "@strays/example-bun-effect-http",
+  "name": "@ownheim/example-bun-effect-http",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,11 +8,11 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
-    "@strays/effect": "workspace:*",
-    "@strays/datadog": "workspace:*",
-    "@strays/sentry": "workspace:*",
-    "@strays/otel": "workspace:*",
+    "@ownheim/core": "workspace:*",
+    "@ownheim/effect": "workspace:*",
+    "@ownheim/datadog": "workspace:*",
+    "@ownheim/sentry": "workspace:*",
+    "@ownheim/otel": "workspace:*",
     "effect": "^3.10.0"
   }
 }

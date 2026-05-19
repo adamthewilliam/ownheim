@@ -1,7 +1,7 @@
 {
-  "name": "@strays/express",
+  "name": "@ownheim/express",
   "version": "0.1.0",
-  "description": "strays — Express middleware for per-route team tagging",
+  "description": "ownheim — Express middleware for per-route team tagging",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -17,6 +17,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*"
+    "@ownheim/core": "workspace:*"
   }
 }

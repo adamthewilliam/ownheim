@@ -1,7 +1,7 @@
 {
-  "name": "@strays/effect",
+  "name": "@ownheim/effect",
   "version": "0.1.0",
-  "description": "strays — Effect-TS Owner Context.Tag, ownedBy decorator, Logger and Tracer Layers",
+  "description": "ownheim — Effect-TS Owner Context.Tag, ownedBy decorator, Logger and Tracer Layers",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -20,7 +20,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*"
+    "@ownheim/core": "workspace:*"
   },
   "peerDependencies": {
     "effect": "^3.10.0"

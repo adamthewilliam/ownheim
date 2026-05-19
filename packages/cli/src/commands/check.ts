@@ -1,24 +1,24 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
-import { generateCodeowners } from '@strays/build/generateCodeowners';
-import { resolveOwnerForFile } from '@strays/build/resolveRules';
-import type { ResolvedOwner } from '@strays/core/types';
+import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
+import { generateCodeowners } from '@ownheim/build/generateCodeowners';
+import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
+import type { ResolvedOwner } from '@ownheim/core/types';
 import type { LoadedConfig } from '../loadConfig.ts';
 import { walkSourceFiles } from '../walkFiles.ts';
 
 export interface CheckResult {
   readonly drift: boolean;
   readonly diff?: string;
-  readonly straysCount: number;
-  readonly straysFiles: readonly string[];
+  readonly ownheimCount: number;
+  readonly ownheimFiles: readonly string[];
 }
 
 export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
   const codeownersPath = join(loaded.projectRoot, '.github/CODEOWNERS');
 
   const resolved: ResolvedOwner[] = [];
-  const straysFiles: string[] = [];
+  const ownheimFiles: string[] = [];
 
   for await (const file of walkSourceFiles(loaded.projectRoot)) {
     const extraction = extractFromSourceText(file.relative, file.source);
@@ -27,7 +27,7 @@ export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
       jsdocOwner: extraction.jsdocOwner,
     });
     if (result === undefined || result.source === 'fallback') {
-      straysFiles.push(file.relative);
+      ownheimFiles.push(file.relative);
     }
     if (result !== undefined) {
       resolved.push(result);
@@ -44,8 +44,8 @@ export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
 
   const drift = actual !== expected;
   const result: CheckResult = drift
-    ? { drift, diff: simpleDiff(actual ?? '', expected), straysCount: straysFiles.length, straysFiles }
-    : { drift, straysCount: straysFiles.length, straysFiles };
+    ? { drift, diff: simpleDiff(actual ?? '', expected), ownheimCount: ownheimFiles.length, ownheimFiles }
+    : { drift, ownheimCount: ownheimFiles.length, ownheimFiles };
   return result;
 }
 

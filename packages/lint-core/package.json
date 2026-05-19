@@ -1,7 +1,7 @@
 {
-  "name": "@strays/lint-core",
+  "name": "@ownheim/lint-core",
   "version": "0.1.0",
-  "description": "strays — linter-agnostic rule logic (pure functions, returns Diagnostic[])",
+  "description": "ownheim — linter-agnostic rule logic (pure functions, returns Diagnostic[])",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -14,7 +14,7 @@
     "./adapter": "./src/adapter.ts",
     "./validateFileOwnership": "./src/validateFileOwnership.ts",
     "./validateCodeownersEdit": "./src/validateCodeownersEdit.ts",
-    "./rules/noStrays": "./src/rules/noStrays.ts",
+    "./rules/noOwnheim": "./src/rules/noOwnheim.ts",
     "./rules/noCodeownersEdit": "./src/rules/noCodeownersEdit.ts",
     "./rules/registry": "./src/rules/registry.ts"
   },
@@ -23,7 +23,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/build": "workspace:*",
-    "@strays/core": "workspace:*"
+    "@ownheim/build": "workspace:*",
+    "@ownheim/core": "workspace:*"
   }
 }

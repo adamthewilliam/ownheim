@@ -50,9 +50,9 @@ export function formatOwnedLogEntry(entry: OwnedLogEntry): FormattedLogLine {
     msg: entry.message,
     ...entry.fields,
     ...(entry.error !== undefined ? { err: serialiseError(entry.error) } : {}),
-    ...(entrypointTeam === undefined ? {} : { strays_entrypoint_team: entrypointTeam }),
-    ...(codeTeam === undefined ? {} : { strays_code_team: codeTeam }),
-    ...(responderTeam === undefined ? {} : { strays_responder_team: responderTeam }),
+    ...(entrypointTeam === undefined ? {} : { ownheim_entrypoint_team: entrypointTeam }),
+    ...(codeTeam === undefined ? {} : { ownheim_code_team: codeTeam }),
+    ...(responderTeam === undefined ? {} : { ownheim_responder_team: responderTeam }),
     team,
   };
 

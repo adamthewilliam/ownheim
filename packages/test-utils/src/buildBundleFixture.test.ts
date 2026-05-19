@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { Team } from '@strays/core/types';
+import type { Team } from '@ownheim/core/types';
 import { buildBundleFixture } from './buildBundleFixture.ts';
 
 describe('buildBundleFixture (harness self-test)', () => {

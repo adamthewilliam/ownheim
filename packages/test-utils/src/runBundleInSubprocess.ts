@@ -24,7 +24,7 @@ export async function runBundleInSubprocess(
   opts: RunBundleOptions = {},
 ): Promise<RunBundleResult> {
   const runtime = opts.runtime ?? 'bun';
-  const dir = await mkdtemp(join(tmpdir(), 'strays-run-'));
+  const dir = await mkdtemp(join(tmpdir(), 'ownheim-run-'));
   const scriptPath = join(dir, 'bundle.mjs');
 
   try {

@@ -1,5 +1,5 @@
 import type { LintRuleDefinition, LintRuleOptions } from '../adapter.ts';
-import { noStraysRule } from './noStrays.ts';
+import { noOwnheimRule } from './noOwnheim.ts';
 import { noCodeownersEditRule } from './noCodeownersEdit.ts';
 
 /**
@@ -23,13 +23,13 @@ export interface RegisteredRule<TOptions = LintRuleOptions> {
 export const rules: ReadonlyArray<RegisteredRule<unknown>> = [
   {
     meta: {
-      id: 'no-strays',
+      id: 'no-ownheim',
       description: 'every source file must resolve to an explicit (non-fallback) owner',
       category: 'problem',
       fixable: true,
       optionsSchema: 'lint-rule-options',
     },
-    definition: noStraysRule as LintRuleDefinition<unknown>,
+    definition: noOwnheimRule as LintRuleDefinition<unknown>,
   },
   {
     meta: {

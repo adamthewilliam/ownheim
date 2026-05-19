@@ -1,7 +1,7 @@
 {
-  "name": "@strays/build",
+  "name": "@ownheim/build",
   "version": "0.1.0",
-  "description": "strays — AST walker, rule resolver, CODEOWNERS + manifest generators, esbuild plugin",
+  "description": "ownheim — AST walker, rule resolver, CODEOWNERS + manifest generators, esbuild plugin",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -21,7 +21,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*",
+    "@ownheim/core": "workspace:*",
     "ts-morph": "^24.0.0",
     "picomatch": "^4.0.2"
   },

@@ -20,14 +20,14 @@ describe('lint-core rule registry', () => {
   });
 
   it('rules length matches the count of validator modules in lint-core', () => {
-    // Two validator modules currently exist: noStrays + noCodeownersEdit.
+    // Two validator modules currently exist: noOwnheim + noCodeownersEdit.
     // This guards against forgetting to register a new validator.
     expect(rules).toHaveLength(2);
   });
 
   it('exposes the expected rule ids', () => {
     expect(rules.map((r) => r.meta.id).sort()).toEqual(
-      ['no-codeowners-edit', 'no-strays'].sort(),
+      ['no-codeowners-edit', 'no-ownheim'].sort(),
     );
   });
 });

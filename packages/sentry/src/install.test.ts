@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import { OwnedError } from '@strays/core/OwnedError';
-import { ManifestRegistry, type OwnershipManifest } from '@strays/core/manifest/ManifestRegistry';
-import { resetDefaultRegistry, setDefaultRegistry } from '@strays/core/manifest/defaultRegistry';
-import { runWithEntrypointOwner } from '@strays/core/ownership';
+import { OwnedError } from '@ownheim/core/OwnedError';
+import { ManifestRegistry, type OwnershipManifest } from '@ownheim/core/manifest/ManifestRegistry';
+import { resetDefaultRegistry, setDefaultRegistry } from '@ownheim/core/manifest/defaultRegistry';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 import { installSentry, type SentryClient, type SentryEventProcessor } from './install.ts';
 
 function loadManifest(manifest: OwnershipManifest): void {
@@ -28,8 +28,8 @@ describe('installSentry', () => {
     const err = new OwnedError('boom', { responderTeam: 'Billing' });
 
     const event = processors[0]!({}, { originalException: err });
-    expect(event?.tags?.['strays.responder_team']).toBe('Billing');
-    expect(event?.tags?.['strays.code_team']).toBe('unowned');
+    expect(event?.tags?.['ownheim.responder_team']).toBe('Billing');
+    expect(event?.tags?.['ownheim.code_team']).toBe('unowned');
   });
 
   it('tags events with entrypoint ownership from scope', () => {
@@ -39,7 +39,7 @@ describe('installSentry', () => {
     const event = runWithEntrypointOwner('Identity', () =>
       processors[0]!({}, { originalException: new Error('plain') }),
     );
-    expect(event?.tags?.['strays.entrypoint_team']).toBe('Identity');
+    expect(event?.tags?.['ownheim.entrypoint_team']).toBe('Identity');
   });
 
   it('uses manifest lookup via stack frames for code ownership', () => {
@@ -65,7 +65,7 @@ describe('installSentry', () => {
       { originalException: new Error('plain') },
     );
 
-    expect(event?.tags?.['strays.code_team']).toBe('Billing');
+    expect(event?.tags?.['ownheim.code_team']).toBe('Billing');
   });
 
   it('uses fallbackCodeTeam when nothing resolves', () => {
@@ -73,7 +73,7 @@ describe('installSentry', () => {
     installSentry(client, { fallbackCodeTeam: 'platform-default' });
 
     const event = processors[0]!({}, { originalException: new Error('orphan') });
-    expect(event?.tags?.['strays.code_team']).toBe('platform-default');
+    expect(event?.tags?.['ownheim.code_team']).toBe('platform-default');
   });
 
   it('honours custom tag keys', () => {

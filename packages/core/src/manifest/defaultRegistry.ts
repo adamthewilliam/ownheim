@@ -17,7 +17,7 @@ export function resetDefaultRegistry(): void {
 /**
  * Register the generated ownership manifest used by stack-frame based owner
  * resolution. Call this once during process startup after loading the JSON
- * produced by `strays generate`.
+ * produced by `ownheim generate`.
  */
 export function registerOwnershipManifest(manifest: OwnershipManifest): ManifestRegistry {
   const registry = ManifestRegistry.fromManifest(manifest);

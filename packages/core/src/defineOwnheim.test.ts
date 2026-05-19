@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import { defineStrays } from './defineStrays.ts';
+import { defineOwnheim } from './defineOwnheim.ts';
 
-describe('defineStrays', () => {
+describe('defineOwnheim', () => {
   it('returns the config unchanged for valid input', () => {
-    const config = defineStrays({
+    const config = defineOwnheim({
       teams: {
         Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
       },
@@ -15,7 +15,7 @@ describe('defineStrays', () => {
 
   it('throws when a shared rule references an unknown team', () => {
     expect(() =>
-      defineStrays({
+      defineOwnheim({
         teams: {
           Billing: { github: '@org/billing' },
         },
@@ -27,7 +27,7 @@ describe('defineStrays', () => {
 
   it('throws when more than one team has fallback: true', () => {
     expect(() =>
-      defineStrays({
+      defineOwnheim({
         teams: {
           Billing: { github: '@org/billing', fallback: true },
           Platform: { github: '@org/platform', fallback: true },
@@ -37,7 +37,7 @@ describe('defineStrays', () => {
   });
 
   it('accepts shared rules with multiple teams', () => {
-    const config = defineStrays({
+    const config = defineOwnheim({
       teams: {
         Billing: { github: '@org/billing' },
         Platform: { github: '@org/platform' },
@@ -50,7 +50,7 @@ describe('defineStrays', () => {
 
   it('rejects shared rules with an unknown team in the array', () => {
     expect(() =>
-      defineStrays({
+      defineOwnheim({
         teams: {
           Billing: { github: '@org/billing' },
         },

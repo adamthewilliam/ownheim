@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { defineStrays } from '@strays/core/defineStrays';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 import { resolveOwnerForFile } from './resolveRules.ts';
 
-const config = defineStrays({
+const config = defineOwnheim({
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Identity: { github: '@org/identity', owns: ['packages/auth/**'] },
@@ -58,7 +58,7 @@ describe('resolveOwnerForFile', () => {
   });
 
   it('returns undefined when no fallback and no match', () => {
-    const cfg = defineStrays({
+    const cfg = defineOwnheim({
       teams: {
         Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
       },
@@ -67,7 +67,7 @@ describe('resolveOwnerForFile', () => {
   });
 
   it('shared rule returns all teams', () => {
-    const cfg = defineStrays({
+    const cfg = defineOwnheim({
       teams: {
         Billing: { github: '@org/billing' },
         Platform: { github: '@org/platform' },

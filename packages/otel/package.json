@@ -1,7 +1,7 @@
 {
-  "name": "@strays/otel",
+  "name": "@ownheim/otel",
   "version": "0.1.0",
-  "description": "strays — OpenTelemetry SpanProcessor + resource attribute injector",
+  "description": "ownheim — OpenTelemetry SpanProcessor + resource attribute injector",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -18,6 +18,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/core": "workspace:*"
+    "@ownheim/core": "workspace:*"
   }
 }

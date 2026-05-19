@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/express",
+  "name": "@ownheim-it/express",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,9 +8,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/express": "workspace:*",
-    "@strays/core": "workspace:*",
-    "@strays/test-utils": "workspace:*"
+    "@ownheim/express": "workspace:*",
+    "@ownheim/core": "workspace:*",
+    "@ownheim/test-utils": "workspace:*"
   },
   "optionalDependencies": {
     "@types/express": "^5.0.6",

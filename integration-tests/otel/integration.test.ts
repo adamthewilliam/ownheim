@@ -5,10 +5,10 @@ import {
   NodeTracerProvider,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
-import { runWithEntrypointOwner } from '@strays/core/ownership';
-import { OwnershipSpanProcessor } from '@strays/otel/SpanProcessor';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
+import { OwnershipSpanProcessor } from '@ownheim/otel/SpanProcessor';
 
-describe('@strays/otel integration with real SDK', () => {
+describe('@ownheim/otel integration with real SDK', () => {
   let exporter: InMemorySpanExporter;
   let provider: NodeTracerProvider;
 

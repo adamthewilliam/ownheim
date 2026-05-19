@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/hono",
+  "name": "@ownheim-it/hono",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,9 +8,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/hono": "workspace:*",
-    "@strays/core": "workspace:*",
-    "@strays/test-utils": "workspace:*"
+    "@ownheim/hono": "workspace:*",
+    "@ownheim/core": "workspace:*",
+    "@ownheim/test-utils": "workspace:*"
   },
   "optionalDependencies": {
     "hono": "^4.12.16"

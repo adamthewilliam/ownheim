@@ -1,16 +1,16 @@
-# @strays/trpc
+# @ownheim/trpc
 
 Tag every tRPC procedure with the team that owns it, in a way TypeScript can verify.
 
-This is a tRPC middleware. It wraps the procedure's handler in a `runWithEntrypointOwner` scope so that every span, log, and error emitted while the procedure runs is automatically tagged with the right entrypoint team — by `@strays/datadog`, `@strays/sentry`, `@strays/otel`, or anything else that reads `currentEntrypointOwner()`.
+This is a tRPC middleware. It wraps the procedure's handler in a `runWithEntrypointOwner` scope so that every span, log, and error emitted while the procedure runs is automatically tagged with the right entrypoint team — by `@ownheim/datadog`, `@ownheim/sentry`, `@ownheim/otel`, or anything else that reads `currentEntrypointOwner()`.
 
 ## Install
 
 ```bash
-bun add @strays/trpc @strays/runtime @strays/core
+bun add @ownheim/trpc @ownheim/runtime @ownheim/core
 ```
 
-You also need `@trpc/server`. Strays doesn't pin a version. Anything with the standard `.use(middleware)` builder API (v10, v11) works.
+You also need `@trpc/server`. Ownheim doesn't pin a version. Anything with the standard `.use(middleware)` builder API (v10, v11) works.
 
 ## Two ways to use it
 
@@ -20,7 +20,7 @@ You also need `@trpc/server`. Strays doesn't pin a version. Anything with the st
 
 ```ts
 import { initTRPC } from '@trpc/server';
-import { entrypointProcedure } from '@strays/trpc/entrypointProcedure';
+import { entrypointProcedure } from '@ownheim/trpc/entrypointProcedure';
 
 const t = initTRPC.create();
 
@@ -44,7 +44,7 @@ const billingAuthed = entrypointProcedure(protectedProcedure, 'Billing');
 If you'd rather use `.use()` yourself, `entrypointOwner(owner)` returns the bare middleware function:
 
 ```ts
-import { entrypointOwner } from '@strays/trpc/entrypointOwner';
+import { entrypointOwner } from '@ownheim/trpc/entrypointOwner';
 
 const billingProcedure = t.procedure
   .use(authMiddleware)
@@ -60,15 +60,15 @@ Order matters here only if other middlewares read `currentEntrypointOwner()`. An
 ({ next }) => runWithEntrypointOwner(owner, () => next());
 ```
 
-That's the whole thing. AsyncLocalStorage holds the owner for the duration of `next()` and any async work it spawns. The next time something downstream calls `currentEntrypointOwner()` — inside a handler, inside a span processor, inside an event processor — it gets the owner back. On the wire (logs, spans, Sentry tags) it's emitted as `strays.entrypoint_team`.
+That's the whole thing. AsyncLocalStorage holds the owner for the duration of `next()` and any async work it spawns. The next time something downstream calls `currentEntrypointOwner()` — inside a handler, inside a span processor, inside an event processor — it gets the owner back. On the wire (logs, spans, Sentry tags) it's emitted as `ownheim.entrypoint_team`.
 
 ## Pairing it with the lint rule
 
-The real win is at the type level. If every procedure in your router is built from an owner-tagged builder, you can add an `@strays/oxlint` rule that flags any router member built from the bare `t.procedure`. That gives you compile-time owner coverage for your entire API surface without runtime checks.
+The real win is at the type level. If every procedure in your router is built from an owner-tagged builder, you can add an `@ownheim/oxlint` rule that flags any router member built from the bare `t.procedure`. That gives you compile-time owner coverage for your entire API surface without runtime checks.
 
 In practice this means: do a one-time audit, replace every `t.procedure` with an owner-tagged variant, and turn the lint rule on. New procedures can't be added without picking an owner.
 
-## Pairing it with `@strays/sentry` and `@strays/datadog`
+## Pairing it with `@ownheim/sentry` and `@ownheim/datadog`
 
 Nothing extra to do. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope. The owner flows through:
 

@@ -21,7 +21,7 @@
 //      lookup. If the registry can resolve via the captured path, the
 //      whole stack-frame → manifest pipeline works for that config.
 //   3. The entry also issues a second lookup against a registry keyed
-//      by the relative source path (`src/feature.ts`) — what the strays
+//      by the relative source path (`src/feature.ts`) — what the ownheim
 //      build plugin actually emits in production. This is the realistic
 //      production case that fails when frames are not source-mapped.
 //   4. `feature.ts` also throws an `OwnedError` whose tag is
@@ -33,7 +33,7 @@
 //   - The helper does not pass `outfile` / `outdir`, which esbuild
 //     requires for `sourcemap: 'external'`.
 //   - The helper points `absWorkingDir` at the freshly-mkdtemp'd fixture
-//     dir, leaving esbuild's resolver unable to find `@strays/*`
+//     dir, leaving esbuild's resolver unable to find `@ownheim/*`
 //     workspace packages from outside the monorepo. We sidestep that by
 //     writing the entry+feature *inside* the package's test tree, where
 //     normal node_modules resolution Just Works.
@@ -46,7 +46,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
-import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess';
+import { runBundleInSubprocess } from '@ownheim/test-utils/runBundleInSubprocess';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MONOREPO_ROOT = resolve(HERE, '../../../..');
@@ -124,7 +124,7 @@ const selfRegistry = ManifestRegistry.fromManifest({
 setDefaultRegistry(selfRegistry);
 const ownerWithSelfPath = callLookupFromFeature() ?? null;
 
-// Lookup #2: registry keyed by the relative source path the strays
+// Lookup #2: registry keyed by the relative source path the ownheim
 // build plugin would emit (\`src/feature.ts\`). This is the realistic
 // production case. Whether it succeeds depends on whether the runtime
 // frame matches a path the manifest knows about — i.e. whether source
@@ -182,7 +182,7 @@ interface BuiltBundle {
 }
 
 async function bundle(cfg: Config): Promise<BuiltBundle> {
-  const fixtureRoot = await mkdtemp(join(tmpdir(), 'strays-a5-'));
+  const fixtureRoot = await mkdtemp(join(tmpdir(), 'ownheim-a5-'));
   const entryAbs = join(fixtureRoot, 'src', 'entry.ts');
   const featureAbs = join(fixtureRoot, 'src', 'feature.ts');
 
@@ -294,7 +294,7 @@ describe('A5 — stack-frame robustness on bundles', () => {
   it('minified bundle, no source map: owner resolution against source-keyed manifest FAILS (production failure mode)', async () => {
     const out = await buildAndRun(CONFIGS.minifyNoMap);
     expect(out.featureFramePath ?? '').toContain('bundle.mjs');
-    // The strays build plugin keys the manifest by source paths (e.g.
+    // The ownheim build plugin keys the manifest by source paths (e.g.
     // `src/feature.ts`).  The runtime sees `bundle.mjs`.  No match.
     expect(out.ownerWithSourcePath).toBeNull();
   }, 30_000);

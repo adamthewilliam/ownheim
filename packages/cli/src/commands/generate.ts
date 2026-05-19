@@ -1,10 +1,10 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
-import { generateCodeowners } from '@strays/build/generateCodeowners';
-import { generateManifest } from '@strays/build/generateManifest';
-import { resolveOwnerForFile } from '@strays/build/resolveRules';
-import type { ResolvedOwner } from '@strays/core/types';
+import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
+import { generateCodeowners } from '@ownheim/build/generateCodeowners';
+import { generateManifest } from '@ownheim/build/generateManifest';
+import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
+import type { ResolvedOwner } from '@ownheim/core/types';
 import type { LoadedConfig } from '../loadConfig.ts';
 import { walkSourceFiles } from '../walkFiles.ts';
 
@@ -18,7 +18,7 @@ export interface GenerateResult {
   readonly codeownersText: string;
   readonly codeownersPath: string;
   readonly manifestPath: string;
-  readonly straysCount: number;
+  readonly ownheimCount: number;
 }
 
 export async function runGenerate(
@@ -26,10 +26,10 @@ export async function runGenerate(
   options: GenerateOptions = {},
 ): Promise<GenerateResult> {
   const codeownersPath = options.codeownersPath ?? join(loaded.projectRoot, '.github/CODEOWNERS');
-  const manifestPath = options.manifestPath ?? join(loaded.projectRoot, 'dist/strays-manifest.json');
+  const manifestPath = options.manifestPath ?? join(loaded.projectRoot, 'dist/ownheim-manifest.json');
 
   const resolved: ResolvedOwner[] = [];
-  let straysCount = 0;
+  let ownheimCount = 0;
 
   for await (const file of walkSourceFiles(loaded.projectRoot)) {
     const extraction = extractFromSourceText(file.relative, file.source);
@@ -38,7 +38,7 @@ export async function runGenerate(
       jsdocOwner: extraction.jsdocOwner,
     });
     if (result === undefined || result.source === 'fallback') {
-      straysCount++;
+      ownheimCount++;
     }
     if (result !== undefined) {
       resolved.push(result);
@@ -54,5 +54,5 @@ export async function runGenerate(
   await mkdir(dirname(manifestPath), { recursive: true });
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
 
-  return { resolved, codeownersText, codeownersPath, manifestPath, straysCount };
+  return { resolved, codeownersText, codeownersPath, manifestPath, ownheimCount };
 }

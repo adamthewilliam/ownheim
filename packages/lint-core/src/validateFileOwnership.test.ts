@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'bun:test';
-import { defineStrays } from '@strays/core/defineStrays';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 import { validateFileOwnership } from './validateFileOwnership.ts';
 
-const config = defineStrays({
+const config = defineOwnheim({
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Platform: { github: '@org/platform', fallback: true },
   },
 });
 
-const configNoFallback = defineStrays({
+const configNoFallback = defineOwnheim({
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
   },
@@ -41,7 +41,7 @@ describe('validateFileOwnership', () => {
       config,
     });
     expect(result).toHaveLength(1);
-    expect(result[0]?.ruleId).toBe('no-strays');
+    expect(result[0]?.ruleId).toBe('no-ownheim');
     expect(result[0]?.message).toContain('fallback');
     expect(result[0]?.fix?.insertText).toBe('/** @owner TODO */\n');
   });
@@ -53,7 +53,7 @@ describe('validateFileOwnership', () => {
       config: configNoFallback,
     });
     expect(result).toHaveLength(1);
-    expect(result[0]?.ruleId).toBe('no-strays');
+    expect(result[0]?.ruleId).toBe('no-ownheim');
     expect(result[0]?.message).toContain('no rule matched');
   });
 

@@ -1,5 +1,5 @@
-import { extractFromSourceText } from '@strays/build/analyzeSourceFile';
-import { resolveOwnerForFile } from '@strays/build/resolveRules';
+import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
+import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
 import type { LoadedConfig } from '../loadConfig.ts';
 import { walkSourceFiles } from '../walkFiles.ts';
 

@@ -2,8 +2,8 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { build, type BuildOptions, type Plugin } from 'esbuild';
-import type { Team, StraysConfig } from '@strays/core/types';
-import { strays } from '@strays/build/esbuildPlugin';
+import type { Team, OwnheimConfig } from '@ownheim/core/types';
+import { ownheim } from '@ownheim/build/esbuildPlugin';
 
 export interface BundleFixtureOptions<TTeams extends Record<string, Team>> {
   readonly source: string;
@@ -13,7 +13,7 @@ export interface BundleFixtureOptions<TTeams extends Record<string, Team>> {
   readonly minify?: boolean;
   readonly treeShake?: boolean;
   readonly sourcemap?: boolean | 'inline' | 'external';
-  readonly config: StraysConfig<TTeams>;
+  readonly config: OwnheimConfig<TTeams>;
   readonly projectRoot?: string;
 }
 
@@ -27,9 +27,9 @@ export async function buildBundleFixture<TTeams extends Record<string, Team>>(
   opts: BundleFixtureOptions<TTeams>,
 ): Promise<BundleFixtureResult> {
   // Always allocate a fresh tmp dir per call so concurrent fixtures do not
-  // step on each other. The strays plugin reads files off disk inside its
+  // step on each other. The ownheim plugin reads files off disk inside its
   // `onLoad` hook, so we cannot use esbuild's virtual stdin path.
-  const fixtureRoot = await mkdtemp(join(tmpdir(), 'strays-fixture-'));
+  const fixtureRoot = await mkdtemp(join(tmpdir(), 'ownheim-fixture-'));
   const projectRoot = opts.projectRoot ?? fixtureRoot;
   const entryRelative = opts.entryPath ?? 'src/entry.ts';
 
@@ -42,7 +42,7 @@ export async function buildBundleFixture<TTeams extends Record<string, Team>>(
   }
 
   const entryAbs = resolve(fixtureRoot, entryRelative);
-  const plugin: Plugin = strays({ config: opts.config, projectRoot });
+  const plugin: Plugin = ownheim({ config: opts.config, projectRoot });
 
   const buildOptions: BuildOptions = {
     entryPoints: [entryAbs],

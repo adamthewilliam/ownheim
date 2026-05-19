@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/otel",
+  "name": "@ownheim-it/otel",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/otel": "workspace:*",
-    "@strays/core": "workspace:*"
+    "@ownheim/otel": "workspace:*",
+    "@ownheim/core": "workspace:*"
   },
   "optionalDependencies": {
     "@opentelemetry/api": "^1.9.1",

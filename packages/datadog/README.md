@@ -1,19 +1,19 @@
-# @strays/datadog
+# @ownheim/datadog
 
-Tag Datadog spans with Strays' layered ownership model.
+Tag Datadog spans with Ownheim' layered ownership model.
 
-Strays emits separate tags for separate questions:
+Ownheim emits separate tags for separate questions:
 
 | Concept | Tag |
 |---|---|
-| Entrypoint owner | `strays.entrypoint_team` |
-| Code owner | `strays.code_team` |
-| Responder | `strays.responder_team` |
+| Entrypoint owner | `ownheim.entrypoint_team` |
+| Code owner | `ownheim.code_team` |
+| Responder | `ownheim.responder_team` |
 
 ## Install
 
 ```bash
-bun add @strays/datadog @strays/core
+bun add @ownheim/datadog @ownheim/core
 ```
 
 You also need `dd-trace`.
@@ -22,7 +22,7 @@ You also need `dd-trace`.
 
 ```ts
 import tracer from 'dd-trace';
-import { instrumentDatadog } from '@strays/datadog';
+import { instrumentDatadog } from '@ownheim/datadog';
 
 tracer.init({ service: 'api' });
 instrumentDatadog(tracer);
@@ -31,7 +31,7 @@ instrumentDatadog(tracer);
 ## Entrypoint ownership
 
 ```ts
-import { runWithEntrypointOwner } from '@strays/core/ownership';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 
 app.post('/charge', (req, res) =>
   runWithEntrypointOwner('Billing', async () => {
@@ -43,7 +43,7 @@ app.post('/charge', (req, res) =>
 Spans started inside the operation include:
 
 ```txt
-strays.entrypoint_team=Billing
+ownheim.entrypoint_team=Billing
 ```
 
 ## Code ownership
@@ -51,18 +51,18 @@ strays.entrypoint_team=Billing
 Register the generated manifest once at process startup:
 
 ```ts
-import manifest from './.strays/ownership.json' with { type: 'json' };
-import { registerOwnershipManifest } from '@strays/core';
+import manifest from './.ownheim/ownership.json' with { type: 'json' };
+import { registerOwnershipManifest } from '@ownheim/core';
 
 registerOwnershipManifest(manifest);
 ```
 
-Spans also include `strays.code_team` based on the file/package that started the span.
+Spans also include `ownheim.code_team` based on the file/package that started the span.
 
 ## Responder ownership
 
 ```ts
-import { OwnedError } from '@strays/core';
+import { OwnedError } from '@ownheim/core';
 
 throw new OwnedError('payment provider timed out', {
   responderTeam: 'Billing',
@@ -72,7 +72,7 @@ throw new OwnedError('payment provider timed out', {
 Telemetry for that failure can include:
 
 ```txt
-strays.responder_team=Billing
+ownheim.responder_team=Billing
 ```
 
 ## Options
@@ -81,9 +81,9 @@ strays.responder_team=Billing
 instrumentDatadog(tracer, {
   fallbackCodeTeam: 'platform',
   tags: {
-    entrypointTeam: 'strays.entrypoint_team',
-    codeTeam: 'strays.code_team',
-    responderTeam: 'strays.responder_team',
+    entrypointTeam: 'ownheim.entrypoint_team',
+    codeTeam: 'ownheim.code_team',
+    responderTeam: 'ownheim.responder_team',
   },
 });
 ```
@@ -92,7 +92,7 @@ instrumentDatadog(tracer, {
 
 ```ts
 import { datadogRum } from '@datadog/browser-rum';
-import { installDatadogRum } from '@strays/datadog/rum';
+import { installDatadogRum } from '@ownheim/datadog/rum';
 
 datadogRum.init({ applicationId: '...', clientToken: '...', service: 'web' });
 installDatadogRum(datadogRum, 'web-platform');

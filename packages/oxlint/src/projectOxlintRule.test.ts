@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'bun:test';
-import { defineStrays } from '@strays/core/defineStrays';
-import type { Owner, StraysConfig } from '@strays/core/types';
-import { rules } from '@strays/lint-core/rules/registry';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
+import type { Owner, OwnheimConfig } from '@ownheim/core/types';
+import { rules } from '@ownheim/lint-core/rules/registry';
 import { projectOxlintRule, type OxlintRuleContext } from './adapter.ts';
 
-const config = defineStrays({
+const config = defineOwnheim({
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Platform: { github: '@org/platform', fallback: true },
   },
-}) as unknown as StraysConfig<Record<string, Owner>>;
+}) as unknown as OwnheimConfig<Record<string, Owner>>;
 
 describe('projectOxlintRule', () => {
   it('produces a valid OxlintRule shape for every registered rule', () => {
@@ -27,9 +27,9 @@ describe('projectOxlintRule', () => {
   });
 
   it('end-to-end Program() propagates diagnostics from validateFileOwnership', () => {
-    const noStrays = rules.find((r) => r.meta.id === 'no-strays');
-    expect(noStrays).toBeDefined();
-    const projected = projectOxlintRule(noStrays!);
+    const noOwnheim = rules.find((r) => r.meta.id === 'no-ownheim');
+    expect(noOwnheim).toBeDefined();
+    const projected = projectOxlintRule(noOwnheim!);
 
     const reports: Array<{ message: string }> = [];
     const ctx: OxlintRuleContext = {

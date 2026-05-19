@@ -1,5 +1,5 @@
 {
-  "name": "@strays-it/orpc",
+  "name": "@ownheim-it/orpc",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,9 +8,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/orpc": "workspace:*",
-    "@strays/core": "workspace:*",
-    "@strays/test-utils": "workspace:*"
+    "@ownheim/orpc": "workspace:*",
+    "@ownheim/core": "workspace:*",
+    "@ownheim/test-utils": "workspace:*"
   },
   "optionalDependencies": {
     "@orpc/client": "^1.14.0",

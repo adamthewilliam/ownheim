@@ -1,24 +1,24 @@
 // A3 — Dynamic import + TLA contract tests.
 //
-// Goal: assert that the @strays/build esbuild plugin's import-rewrite +
+// Goal: assert that the @ownheim/build esbuild plugin's import-rewrite +
 // `__OWNER__` injection survive less-common module shapes:
 //   1. dynamic `import()` of an owned module
 //   2. dynamic `import()` inside a try/catch
 //   3. top-level await in an owned module
 //
-// We deliberately do NOT use `buildBundleFixture` from @strays/test-utils
+// We deliberately do NOT use `buildBundleFixture` from @ownheim/test-utils
 // here. That harness is locked to `platform: 'neutral'` for ESM and does
-// not expose `nodePaths`. A runnable bundle that imports `@strays/core`
+// not expose `nodePaths`. A runnable bundle that imports `@ownheim/core`
 // requires (a) `platform: 'node'` so `node:async_hooks` (used by the
 // runtime's AsyncLocalStorage) resolves, and (b) `nodePaths` pointing at
 // the workspace's `node_modules` so the rewritten
-// `@strays/core/logging/createLogger` subpath specifier resolves from the
+// `@ownheim/core/logging/createLogger` subpath specifier resolves from the
 // off-tree fixture root. Extending the shared harness is out of scope per
 // the task constraints (only `packages/build/test/contract/` may change).
 //
 // Each test:
 //   (a) writes fixture files into a fresh real-path tmp dir,
-//   (b) bundles via esbuild + the real `strays()` plugin export,
+//   (b) bundles via esbuild + the real `ownheim()` plugin export,
 //   (c) asserts the bundle text contains a `createLogger("<owner>")`
 //       initializer originating in `feature.ts`,
 //   (d) executes the bundle in a subprocess via `runBundleInSubprocess`
@@ -30,9 +30,9 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
-import { strays } from '@strays/build/esbuildPlugin';
-import { runBundleInSubprocess } from '@strays/test-utils/runBundleInSubprocess';
-import type { Team, StraysConfig } from '@strays/core/types';
+import { ownheim } from '@ownheim/build/esbuildPlugin';
+import { runBundleInSubprocess } from '@ownheim/test-utils/runBundleInSubprocess';
+import type { Team, OwnheimConfig } from '@ownheim/core/types';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MONOREPO_ROOT = resolve(HERE, '../../../..');
@@ -49,13 +49,13 @@ interface FixtureFiles {
 
 async function buildContractFixture<TTeams extends Record<string, Team>>(
   files: FixtureFiles,
-  config: StraysConfig<TTeams>,
+  config: OwnheimConfig<TTeams>,
 ): Promise<BuiltFixture> {
   // realpath() collapses macOS's /var → /private/var symlink so that
-  // `relative(projectRoot, args.path)` inside the strays plugin yields
+  // `relative(projectRoot, args.path)` inside the ownheim plugin yields
   // `src/feature.ts` (matchable by picomatch) rather than a leading-`..`
   // path that picomatch refuses to match against `**`.
-  const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'strays-a3-')));
+  const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'ownheim-a3-')));
 
   const writeFx = async (rel: string, contents: string): Promise<void> => {
     const abs = resolve(fixtureRoot, rel);
@@ -72,13 +72,13 @@ async function buildContractFixture<TTeams extends Record<string, Team>>(
     write: false,
     format: 'esm',
     platform: 'node',
-    // Make `@strays/core/logging/createLogger` resolvable from a fixture root
+    // Make `@ownheim/core/logging/createLogger` resolvable from a fixture root
     // that lives outside the workspace tree. Use the monorepo root rather
     // than `process.cwd()` so the test passes regardless of where it's
     // invoked from (workspace root, package dir, or via turbo).
     nodePaths: [resolve(MONOREPO_ROOT, 'node_modules')],
     absWorkingDir: fixtureRoot,
-    plugins: [strays({ config, projectRoot: fixtureRoot })],
+    plugins: [ownheim({ config, projectRoot: fixtureRoot })],
   });
 
   const text = result.outputFiles?.[0]?.text ?? '';
@@ -94,7 +94,7 @@ const teams: Record<string, Team> = {
   billing: { github: '@org/billing', owns: ['src/feature.ts'] },
 };
 
-const billingConfig: StraysConfig<typeof teams> = { teams };
+const billingConfig: OwnheimConfig<typeof teams> = { teams };
 
 /**
  * Assert that the bundle contains the rewritten factory binding originating
@@ -132,7 +132,7 @@ describe('A3 — dynamic import + TLA contract', () => {
         {
           entry: `await import('./feature.ts').then((m) => m.run());\n`,
           feature: [
-            `import { logger } from '@strays/core';`,
+            `import { logger } from '@ownheim/core';`,
             `export function run() {`,
             `  logger.info({ msg: 'hi-from-feature' });`,
             `}`,
@@ -171,7 +171,7 @@ describe('A3 — dynamic import + TLA contract', () => {
             ``,
           ].join('\n'),
           feature: [
-            `import { logger } from '@strays/core';`,
+            `import { logger } from '@ownheim/core';`,
             `export function run() {`,
             `  logger.info({ msg: 'hi-from-try-catch' });`,
             `}`,
@@ -206,7 +206,7 @@ describe('A3 — dynamic import + TLA contract', () => {
           // logger calls. TLA lives in feature.ts.
           entry: `import './feature.ts';\n`,
           feature: [
-            `import { logger } from '@strays/core';`,
+            `import { logger } from '@ownheim/core';`,
             ``,
             `async function someAsync() {`,
             `  return 'ready';`,

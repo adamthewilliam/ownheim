@@ -1,14 +1,14 @@
 {
-  "name": "@strays/cli",
+  "name": "@ownheim/cli",
   "version": "0.1.0",
-  "description": "strays CLI: generate | check | coverage | trace | diff",
+  "description": "ownheim CLI: generate | check | coverage | trace | diff",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "bin": {
-    "strays": "./src/index.ts"
+    "ownheim": "./src/index.ts"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -22,7 +22,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@strays/build": "workspace:*",
-    "@strays/core": "workspace:*"
+    "@ownheim/build": "workspace:*",
+    "@ownheim/core": "workspace:*"
   }
 }

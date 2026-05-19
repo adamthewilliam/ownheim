@@ -1,4 +1,4 @@
-import { resolveOwnership } from '@strays/core/ownership';
+import { resolveOwnership } from '@ownheim/core/ownership';
 
 export interface OwnershipMixinOptions {
   readonly fallbackCodeTeam?: string;
@@ -10,9 +10,9 @@ export interface OwnershipMixinOptions {
 }
 
 const defaultFields = {
-  entrypointTeam: 'strays_entrypoint_team',
-  codeTeam: 'strays_code_team',
-  responderTeam: 'strays_responder_team',
+  entrypointTeam: 'ownheim_entrypoint_team',
+  codeTeam: 'ownheim_code_team',
+  responderTeam: 'ownheim_responder_team',
 } as const;
 
 function fieldNames(options: OwnershipMixinOptions) {

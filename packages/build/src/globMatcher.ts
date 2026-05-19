@@ -1,6 +1,6 @@
 import picomatch from 'picomatch';
 
-/** True iff `glob` matches `file` under strays' canonical glob semantics (dotfiles included). */
+/** True iff `glob` matches `file` under ownheim' canonical glob semantics (dotfiles included). */
 export function matches(glob: string, file: string): boolean {
   return picomatch(glob, { dot: true })(file);
 }
