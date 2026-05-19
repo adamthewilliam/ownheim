@@ -18,6 +18,7 @@
     "./RecordedSpan": "./src/RecordedSpan.ts"
   },
   "scripts": {
+    "build": "tsdown",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
@@ -27,5 +28,17 @@
   },
   "peerDependencies": {
     "esbuild": "^0.28.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ownheim/ownheim.git",
+    "directory": "packages/test-utils"
+  },
+  "homepage": "https://github.com/ownheim/ownheim#readme",
+  "bugs": {
+    "url": "https://github.com/ownheim/ownheim/issues"
+  },
+  "engines": {
+    "node": ">=18.18.0"
   }
 }
