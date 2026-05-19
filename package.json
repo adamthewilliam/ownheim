@@ -1,5 +1,5 @@
 {
-  "name": "ownheim-monorepo",
+  "name": "ownheim",
   "version": "0.0.0",
   "private": true,
   "description": "Code-first team ownership for TypeScript. Find a home for every line of code.",
