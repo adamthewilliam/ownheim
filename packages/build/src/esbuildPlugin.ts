@@ -2,8 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { extname, relative } from 'node:path';
 import type { Plugin } from 'esbuild';
 import type { Team, OwnheimConfig } from '@ownheim/core/types';
-import { analyzeSourceFile } from './analyzeSourceFile.ts';
-import { resolveOwnerForFile } from './resolveRules.ts';
+import { createSourceAnalyzer } from './analyzeSourceFile.ts';
+import { createOwnershipResolver } from './ownershipResolver.ts';
 
 export interface OwnheimPluginOptions<TTeams extends Record<string, Team>> {
   readonly config: OwnheimConfig<TTeams>;
@@ -17,6 +17,8 @@ export function ownheim<TTeams extends Record<string, Team>>(
   options: OwnheimPluginOptions<TTeams>,
 ): Plugin {
   const extensions = options.extensions ?? DEFAULT_EXTENSIONS;
+  const analyzer = createSourceAnalyzer();
+  const resolver = createOwnershipResolver(options.config);
 
   return {
     name: '@ownheim/build',
@@ -27,11 +29,8 @@ export function ownheim<TTeams extends Record<string, Team>>(
         const source = await readFile(args.path, 'utf8');
         const relativePath = relative(options.projectRoot, args.path).replace(/\\/g, '/');
 
-        const analyzed = analyzeSourceFile(relativePath, source);
-        const resolved = resolveOwnerForFile(options.config, {
-          filePath: relativePath,
-          jsdocOwner: analyzed.jsdocOwner,
-        });
+        const analyzed = analyzer.analyze(relativePath, source);
+        const resolved = resolver.resolve({ filePath: relativePath, jsdocOwner: analyzed.jsdocOwner });
 
         if (!resolved) return undefined;
 

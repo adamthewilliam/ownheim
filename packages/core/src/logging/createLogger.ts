@@ -2,6 +2,8 @@ import { getDefaultLogSink } from './defaultLogSink.ts';
 import { formatOwnedLogEntry, type LogLevel } from './formatOwnedLogEntry.ts';
 import type { LogSink } from './LogSink.ts';
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
+import { currentEntrypointOwner, type OwnershipContext } from '../ownership.ts';
+import { walkResponderTeamChain } from '../resolution/walkOwnedErrorChain.ts';
 import { resolveProjectedOwnershipContext } from '../tracing/projectOwnership.ts';
 
 export type LogValue =
@@ -35,12 +37,14 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
 
   const emit = (level: LogLevel, record: LogRecord, err?: unknown) => {
     const { msg, ...fields } = record;
-    const ownership = resolveProjectedOwnershipContext({
-      ...(err === undefined ? {} : { error: err }),
-      ...(normalisedModuleOwner === undefined ? {} : { moduleOwner: normalisedModuleOwner }),
-      ...(options.registry === undefined ? {} : { registry: options.registry }),
-      fallbackCodeTeam,
-    });
+    const ownership =
+      normalisedModuleOwner === undefined
+        ? resolveProjectedOwnershipContext({
+            ...(err === undefined ? {} : { error: err }),
+            ...(options.registry === undefined ? {} : { registry: options.registry }),
+            fallbackCodeTeam,
+          })
+        : resolveKnownModuleOwnership(normalisedModuleOwner, err);
     const line = formatOwnedLogEntry({
       level,
       message: msg,
@@ -55,5 +59,15 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
     info: (record) => emit('info', record),
     warn: (record) => emit('warn', record),
     error: (record, err) => emit('error', record, err),
+  };
+}
+
+function resolveKnownModuleOwnership(moduleOwner: string, err: unknown): OwnershipContext {
+  const entrypointTeam = currentEntrypointOwner();
+  const responderTeam = err === undefined ? undefined : walkResponderTeamChain(err);
+  return {
+    ...(entrypointTeam === undefined ? {} : { entrypointTeam }),
+    codeTeam: moduleOwner,
+    ...(responderTeam === undefined ? {} : { responderTeam }),
   };
 }

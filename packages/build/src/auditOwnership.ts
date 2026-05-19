@@ -1,5 +1,6 @@
 import type { OwnheimConfig, ResolvedOwnership, Team } from '@ownheim/core/types';
-import { extractFromSourceText, type FileExtraction } from './analyzeSourceFile.ts';
+import { createSourceAnalyzer, extractFromSourceText, type FileExtraction } from './analyzeSourceFile.ts';
+import { createOwnershipResolver } from './ownershipResolver.ts';
 import { resolveOwnerForFile } from './resolveRules.ts';
 
 export type OwnershipAuditStatus = 'explicit' | 'fallback' | 'unowned' | 'invalid-jsdoc-owner';
@@ -76,7 +77,25 @@ export function auditSourceFiles<TTeams extends Record<string, Team>>(
   config: OwnheimConfig<TTeams>,
   files: readonly AuditSourceFileInput[],
 ): OwnershipAuditReport {
-  const audits = files.map((file) => auditSourceFile(config, file));
+  const analyzer = createSourceAnalyzer();
+  const resolver = createOwnershipResolver(config);
+  const audits = files.map((file) => {
+    const extraction = analyzer.extract(file.filePath, file.sourceText);
+    const resolved = resolver.resolve({
+      filePath: file.filePath,
+      jsdocOwner: extraction.jsdocOwner,
+    });
+    const status = determineStatus(config, extraction.jsdocOwner, resolved);
+    return {
+      file: file.filePath,
+      extraction,
+      jsdocOwner: extraction.jsdocOwner,
+      resolved,
+      status,
+      isExplicit: status === 'explicit',
+      needsAttention: status !== 'explicit',
+    };
+  });
   return summarizeOwnershipAudits(audits);
 }
 

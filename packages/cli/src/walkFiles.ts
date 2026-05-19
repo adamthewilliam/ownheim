@@ -1,4 +1,4 @@
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mts', '.cts'];
@@ -28,14 +28,13 @@ export async function* walkSourceFiles(
 }
 
 async function* walk(dir: string, ignore: ReadonlySet<string>): AsyncIterable<string> {
-  const entries = await readdir(dir);
+  const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
-    if (ignore.has(entry)) continue;
-    const path = join(dir, entry);
-    const info = await stat(path);
-    if (info.isDirectory()) {
+    if (ignore.has(entry.name)) continue;
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) {
       yield* walk(path, ignore);
-    } else if (info.isFile()) {
+    } else if (entry.isFile()) {
       yield path;
     }
   }
