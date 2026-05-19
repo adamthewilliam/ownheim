@@ -1,5 +1,4 @@
-import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
-import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
+import { auditSourceFile } from '@ownheim/build/auditOwnership';
 import type { Team, OwnheimConfig } from '@ownheim/core/types';
 import type { Diagnostic } from './types.ts';
 
@@ -12,13 +11,24 @@ export interface ValidateOptions<TTeams extends Record<string, Team>> {
 export function validateFileOwnership<TTeams extends Record<string, Team>>(
   options: ValidateOptions<TTeams>,
 ): Diagnostic[] {
-  const extraction = extractFromSourceText(options.filePath, options.sourceText);
-  const resolved = resolveOwnerForFile(options.config, {
+  const audit = auditSourceFile(options.config, {
     filePath: options.filePath,
-    jsdocOwner: extraction.jsdocOwner,
+    sourceText: options.sourceText,
   });
 
-  if (resolved === undefined) {
+  if (audit.status === 'invalid-jsdoc-owner') {
+    return [
+      {
+        ruleId: 'no-ownheim',
+        severity: 'error',
+        message: `${options.filePath} references unknown owner '${audit.jsdocOwner}' in /** @owner ${audit.jsdocOwner} */. Use a team from ownheim.config.ts.`,
+        line: 1,
+        column: 1,
+      },
+    ];
+  }
+
+  if (audit.status === 'unowned') {
     return [
       {
         ruleId: 'no-ownheim',
@@ -35,12 +45,12 @@ export function validateFileOwnership<TTeams extends Record<string, Team>>(
     ];
   }
 
-  if (resolved.source === 'fallback') {
+  if (audit.status === 'fallback') {
     return [
       {
         ruleId: 'no-ownheim',
         severity: 'error',
-        message: `${options.filePath} only matches the fallback rule (${resolved.matchedGlob ?? '**'}). Add a directory rule for this path or annotate the file with /** @owner <Team> */.`,
+        message: `${options.filePath} only matches the fallback rule (${audit.resolved?.matchedGlob ?? '**'}). Add a directory rule for this path or annotate the file with /** @owner <Team> */.`,
         line: 1,
         column: 1,
         fix: {

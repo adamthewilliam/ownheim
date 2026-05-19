@@ -39,6 +39,16 @@
         "default": "./dist/resolveRules.cjs"
       }
     },
+    "./auditOwnership": {
+      "import": {
+        "types": "./dist/auditOwnership.d.mts",
+        "default": "./dist/auditOwnership.mjs"
+      },
+      "require": {
+        "types": "./dist/auditOwnership.d.cts",
+        "default": "./dist/auditOwnership.cjs"
+      }
+    },
     "./generateCodeowners": {
       "import": {
         "types": "./dist/generateCodeowners.d.mts",
@@ -100,5 +110,8 @@
   ],
   "engines": {
     "node": ">=18.18.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

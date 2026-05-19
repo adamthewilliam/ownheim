@@ -1,5 +1,4 @@
-import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
-import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
+import { auditSourceFile } from '@ownheim/build/auditOwnership';
 import type { LoadedConfig } from '../loadConfig.ts';
 import { walkSourceFiles } from '../walkFiles.ts';
 
@@ -21,15 +20,18 @@ export async function runCoverage(loaded: LoadedConfig): Promise<CoverageResult>
 
   for await (const file of walkSourceFiles(loaded.projectRoot)) {
     total++;
-    const extraction = extractFromSourceText(file.relative, file.source);
-    const result = resolveOwnerForFile(loaded.config, {
+    const audit = auditSourceFile(loaded.config, {
       filePath: file.relative,
-      jsdocOwner: extraction.jsdocOwner,
+      sourceText: file.source,
     });
 
-    if (result === undefined) unownedFiles.push(file.relative);
-    else if (result.source === 'fallback') fallbackFiles.push(file.relative);
-    else explicit++;
+    if (audit.status === 'unowned' || audit.status === 'invalid-jsdoc-owner') {
+      unownedFiles.push(file.relative);
+    } else if (audit.status === 'fallback') {
+      fallbackFiles.push(file.relative);
+    } else {
+      explicit++;
+    }
   }
 
   const percent = total === 0 ? 100 : Math.round((explicit / total) * 1000) / 10;

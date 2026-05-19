@@ -4,6 +4,7 @@ export default defineConfig({
   entry: [
     'src/index.ts',
     'src/analyzeSourceFile.ts',
+    'src/auditOwnership.ts',
     'src/resolveRules.ts',
     'src/generateCodeowners.ts',
     'src/generateManifest.ts',

@@ -1,8 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
+import { auditSourceFile } from '@ownheim/build/auditOwnership';
 import { generateCodeowners } from '@ownheim/build/generateCodeowners';
-import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
 import type { ResolvedOwner } from '@ownheim/core/types';
 import type { LoadedConfig } from '../loadConfig.ts';
 import { walkSourceFiles } from '../walkFiles.ts';
@@ -21,16 +20,15 @@ export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
   const ownheimFiles: string[] = [];
 
   for await (const file of walkSourceFiles(loaded.projectRoot)) {
-    const extraction = extractFromSourceText(file.relative, file.source);
-    const result = resolveOwnerForFile(loaded.config, {
+    const audit = auditSourceFile(loaded.config, {
       filePath: file.relative,
-      jsdocOwner: extraction.jsdocOwner,
+      sourceText: file.source,
     });
-    if (result === undefined || result.source === 'fallback') {
+    if (audit.needsAttention) {
       ownheimFiles.push(file.relative);
     }
-    if (result !== undefined) {
-      resolved.push(result);
+    if (audit.resolved !== undefined) {
+      resolved.push(audit.resolved);
     }
   }
 

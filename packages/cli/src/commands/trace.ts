@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join, relative } from 'node:path';
-import { extractFromSourceText } from '@ownheim/build/analyzeSourceFile';
-import { resolveOwnerForFile } from '@ownheim/build/resolveRules';
+import { auditSourceFile, type OwnershipAuditStatus } from '@ownheim/build/auditOwnership';
 import type { ResolvedOwner } from '@ownheim/core/types';
 import type { LoadedConfig } from '../loadConfig.ts';
 
@@ -17,17 +16,16 @@ export async function runTrace(loaded: LoadedConfig, filePath: string): Promise<
   const rel = relative(loaded.projectRoot, absolute).replace(/\\/g, '/');
   const source = await readFile(absolute, 'utf8');
 
-  const extraction = extractFromSourceText(rel, source);
-  const resolved = resolveOwnerForFile(loaded.config, {
+  const audit = auditSourceFile(loaded.config, {
     filePath: rel,
-    jsdocOwner: extraction.jsdocOwner,
+    sourceText: source,
   });
 
   return {
     file: rel,
-    resolved,
-    jsdocOwner: extraction.jsdocOwner,
-    explanation: explain(rel, extraction.jsdocOwner, resolved),
+    resolved: audit.resolved,
+    jsdocOwner: audit.jsdocOwner,
+    explanation: explain(rel, audit.jsdocOwner, audit.resolved, audit.status),
   };
 }
 
@@ -35,7 +33,11 @@ function explain(
   file: string,
   jsdocOwner: string | undefined,
   resolved: ResolvedOwner | undefined,
+  status: OwnershipAuditStatus,
 ): string {
+  if (status === 'invalid-jsdoc-owner') {
+    return `${file} -> INVALID @owner '${jsdocOwner}' (team not found in ownheim.config.ts)`;
+  }
   if (resolved === undefined) {
     return `${file} -> UNOWNED (no rule matched and no fallback)`;
   }

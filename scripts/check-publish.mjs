@@ -8,7 +8,15 @@ for (const name of packages) {
   const pkgPath = `packages/${name}/package.json`;
   if (!existsSync(pkgPath)) continue;
   const pkg = JSON.parse(await readFile(pkgPath, 'utf8'));
-  if (pkg.private) continue;
+  if (pkg.private) {
+    console.log(`\n## ${pkg.name} (private; skipped)`);
+    continue;
+  }
+  if (pkg.publishConfig?.access !== 'public') {
+    console.error(`${pkg.name} is publishable but missing publishConfig.access = "public"`);
+    failed = true;
+    continue;
+  }
   console.log(`\n## ${pkg.name}`);
   for (const cmd of [
     ['bunx', ['publint', `packages/${name}`]],

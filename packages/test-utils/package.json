@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/test-utils",
   "version": "0.1.0",
-  "description": "ownheim — shared in-memory bundle, subprocess, log, and OTel exporter helpers for the test suite",
+  "description": "ownheim internal test helpers for the monorepo test suite",
   "type": "module",
   "private": true,
   "license": "MIT",
