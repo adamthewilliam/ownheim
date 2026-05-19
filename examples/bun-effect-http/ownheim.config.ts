@@ -1,6 +1,7 @@
 import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 
 export default defineOwnheim({
+  fallback: 'Platform',
   teams: {
     Billing: {
       github: '@org/billing',
@@ -16,7 +17,6 @@ export default defineOwnheim({
       github: '@org/platform',
       handles: { pagerduty: 'platform-second' },
       owns: ['src/billing/admin/**'],
-      fallback: true,
     },
   },
 });

@@ -25,15 +25,16 @@ describe('defineOwnheim', () => {
     ).toThrow(/unknown team 'Platform'/);
   });
 
-  it('throws when more than one team has fallback: true', () => {
+  it('throws when fallback references an unknown team', () => {
     expect(() =>
       defineOwnheim({
         teams: {
-          Billing: { github: '@org/billing', fallback: true },
-          Platform: { github: '@org/platform', fallback: true },
+          Billing: { github: '@org/billing' },
         },
+        // @ts-expect-error - intentional invalid team reference for runtime check
+        fallback: 'Platform',
       }),
-    ).toThrow(/at most one team may have fallback: true/);
+    ).toThrow(/fallback references unknown team 'Platform'/);
   });
 
   it('accepts shared rules with multiple teams', () => {

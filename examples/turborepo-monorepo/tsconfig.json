@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@acme/core": ["packages/core/src/index.ts"],
+      "@acme/checkout": ["packages/checkout/src/index.ts"],
+      "@acme/catalog": ["packages/catalog/src/index.ts"]
+    }
+  }
+}

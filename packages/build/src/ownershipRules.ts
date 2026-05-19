@@ -39,5 +39,5 @@ export function codeownersRulesFirst(
 export function getFallbackTeam<TTeams extends Record<string, Team>>(
   config: OwnheimConfig<TTeams>,
 ): string | undefined {
-  return Object.entries(config.teams).find(([, team]) => team.fallback)?.[0];
+  return config.fallback;
 }

@@ -4,13 +4,13 @@ import { generateCodeowners } from './generateCodeowners.ts';
 import type { ResolvedOwnership } from '@ownheim/core/types';
 
 const config = defineOwnheim({
+  fallback: 'Platform',
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Identity: { github: '@org/identity', owns: ['packages/auth/**'] },
     Platform: {
       github: '@org/platform',
       owns: ['packages/billing/admin/**'],
-      fallback: true,
     },
   },
 });

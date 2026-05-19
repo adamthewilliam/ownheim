@@ -38,7 +38,7 @@ describe('runGenerate (integration)', () => {
       teams: {
         Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
         Identity: { github: '@org/identity', owns: ['packages/auth/**'] },
-        Platform: { github: '@org/platform', fallback: true },
+        Platform: { github: '@org/platform' },
       },
     });
 

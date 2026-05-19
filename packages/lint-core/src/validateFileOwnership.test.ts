@@ -3,9 +3,10 @@ import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 import { validateFileOwnership } from './validateFileOwnership.ts';
 
 const config = defineOwnheim({
+  fallback: 'Platform',
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
-    Platform: { github: '@org/platform', fallback: true },
+    Platform: { github: '@org/platform' },
   },
 });
 

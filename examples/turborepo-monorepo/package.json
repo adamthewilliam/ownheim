@@ -1,0 +1,23 @@
+{
+  "name": "@ownheim/example-turborepo-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@ownheim/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@ownheim/cli": "workspace:*",
+    "turbo": "^2.5.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -2,7 +2,6 @@ export interface Team {
   readonly github: string;
   readonly handles?: Record<string, string>;
   readonly owns?: readonly string[];
-  readonly fallback?: boolean;
 }
 
 export type Owner = Team;
@@ -16,6 +15,7 @@ export interface SharedRule<TKey extends string = string> {
 
 export interface OwnheimConfig<TTeams extends Record<string, Team>> {
   readonly teams: TTeams;
+  readonly fallback?: TeamId<TTeams>;
   readonly shared?: readonly SharedRule<TeamId<TTeams>>[];
 }
 

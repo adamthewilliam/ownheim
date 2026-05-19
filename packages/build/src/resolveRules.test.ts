@@ -3,13 +3,13 @@ import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 import { resolveOwnerForFile } from './resolveRules.ts';
 
 const config = defineOwnheim({
+  fallback: 'Platform',
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Identity: { github: '@org/identity', owns: ['packages/auth/**'] },
     Platform: {
       github: '@org/platform',
       owns: ['packages/billing/admin/**'],
-      fallback: true,
     },
   },
 });

@@ -3,10 +3,11 @@ import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 import { auditSourceFile, auditSourceFiles } from './auditOwnership.ts';
 
 const config = defineOwnheim({
+  fallback: 'Platform',
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
     Identity: { github: '@org/identity' },
-    Platform: { github: '@org/platform', fallback: true },
+    Platform: { github: '@org/platform' },
   },
 });
 

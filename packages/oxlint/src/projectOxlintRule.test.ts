@@ -5,9 +5,10 @@ import { rules } from '@ownheim/lint-core/rules/registry';
 import { projectOxlintRule, type OxlintRuleContext } from './adapter.ts';
 
 const config = defineOwnheim({
+  fallback: 'Platform',
   teams: {
     Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
-    Platform: { github: '@org/platform', fallback: true },
+    Platform: { github: '@org/platform' },
   },
 }) as unknown as OwnheimConfig<Record<string, Owner>>;
 
