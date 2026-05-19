@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Schema } from 'effect';
-import { walkOwnedErrorChain } from '@strays/core/resolution/walkOwnedErrorChain';
+import { walkResponderTeamChain } from '@strays/core/resolution/walkOwnedErrorChain';
 import { ownedBy } from './ownedBy.ts';
 
 class BillingError extends Schema.TaggedError<BillingError>('BillingError')(
@@ -15,9 +15,9 @@ describe('ownedBy', () => {
     expect(err._tag).toBe('BillingError');
   });
 
-  it('walkOwnedErrorChain finds the owner', () => {
+  it('walkResponderTeamChain finds the owner', () => {
     const err = new BillingError({ code: 'NONE' });
-    expect(walkOwnedErrorChain(err)).toBe('Billing');
+    expect(walkResponderTeamChain(err)).toBe('Billing');
   });
 
   it('integrates with Effect.fail', async () => {

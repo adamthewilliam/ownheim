@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
-import { currentOwner } from '@strays/core/ownership';
-import { ownedProcedure } from './ownedProcedure.ts';
-import type { OwnerMiddleware } from './ownerMiddleware.ts';
+import { currentEntrypointOwner } from '@strays/core/ownership';
+import { entrypointProcedure } from './ownedProcedure.ts';
+import type { EntrypointOwnerMiddleware } from './ownerMiddleware.ts';
 
 interface MockBuilder {
-  middlewares: OwnerMiddleware[];
-  use(middleware: OwnerMiddleware): MockBuilder;
+  middlewares: EntrypointOwnerMiddleware[];
+  use(middleware: EntrypointOwnerMiddleware): MockBuilder;
   run(handler: () => unknown): Promise<unknown>;
 }
 
@@ -27,28 +27,28 @@ function makeMockBuilder(): MockBuilder {
   return builder;
 }
 
-describe('ownedProcedure', () => {
-  it('chains an ownerMiddleware onto the builder', () => {
+describe('entrypointProcedure', () => {
+  it('chains an entrypointOwner onto the builder', () => {
     const builder = makeMockBuilder();
-    const tagged = ownedProcedure(builder, 'Billing');
+    const tagged = entrypointProcedure(builder, 'Billing');
 
     expect(tagged.middlewares).toHaveLength(1);
   });
 
   it('returns the same builder reference for chaining', () => {
     const builder = makeMockBuilder();
-    const tagged = ownedProcedure(builder, 'Billing');
+    const tagged = entrypointProcedure(builder, 'Billing');
 
     expect(tagged).toBe(builder);
   });
 
   it('runs handlers inside the owner scope', async () => {
     const builder = makeMockBuilder();
-    const tagged = ownedProcedure(builder, 'Billing');
+    const tagged = entrypointProcedure(builder, 'Billing');
     let observed: string | undefined;
 
     await tagged.run(() => {
-      observed = currentOwner();
+      observed = currentEntrypointOwner();
     });
 
     expect(observed).toBe('Billing');
@@ -56,12 +56,12 @@ describe('ownedProcedure', () => {
 
   it('composes with existing middlewares (inner owner wins)', async () => {
     const builder = makeMockBuilder();
-    ownedProcedure(builder, 'Outer');
-    ownedProcedure(builder, 'Inner');
+    entrypointProcedure(builder, 'Outer');
+    entrypointProcedure(builder, 'Inner');
     let observed: string | undefined;
 
     await builder.run(() => {
-      observed = currentOwner();
+      observed = currentEntrypointOwner();
     });
 
     expect(observed).toBe('Inner');

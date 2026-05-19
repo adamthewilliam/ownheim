@@ -1,2 +1,2 @@
-export { ownerMiddleware } from './ownerMiddleware.ts';
-export type { OwnerMiddleware } from './ownerMiddleware.ts';
+export { entrypointOwner } from './ownerMiddleware.ts';
+export type { EntrypointOwnerMiddleware } from './ownerMiddleware.ts';

@@ -2,7 +2,7 @@ import { getDefaultLogSink } from './defaultLogSink.ts';
 import { formatOwnedLogEntry, type LogLevel } from './formatOwnedLogEntry.ts';
 import type { LogSink } from './LogSink.ts';
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
-import { resolveOwner } from '../ownership.ts';
+import { resolveOwnership } from '../ownership.ts';
 
 export type LogValue =
   | string
@@ -25,30 +25,29 @@ export interface Logger {
 
 export interface CreateLoggerOptions {
   readonly sink?: LogSink;
-  readonly fallback?: string;
+  readonly fallbackCodeTeam?: string;
   readonly registry?: ManifestRegistry;
 }
 
 export function createLogger(moduleOwner: string, options: CreateLoggerOptions = {}): Logger {
   const sink = options.sink ?? getDefaultLogSink();
-  const fallback = options.fallback ?? 'unowned';
+  const fallbackCodeTeam = options.fallbackCodeTeam ?? 'unowned';
   const normalisedModuleOwner = moduleOwner === '' ? undefined : moduleOwner;
 
   const emit = (level: LogLevel, record: LogRecord, err?: unknown) => {
     const { msg, ...fields } = record;
-    const owner = resolveOwner({
+    const { ownership } = resolveOwnership({
       ...(err === undefined ? {} : { error: err }),
       ...(normalisedModuleOwner === undefined ? {} : { moduleOwner: normalisedModuleOwner }),
       ...(options.registry === undefined ? {} : { registry: options.registry }),
-      fallback,
+      fallbackCodeTeam,
     });
     const line = formatOwnedLogEntry({
       level,
       message: msg,
       fields,
       ...(err === undefined ? {} : { error: err }),
-      scopeOwner: owner,
-      fallback,
+      ...ownership,
     });
     sink.write(line, level);
   };

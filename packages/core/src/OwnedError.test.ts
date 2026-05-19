@@ -1,45 +1,44 @@
 import { describe, expect, it } from 'bun:test';
-import { OwnedError, getErrorOwner, isOwnedError } from './OwnedError.ts';
+import { OwnedError, getResponderTeam, isOwnedError, withResponderTeam } from './OwnedError.ts';
 import { OWNER_TAG } from './symbols.ts';
 
 describe('OwnedError', () => {
-  it('attaches owner via Symbol.for tag', () => {
-    const err = new OwnedError('boom', 'Billing');
-    expect(err.message).toBe('boom');
+  it('attaches responder team via Symbol.for tag', () => {
+    const err = new OwnedError('boom', { responderTeam: 'Billing' });
+
+    expect(err).toBeInstanceOf(Error);
+    expect(err.name).toBe('OwnedError');
     expect(err[OWNER_TAG]).toBe('Billing');
+    expect(err.responderTeam).toBe('Billing');
+    expect(getResponderTeam(err)).toBe('Billing');
   });
 
-  it('subclasses preserve the owner tag', () => {
-    class BillingError extends OwnedError {
-      constructor(message: string, public code: string) {
-        super(message, 'Billing');
-      }
-    }
+  it('subclasses preserve the responder tag', () => {
+    class PaymentError extends OwnedError {}
+    const err = new PaymentError('declined', { responderTeam: 'Payments' });
 
-    const err = new BillingError('charge failed', 'CARD_DECLINED');
-    expect(getErrorOwner(err)).toBe('Billing');
-    expect(err.code).toBe('CARD_DECLINED');
-  });
-
-  it('isOwnedError detects via Symbol.for, not instanceof', () => {
-    const err = new OwnedError('x', 'Platform');
     expect(isOwnedError(err)).toBe(true);
-    expect(isOwnedError(new Error('plain'))).toBe(false);
-    expect(isOwnedError(null)).toBe(false);
-    expect(isOwnedError(undefined)).toBe(false);
-    expect(isOwnedError('string')).toBe(false);
+    expect(getResponderTeam(err)).toBe('Payments');
   });
 
   it('detects an OwnedError-shaped object even when not an instance', () => {
-    // Simulates a duplicated bundle producing structurally compatible errors.
-    const fauxError = { [OWNER_TAG]: 'Billing', message: 'duplicated bundle' };
+    const fauxError = { [OWNER_TAG]: 'Billing' };
+
     expect(isOwnedError(fauxError)).toBe(true);
-    expect(getErrorOwner(fauxError)).toBe('Billing');
+    expect(getResponderTeam(fauxError)).toBe('Billing');
   });
 
   it('preserves Error.cause via options', () => {
     const root = new Error('root');
-    const owned = new OwnedError('wrapper', 'Identity', { cause: root });
+    const owned = new OwnedError('wrapper', { responderTeam: 'Identity', cause: root });
+
     expect(owned.cause).toBe(root);
+  });
+
+  it('can annotate an existing Error with a responder team', () => {
+    const err = withResponderTeam(new Error('boom'), 'Platform');
+
+    expect(isOwnedError(err)).toBe(true);
+    expect(getResponderTeam(err)).toBe('Platform');
   });
 });

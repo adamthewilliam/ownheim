@@ -2,126 +2,88 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { callerFrameSource, findOwnedFrame, type FrameSource } from './resolution/frames.ts';
 import { getDefaultRegistry } from './manifest/defaultRegistry.ts';
 import type { ManifestRegistry } from './manifest/ManifestRegistry.ts';
-import { walkOwnedErrorChain } from './resolution/walkOwnedErrorChain.ts';
+import { walkResponderTeamChain } from './resolution/walkOwnedErrorChain.ts';
 
-/**
- * The single source of truth for "who owns this code path right now".
- *
- * `ownership.ts` unifies what was previously split across `scope/` and
- * `resolution/`: the runtime ALS that propagates owner across async
- * boundaries, the helpers that wrap framework middleware, and the
- * priority chain that resolves an owner from errors / scope / stack
- * frames / module declarations / fallback.
- *
- * The split was artificial — `resolveOwner`'s tier-2 (active scope) is
- * literally a read of the same ALS that `runWithOwner` writes. Keeping
- * them in one module makes the behavioural contract readable in one
- * place and lets the AsyncLocalStorage stay private.
- */
+const entrypointOwnerStore = new AsyncLocalStorage<string>();
 
-const ownerStore = new AsyncLocalStorage<string>();
-
-// ---------------------------------------------------------------------------
-// Scope: write + read the active owner across async boundaries.
-// ---------------------------------------------------------------------------
-
-export function runWithOwner<TResult>(owner: string, fn: () => TResult): TResult {
-  return ownerStore.run(owner, fn);
+export function runWithEntrypointOwner<TResult>(team: string, fn: () => TResult): TResult {
+  return entrypointOwnerStore.run(team, fn);
 }
 
-export function currentOwner(): string | undefined {
-  return ownerStore.getStore();
+export function currentEntrypointOwner(): string | undefined {
+  return entrypointOwnerStore.getStore();
 }
 
-/**
- * A thunk that yields control to whatever the framework considers "next".
- * The return type is intentionally `unknown` — frameworks discard, await, or
- * forward this value as their signature requires.
- */
 export type NextThunk = () => unknown;
 
-/**
- * Build a framework-shaped middleware factory.
- *
- * `pickNext` extracts the framework's continuation from its native call args.
- * The returned factory takes an owner id and yields a middleware whose call
- * shape is exactly `(...args) => TReturn`.
- *
- * Behavioral guarantees:
- *  - The continuation runs inside `runWithOwner(owner, ...)`.
- *  - Whatever the continuation returns is returned directly to the framework.
- *  - The owner scope does not leak past the synchronous return of `pickNext`.
- */
-export function withOwnerScope<TArgs extends readonly unknown[], TReturn = unknown>(
+export function withEntrypointOwnerScope<TArgs extends readonly unknown[], TReturn = unknown>(
   pickNext: (...args: TArgs) => NextThunk,
-): (owner: string) => (...args: TArgs) => TReturn {
-  return (owner) =>
-    ((...args: TArgs) => runWithOwner(owner, () => pickNext(...args)())) as (
+): (team: string) => (...args: TArgs) => TReturn {
+  return (team) =>
+    ((...args: TArgs) => runWithEntrypointOwner(team, () => pickNext(...args)())) as (
       ...args: TArgs
     ) => TReturn;
 }
 
-// ---------------------------------------------------------------------------
-// Resolution: the priority chain that maps a context (error / scope /
-// frames / module declaration / fallback) onto a single owner id.
-// ---------------------------------------------------------------------------
+export type CodeOwnerSource = 'module' | 'frame' | 'fallback';
 
-/**
- * The tier in `resolveOwner`'s chain that produced the owner.
- *
- * The Datadog/Sentry/OTel adapters can emit it as `team_source` alongside
- * `team` when `emitSource: true` is passed; off by default to keep
- * production cardinality minimal.
- */
-export type OwnerSource = 'error' | 'scope' | 'frame' | 'module' | 'fallback';
-
-export interface OwnerResolution {
-  readonly owner: string;
-  readonly source: OwnerSource;
+export interface OwnershipContext {
+  readonly entrypointTeam?: string;
+  readonly codeTeam?: string;
+  readonly responderTeam?: string;
 }
 
-export interface ResolveOwnerInput {
-  /** Throwable-like value whose .cause chain may carry an OWNER_TAG. */
+export interface OwnershipSources {
+  readonly entrypointTeam?: 'scope';
+  readonly codeTeam?: CodeOwnerSource;
+  readonly responderTeam?: 'error';
+}
+
+export interface OwnershipResolution {
+  readonly ownership: OwnershipContext;
+  readonly sources: OwnershipSources;
+}
+
+export interface ResolveOwnershipInput {
   readonly error?: unknown;
-  /** Optional frame source. Defaults to the V8 stack of the calling code. */
   readonly frameSource?: FrameSource | undefined;
-  /**
-   * Owner declared at module scope (e.g. via `defineStrays` / OWNER constant).
-   * Used before stack-frame lookup because it is explicit at the call site.
-   */
   readonly moduleOwner?: string | undefined;
-  /** Registry used for stack-frame ownership lookup. Defaults to the process-wide registry. */
   readonly registry?: ManifestRegistry | undefined;
-  /** Final fallback when no tier yields a team. Defaults to `'unowned'`. */
-  readonly fallback?: string | undefined;
+  readonly fallbackCodeTeam?: string | undefined;
 }
 
-export function resolveOwnerWithSource(input: ResolveOwnerInput = {}): OwnerResolution {
-  // 1. Owned-error chain.
-  if (input.error !== undefined) {
-    const fromError = walkOwnedErrorChain(input.error);
-    if (fromError !== undefined) return { owner: fromError, source: 'error' };
+export function resolveOwnership(input: ResolveOwnershipInput = {}): OwnershipResolution {
+  const ownership: Record<string, string> = {};
+  const sources: Record<string, string> = {};
+
+  const entrypointTeam = entrypointOwnerStore.getStore();
+  if (entrypointTeam !== undefined) {
+    ownership.entrypointTeam = entrypointTeam;
+    sources.entrypointTeam = 'scope';
   }
 
-  // 2. Active ALS scope — same store `runWithOwner` writes to.
-  const fromScope = ownerStore.getStore();
-  if (fromScope !== undefined) return { owner: fromScope, source: 'scope' };
-
-  // 3. Module-declared owner.
   if (input.moduleOwner !== undefined && input.moduleOwner !== '') {
-    return { owner: input.moduleOwner, source: 'module' };
+    ownership.codeTeam = input.moduleOwner;
+    sources.codeTeam = 'module';
+  } else {
+    const frameSource: FrameSource = input.frameSource ?? callerFrameSource(2);
+    const fromFrame = findOwnedFrame(frameSource, input.registry ?? getDefaultRegistry());
+    if (fromFrame !== undefined) {
+      ownership.codeTeam = fromFrame;
+      sources.codeTeam = 'frame';
+    } else {
+      ownership.codeTeam = input.fallbackCodeTeam ?? 'unowned';
+      sources.codeTeam = 'fallback';
+    }
   }
 
-  // 4. Frame source -> manifest. Default: caller stack, skipping
-  //    [resolveOwnerWithSource, this caller] => skip 2.
-  const frameSource: FrameSource = input.frameSource ?? callerFrameSource(2);
-  const fromFrame = findOwnedFrame(frameSource, input.registry ?? getDefaultRegistry());
-  if (fromFrame !== undefined) return { owner: fromFrame, source: 'frame' };
+  if (input.error !== undefined) {
+    const responderTeam = walkResponderTeamChain(input.error);
+    if (responderTeam !== undefined) {
+      ownership.responderTeam = responderTeam;
+      sources.responderTeam = 'error';
+    }
+  }
 
-  // 5. Final fallback.
-  return { owner: input.fallback ?? 'unowned', source: 'fallback' };
-}
-
-export function resolveOwner(input: ResolveOwnerInput = {}): string {
-  return resolveOwnerWithSource(input).owner;
+  return { ownership, sources } as OwnershipResolution;
 }

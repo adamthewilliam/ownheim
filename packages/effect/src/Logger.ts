@@ -1,7 +1,7 @@
 import { Logger as EffectLogger } from 'effect';
 import { formatOwnedLogEntry, type LogLevel } from '@strays/core/logging/formatOwnedLogEntry';
 import { stdoutJsonSink, type LogSink } from '@strays/core/logging/LogSink';
-import { resolveOwner } from '@strays/core/ownership';
+import { resolveOwnership } from '@strays/core/ownership';
 
 const LOG_LEVELS = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 
@@ -11,21 +11,21 @@ const levelFromLabel = (label: string): LogLevel =>
 export const makeOwnershipLogger = (sink: LogSink = stdoutJsonSink) =>
   EffectLogger.make(({ logLevel, message, annotations, cause }) => {
     const annotationsObj = Object.fromEntries(annotations);
-    const annotatedOwner =
+    const annotatedCodeTeam =
       typeof annotationsObj.team === 'string' ? annotationsObj.team : undefined;
     const level = levelFromLabel(logLevel.label);
     const error = extractCauseError(cause);
-    const owner = resolveOwner({
+    const { ownership } = resolveOwnership({
       ...(error === undefined ? {} : { error }),
-      ...(annotatedOwner === undefined ? {} : { moduleOwner: annotatedOwner }),
-      fallback: 'unowned',
+      ...(annotatedCodeTeam === undefined ? {} : { moduleOwner: annotatedCodeTeam }),
+      fallbackCodeTeam: 'unowned',
     });
     const line = formatOwnedLogEntry({
       level,
       message: typeof message === 'string' ? message : String(message),
       fields: annotationsObj,
       ...(error === undefined ? {} : { error }),
-      scopeOwner: owner,
+      ...ownership,
     });
     sink.write(line, level);
   });

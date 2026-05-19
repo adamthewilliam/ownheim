@@ -9,7 +9,7 @@ export function isOwnedShape(value: unknown): value is OwnedShape {
   return value !== null && value !== undefined && typeof value === 'object';
 }
 
-export function walkOwnedErrorChain(value: unknown): string | undefined {
+export function walkResponderTeamChain(value: unknown): string | undefined {
   let current: unknown = value;
   const seen = new WeakSet<object>();
 

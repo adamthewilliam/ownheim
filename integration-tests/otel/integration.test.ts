@@ -5,7 +5,7 @@ import {
   NodeTracerProvider,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
-import { runWithOwner } from '@strays/core/ownership';
+import { runWithEntrypointOwner } from '@strays/core/ownership';
 import { OwnershipSpanProcessor } from '@strays/otel/SpanProcessor';
 
 describe('@strays/otel integration with real SDK', () => {
@@ -26,8 +26,8 @@ describe('@strays/otel integration with real SDK', () => {
     exporter.reset();
   });
 
-  it('tags spans with team from runWithOwner scope', async () => {
-    runWithOwner('Billing', () => {
+  it('tags spans with team from runWithEntrypointOwner scope', async () => {
+    runWithEntrypointOwner('Billing', () => {
       trace.getTracer('app').startSpan('charge').end();
     });
     await provider.forceFlush();
@@ -37,7 +37,7 @@ describe('@strays/otel integration with real SDK', () => {
     expect(finished[0]?.attributes.team).toBe('Billing');
   });
 
-  it('does not tag spans created outside any runWithOwner scope (uses default fallback)', async () => {
+  it('does not tag spans created outside any runWithEntrypointOwner scope (uses default fallback)', async () => {
     trace.getTracer('app').startSpan('orphan').end();
     await provider.forceFlush();
 
@@ -46,8 +46,8 @@ describe('@strays/otel integration with real SDK', () => {
     expect(finished[0]?.attributes.team).toBe('unowned');
   });
 
-  it('preserves owner across async hop within runWithOwner', async () => {
-    await runWithOwner('Billing', async () => {
+  it('preserves owner across async hop within runWithEntrypointOwner', async () => {
+    await runWithEntrypointOwner('Billing', async () => {
       await Promise.resolve();
       await new Promise((resolve) => setTimeout(resolve, 0));
       trace.getTracer('app').startSpan('async-op').end();
@@ -59,9 +59,9 @@ describe('@strays/otel integration with real SDK', () => {
     expect(finished[0]?.attributes.team).toBe('Billing');
   });
 
-  it('handles nested runWithOwner correctly (innermost wins)', async () => {
-    runWithOwner('Billing', () => {
-      runWithOwner('Identity', () => {
+  it('handles nested runWithEntrypointOwner correctly (innermost wins)', async () => {
+    runWithEntrypointOwner('Billing', () => {
+      runWithEntrypointOwner('Identity', () => {
         trace.getTracer('app').startSpan('inner').end();
       });
       trace.getTracer('app').startSpan('outer').end();
@@ -79,7 +79,7 @@ describe('@strays/otel integration with real SDK', () => {
     // Because OwnershipSpanProcessor tags on `onStart`, the attribute reflects
     // the scope that was active when the span was started — i.e. the fallback.
     const span = trace.getTracer('app').startSpan('captured-before-scope');
-    runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Billing', () => {
       span.end();
     });
     await provider.forceFlush();
@@ -96,20 +96,23 @@ describe('@strays/otel integration with real SDK', () => {
     exporter = new InMemorySpanExporter();
     provider = new NodeTracerProvider({
       spanProcessors: [
-        new OwnershipSpanProcessor({ attributeKey: 'otel.team', fallback: 'platform' }),
+        new OwnershipSpanProcessor({
+          fallbackCodeTeam: 'platform',
+          tags: { entrypointTeam: 'otel.entrypoint_team', codeTeam: 'otel.code_team' },
+        }),
         new SimpleSpanProcessor(exporter),
       ],
     });
     provider.register();
 
-    runWithOwner('Identity', () => {
+    runWithEntrypointOwner('Identity', () => {
       trace.getTracer('app').startSpan('custom').end();
     });
     await provider.forceFlush();
 
     const finished = exporter.getFinishedSpans();
     expect(finished.length).toBe(1);
-    expect(finished[0]?.attributes['otel.team']).toBe('Identity');
-    expect(finished[0]?.attributes.team).toBeUndefined();
+    expect(finished[0]?.attributes['otel.entrypoint_team']).toBe('Identity');
+    expect(finished[0]?.attributes['otel.code_team']).toBe('platform');
   });
 });

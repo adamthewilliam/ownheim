@@ -1,44 +1,39 @@
 import { describe, expect, it } from 'bun:test';
 import { OwnedError } from '../OwnedError.ts';
-import { walkOwnedErrorChain } from './walkOwnedErrorChain.ts';
+import { walkResponderTeamChain } from './walkOwnedErrorChain.ts';
 
-describe('walkOwnedErrorChain', () => {
-  it('returns undefined for plain errors', () => {
-    expect(walkOwnedErrorChain(new Error('plain'))).toBeUndefined();
+describe('walkResponderTeamChain', () => {
+  it('returns undefined for unowned values', () => {
+    expect(walkResponderTeamChain(new Error('plain'))).toBeUndefined();
+    expect(walkResponderTeamChain('string')).toBeUndefined();
+    expect(walkResponderTeamChain(null)).toBeUndefined();
   });
 
-  it('returns undefined for non-objects', () => {
-    expect(walkOwnedErrorChain('string')).toBeUndefined();
-    expect(walkOwnedErrorChain(42)).toBeUndefined();
-    expect(walkOwnedErrorChain(null)).toBeUndefined();
-    expect(walkOwnedErrorChain(undefined)).toBeUndefined();
+  it('finds responder team on an OwnedError', () => {
+    const err = new OwnedError('boom', { responderTeam: 'Billing' });
+    expect(walkResponderTeamChain(err)).toBe('Billing');
   });
 
-  it('finds owner on a top-level OwnedError', () => {
-    const err = new OwnedError('boom', 'Billing');
-    expect(walkOwnedErrorChain(err)).toBe('Billing');
+  it('walks Error.cause chains', () => {
+    const root = new OwnedError('root', { responderTeam: 'Identity' });
+    const top = new Error('top', { cause: root });
+
+    expect(walkResponderTeamChain(top)).toBe('Identity');
   });
 
-  it('walks Error.cause chain to find the first OwnedError', () => {
-    const root = new OwnedError('root cause', 'Identity');
-    const middle = new Error('middle', { cause: root });
-    const top = new Error('top', { cause: middle });
+  it('returns the first responder in the chain', () => {
+    const inner = new OwnedError('inner', { responderTeam: 'Billing' });
+    const outer = new OwnedError('outer', { responderTeam: 'Platform', cause: inner });
 
-    expect(walkOwnedErrorChain(top)).toBe('Identity');
+    expect(walkResponderTeamChain(outer)).toBe('Platform');
   });
 
-  it('returns the first OwnedError in the chain when multiple exist', () => {
-    const inner = new OwnedError('inner', 'Platform');
-    const outer = new OwnedError('outer', 'Billing', { cause: inner });
-
-    expect(walkOwnedErrorChain(outer)).toBe('Billing');
-  });
-
-  it('handles cyclic cause chains without infinite looping', () => {
-    const a = new Error('a') as Error & { cause?: unknown };
-    const b = new Error('b', { cause: a }) as Error & { cause?: unknown };
+  it('does not hang on cyclic cause chains', () => {
+    const a: Error & { cause?: unknown } = new Error('a');
+    const b: Error & { cause?: unknown } = new Error('b');
     a.cause = b;
+    b.cause = a;
 
-    expect(walkOwnedErrorChain(a)).toBeUndefined();
+    expect(walkResponderTeamChain(a)).toBeUndefined();
   });
 });

@@ -27,17 +27,17 @@ That's it. Every event Sentry sends (exceptions, messages, transactions) now car
 There are three ways the team gets resolved, in order:
 
 1. **`OwnedError`** on the captured exception. Throw `new OwnedError('msg', 'Billing')` and the team rides with the error wherever it goes.
-2. **`runWithOwner` scope.** Wrap a request handler and any error captured inside picks up the scope's owner.
+2. **`runWithEntrypointOwner` scope.** Wrap a request handler and any error captured inside picks up the scope's owner.
 3. **Stack-frame manifest lookup.** If you've loaded a manifest (built from `strays.config.ts`), the processor walks the event's stack frames bottom-up, skips `node_modules` / `node:` internals / `in_app: false` frames, and asks the manifest who owns the first file that matches.
 
 If none of those resolve, you get the fallback (`'unowned'` by default).
 
 ```ts
 // scope-based
-import { runWithOwner } from '@strays/runtime/runWithOwner';
+import { runWithEntrypointOwner } from '@strays/runtime/runWithEntrypointOwner';
 
 app.get('/users/:id', (req, res) =>
-  runWithOwner('Identity', async () => {
+  runWithEntrypointOwner('Identity', async () => {
     res.json(await getUser(req.params.id));
   }),
 );
@@ -60,7 +60,7 @@ I'd leave `tagKey` alone unless `team` is already meaningful in your Sentry org.
 
 ### Why the manifest lookup matters
 
-The `OwnedError` and `runWithOwner` paths cover the cases you instrument explicitly. The stack-frame fallback covers everything else — uncaught errors from cron jobs, third-party callbacks, anywhere you forgot to wrap. If you've generated an ownership manifest from `strays.config.ts`, you get sensible team tagging on errors you didn't even know existed. That's most of the value of this package.
+The `OwnedError` and `runWithEntrypointOwner` paths cover the cases you instrument explicitly. The stack-frame fallback covers everything else — uncaught errors from cron jobs, third-party callbacks, anywhere you forgot to wrap. If you've generated an ownership manifest from `strays.config.ts`, you get sensible team tagging on errors you didn't even know existed. That's most of the value of this package.
 
 Without a manifest loaded, the third step is a no-op and you fall through to the fallback. That's fine for getting started. Add the manifest later.
 

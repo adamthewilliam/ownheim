@@ -1,41 +1,44 @@
-import { describe, test, expect } from 'bun:test';
-import { ownershipMixin, ownershipFromError } from './mixin.ts';
-import { runWithOwner, OwnedError } from '@strays/core';
+import { describe, expect, test } from 'bun:test';
+import { ownershipFromError, ownershipMixin } from './mixin.ts';
+import { runWithEntrypointOwner, OwnedError } from '@strays/core';
 
 describe('ownershipMixin', () => {
-  test('returns fallback when no owner in scope', () => {
+  test('returns fallback code owner when no entrypoint is in scope', () => {
     const mixin = ownershipMixin();
-    expect(mixin()).toEqual({ team: 'unowned' });
+    expect(mixin()).toEqual({ strays_code_team: 'unowned' });
   });
 
-  test('returns current owner from scope', () => {
+  test('returns entrypoint and code ownership', () => {
     const mixin = ownershipMixin();
-    runWithOwner('Billing', () => {
-      expect(mixin()).toEqual({ team: 'Billing' });
+    runWithEntrypointOwner('Billing', () => {
+      expect(mixin()).toEqual({ strays_entrypoint_team: 'Billing', strays_code_team: 'unowned' });
     });
   });
 
-  test('respects custom attribute key', () => {
-    const mixin = ownershipMixin({ attributeKey: 'owner' });
-    runWithOwner('Billing', () => {
-      expect(mixin()).toEqual({ owner: 'Billing' });
+  test('respects custom field names', () => {
+    const mixin = ownershipMixin({ fields: { entrypointTeam: 'entry', codeTeam: 'code' } });
+    runWithEntrypointOwner('Billing', () => {
+      expect(mixin()).toEqual({ entry: 'Billing', code: 'unowned' });
     });
   });
 
-  test('respects custom fallback', () => {
-    const mixin = ownershipMixin({ fallback: 'platform' });
-    expect(mixin()).toEqual({ team: 'platform' });
+  test('respects custom fallback code team', () => {
+    const mixin = ownershipMixin({ fallbackCodeTeam: 'platform' });
+    expect(mixin()).toEqual({ strays_code_team: 'platform' });
   });
 });
 
 describe('ownershipFromError', () => {
-  test('extracts owner from OwnedError', () => {
-    const err = new OwnedError('Payment failed', 'Billing');
-    expect(ownershipFromError(err)).toEqual({ team: 'Billing' });
+  test('extracts responder from OwnedError', () => {
+    const err = new OwnedError('Payment failed', { responderTeam: 'Billing' });
+    expect(ownershipFromError(err)).toEqual({
+      strays_code_team: 'unowned',
+      strays_responder_team: 'Billing',
+    });
   });
 
-  test('falls back when error has no owner', () => {
+  test('falls back when error has no responder', () => {
     const err = new Error('Generic error');
-    expect(ownershipFromError(err)).toEqual({ team: 'unowned' });
+    expect(ownershipFromError(err)).toEqual({ strays_code_team: 'unowned' });
   });
 });

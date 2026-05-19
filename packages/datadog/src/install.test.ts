@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { runWithOwner } from '@strays/core/ownership';
+import { runWithEntrypointOwner } from '@strays/core/ownership';
 import { instrumentDatadog, type DatadogSpan, type DatadogTracer } from './install.ts';
 
 function makeMockTracer() {
@@ -20,89 +20,46 @@ function makeMockTracer() {
 }
 
 describe('instrumentDatadog', () => {
-  it('tags every span with the current owner from scope', () => {
+  it('tags spans with entrypoint and fallback code ownership', () => {
     const { spans, tracer } = makeMockTracer();
     instrumentDatadog(tracer);
 
-    runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Billing', () => {
       tracer.startSpan('http.request');
     });
 
-    expect(spans[0]?.tags.team).toBe('Billing');
+    expect(spans[0]?.tags['strays.entrypoint_team']).toBe('Billing');
+    expect(spans[0]?.tags['strays.code_team']).toBe('unowned');
   });
 
-  it('tags with the fallback when no scope is active', () => {
+  it('uses a custom fallback code team', () => {
     const { spans, tracer } = makeMockTracer();
-    instrumentDatadog(tracer, { fallback: 'platform-default' });
+    instrumentDatadog(tracer, { fallbackCodeTeam: 'platform-default' });
 
     tracer.startSpan('background.job');
 
-    expect(spans[0]?.tags.team).toBe('platform-default');
+    expect(spans[0]?.tags['strays.code_team']).toBe('platform-default');
   });
 
-  it('uses a custom tag key when provided', () => {
+  it('uses custom tag keys when provided', () => {
     const { spans, tracer } = makeMockTracer();
-    instrumentDatadog(tracer, { tagKey: 'dd.team' });
+    instrumentDatadog(tracer, { tags: { entrypointTeam: 'entry', codeTeam: 'code' } });
 
-    runWithOwner('Identity', () => {
+    runWithEntrypointOwner('Identity', () => {
       tracer.startSpan('db.query');
     });
 
-    expect(spans[0]?.tags['dd.team']).toBe('Identity');
-  });
-
-  it('omits team_source by default to keep cardinality minimal', () => {
-    const { spans, tracer } = makeMockTracer();
-    instrumentDatadog(tracer);
-
-    runWithOwner('Billing', () => {
-      tracer.startSpan('http.request');
-    });
-
-    expect(spans[0]?.tags.team).toBe('Billing');
-    expect(spans[0]?.tags.team_source).toBeUndefined();
-  });
-
-  it('emits team_source when emitSource is opted in (source: scope)', () => {
-    const { spans, tracer } = makeMockTracer();
-    instrumentDatadog(tracer, { emitSource: true });
-
-    runWithOwner('Billing', () => {
-      tracer.startSpan('http.request');
-    });
-
-    expect(spans[0]?.tags.team).toBe('Billing');
-    expect(spans[0]?.tags.team_source).toBe('scope');
-  });
-
-  it('emits team_source as "fallback" when opted in and no scope is active', () => {
-    const { spans, tracer } = makeMockTracer();
-    instrumentDatadog(tracer, { emitSource: true, fallback: 'platform-default' });
-
-    tracer.startSpan('background.job');
-
-    expect(spans[0]?.tags.team).toBe('platform-default');
-    expect(spans[0]?.tags.team_source).toBe('fallback');
-  });
-
-  it('honours a custom sourceTagKey when emitSource is opted in', () => {
-    const { spans, tracer } = makeMockTracer();
-    instrumentDatadog(tracer, { emitSource: true, sourceTagKey: 'dd.team_source' });
-
-    runWithOwner('Billing', () => {
-      tracer.startSpan('http.request');
-    });
-
-    expect(spans[0]?.tags['dd.team_source']).toBe('scope');
+    expect(spans[0]?.tags.entry).toBe('Identity');
+    expect(spans[0]?.tags.code).toBe('unowned');
   });
 
   it('is idempotent', () => {
     const { spans, tracer } = makeMockTracer();
-    instrumentDatadog(tracer, { emitSource: true });
-    instrumentDatadog(tracer, { emitSource: true });
+    instrumentDatadog(tracer);
+    instrumentDatadog(tracer);
 
     tracer.startSpan('background.job');
 
-    expect(Object.keys(spans[0]!.tags).sort()).toEqual(['team', 'team_source']);
+    expect(Object.keys(spans[0]!.tags).sort()).toEqual(['strays.code_team']);
   });
 });

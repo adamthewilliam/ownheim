@@ -1,5 +1,5 @@
 export { defineStrays } from './defineStrays.ts';
-export { OwnedError, isOwnedError, getErrorOwner } from './OwnedError.ts';
+export { OwnedError, isOwnedError, getResponderTeam, withResponderTeam } from './OwnedError.ts';
 export { OWNER_TAG, type OwnerTag } from './symbols.ts';
 export type {
   Team,
@@ -12,18 +12,19 @@ export type {
 } from './types.ts';
 
 export {
-  runWithOwner,
-  currentOwner,
-  withOwnerScope,
-  resolveOwner,
-  resolveOwnerWithSource,
+  runWithEntrypointOwner,
+  currentEntrypointOwner,
+  withEntrypointOwnerScope,
+  resolveOwnership,
   type NextThunk,
-  type OwnerSource,
-  type OwnerResolution,
-  type ResolveOwnerInput,
+  type CodeOwnerSource,
+  type OwnershipContext,
+  type OwnershipSources,
+  type OwnershipResolution,
+  type ResolveOwnershipInput,
 } from './ownership.ts';
 export { lookupCallerOwner } from './resolution/lookupCallerOwner.ts';
-export { walkOwnedErrorChain, isOwnedShape } from './resolution/walkOwnedErrorChain.ts';
+export { walkResponderTeamChain, isOwnedShape } from './resolution/walkOwnedErrorChain.ts';
 export {
   callerFrameSource,
   fromSentryFrames,
@@ -79,7 +80,8 @@ export {
   resolveTagOptions,
   type TagOptions,
   type ResolvedTagOptions,
-  DEFAULT_TAG_KEY,
-  DEFAULT_SOURCE_TAG_KEY,
-  DEFAULT_FALLBACK,
+  DEFAULT_CODE_TEAM_FALLBACK,
+  DEFAULT_ENTRYPOINT_TEAM_TAG,
+  DEFAULT_CODE_TEAM_TAG,
+  DEFAULT_RESPONDER_TEAM_TAG,
 } from './tracing/resolveTagOptions.ts';

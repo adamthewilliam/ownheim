@@ -27,7 +27,7 @@ describe('ownership Logger (wiring)', () => {
   it('a failing Effect with OwnedError sets team to the OwnedError owner', async () => {
     const { sink, lines } = makeMemorySink();
     await Effect.runPromise(
-      Effect.fail(new OwnedError('boom', 'Identity')).pipe(
+      Effect.fail(new OwnedError('boom', { responderTeam: 'Identity' })).pipe(
         Effect.tapErrorCause((cause) => Effect.logError('failed', cause)),
         Effect.catchAll(() => Effect.void),
         Effect.annotateLogs('team', 'Platform'),

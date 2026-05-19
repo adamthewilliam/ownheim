@@ -1,5 +1,5 @@
 import { fromSentryFrames, type SentryStacktrace } from '@strays/core/resolution/frames';
-import { resolveOwnerWithSource } from '@strays/core/ownership';
+import { resolveOwnership } from '@strays/core/ownership';
 import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
 
 export interface SentryEvent {
@@ -31,17 +31,19 @@ export function installSentry(client: SentryClient, options: InstallOptions = {}
   if (installedClient[INSTALLED]) return;
   installedClient[INSTALLED] = true;
 
-  const { fallback, tagKey, sourceTagKey, emitSource } = resolveTagOptions(options);
+  const { fallbackCodeTeam, tags: tagKeys } = resolveTagOptions(options);
 
   client.addEventProcessor((event, hint) => {
     const stacktrace = event.exception?.values?.[0]?.stacktrace;
-    const { owner, source } = resolveOwnerWithSource({
+    const { ownership } = resolveOwnership({
       error: hint?.originalException,
       frameSource: fromSentryFrames(stacktrace),
-      fallback,
+      fallbackCodeTeam,
     });
-    const tags: Record<string, string> = { ...event.tags, [tagKey]: owner };
-    if (emitSource) tags[sourceTagKey] = source;
+    const tags: Record<string, string> = { ...event.tags };
+    if (ownership.entrypointTeam !== undefined) tags[tagKeys.entrypointTeam] = ownership.entrypointTeam;
+    if (ownership.codeTeam !== undefined) tags[tagKeys.codeTeam] = ownership.codeTeam;
+    if (ownership.responderTeam !== undefined) tags[tagKeys.responderTeam] = ownership.responderTeam;
     event.tags = tags;
     return event;
   });

@@ -2,13 +2,17 @@
 
 > Find a home for every line of code.
 
-Code-first team ownership for TypeScript. A single source-of-truth annotation in code drives:
+Code-first team ownership for TypeScript monorepos. `strays.config.ts` is the source of truth for code ownership, generated CODEOWNERS, ownership coverage checks, and ownership-aware telemetry.
 
-- **`.github/CODEOWNERS`** — generated from your `strays.config.ts`, never hand-edited
-- **Datadog / Sentry / OpenTelemetry** — every span, log, and error tagged with the owning team
-- **Lint enforcement** — oxlint and eslint rules that flag any unowned (stray) file
+Strays emits explicit ownership layers instead of one ambiguous `team` field:
 
-The library's name is the metric you want at zero. `strays.count` is the number of unowned files; `strays check` fails when it's non-zero.
+| Concept | Meaning | Tag |
+|---|---|---|
+| Entrypoint owner | Team accountable for the request, job, procedure, event, or command that started this work | `strays.entrypoint_team` |
+| Code owner | Team accountable for the source file or package emitting telemetry | `strays.code_team` |
+| Responder | Team best positioned to investigate, mitigate, or remediate a failure | `strays.responder_team` |
+
+See [docs/ownership-model.md](./docs/ownership-model.md) for the full terminology guide.
 
 ## Installation
 
@@ -19,39 +23,36 @@ bun add @strays/core
 # With build tooling
 bun add @strays/core @strays/build @strays/cli
 
-# Framework integrations (pick what you use)
-bun add @strays/hono      # Hono
-bun add @strays/express   # Express
-bun add @strays/trpc      # tRPC
-bun add @strays/orpc      # oRPC
-bun add @strays/effect    # Effect-TS
+# Framework integrations
+bun add @strays/hono
+bun add @strays/express
+bun add @strays/trpc
+bun add @strays/orpc
 
 # Observability integrations
-bun add @strays/datadog   # Datadog
-bun add @strays/sentry    # Sentry
-bun add @strays/otel      # OpenTelemetry
+bun add @strays/datadog
+bun add @strays/pino
+bun add @strays/sentry
+bun add @strays/otel
 ```
 
-> **Note:** These packages export TypeScript source files directly and require a bundler with TypeScript support (Bun, esbuild, Vite, etc.) or `allowImportingTsExtensions` in your tsconfig.
+> These packages export TypeScript source files directly and require a bundler with TypeScript support (Bun, esbuild, Vite, etc.) or `allowImportingTsExtensions` in your tsconfig.
 
 ## Packages
 
 | Package | Purpose |
 |---|---|
-| `@strays/core` | `defineStrays`, `OwnedError`, `runWithOwner`, `currentOwner`, logger/tracer factories |
-| `@strays/effect` | Effect-TS `Owner` Context.Tag, `ownedBy` decorator, Layers |
+| `@strays/core` | `defineStrays`, `OwnedError`, `runWithEntrypointOwner`, `registerOwnershipManifest`, logger/tracer factories |
 | `@strays/build` | esbuild plugin + AST extractor |
 | `@strays/cli` | `strays generate \| check \| coverage \| trace \| diff` |
-| `@strays/trpc` | tRPC procedure middleware (`ownedProcedure`, `ownerMiddleware`) |
-| `@strays/orpc` | oRPC procedure middleware (`ownedProcedure`, `ownerMiddleware`) |
-| `@strays/hono` | Hono per-route / per-prefix middleware (`ownerMiddleware`) |
-| `@strays/express` | Express per-route / per-router middleware (`ownerMiddleware`) |
+| `@strays/trpc` | tRPC entrypoint ownership helpers |
+| `@strays/orpc` | oRPC entrypoint ownership helpers |
+| `@strays/hono` | Hono entrypoint ownership middleware |
+| `@strays/express` | Express entrypoint ownership middleware |
 | `@strays/datadog` | dd-trace + RUM integration |
+| `@strays/pino` | Pino ownership mixin |
 | `@strays/sentry` | Sentry event processor + CODEOWNERS sync |
 | `@strays/otel` | OpenTelemetry SpanProcessor |
-| `@strays/lint-core` | Linter-agnostic rule logic |
-| `@strays/oxlint` | oxlint custom plugin (primary) |
-| `@strays/eslint` | eslint plugin (fallback) |
 
 ## Quick start
 
@@ -61,26 +62,19 @@ import { defineStrays } from '@strays/core';
 
 export default defineStrays({
   teams: {
+    Accounts: {
+      github: '@org/accounts',
+      owns: ['packages/accounts/**'],
+    },
     Billing: {
       github: '@org/billing',
-      handles: { pagerduty: 'billing-primary' },
       owns: ['packages/billing/**'],
-      fallback: true,
     },
   },
 });
 ```
 
-```ts
-// at HTTP entry point
-import { runWithOwner } from '@strays/core/ownership';
-
-app.use((req, _res, next) => {
-  runWithOwner(routeOwnerFor(req.path), () => next());
-});
-```
-
-If you also want spans/errors emitted outside an explicit request scope to resolve ownership from stack frames, load the generated manifest once at process startup:
+Load the generated ownership manifest once at process startup so Strays can resolve code ownership from stack frames:
 
 ```ts
 import manifest from './.strays/ownership.json' with { type: 'json' };
@@ -89,7 +83,43 @@ import { registerOwnershipManifest } from '@strays/core';
 registerOwnershipManifest(manifest);
 ```
 
-That's it. Logs, spans, and errors emitted inside the scope carry `team=Billing` automatically.
+Instrument telemetry:
+
+```ts
+import tracer from 'dd-trace';
+import { instrumentDatadog } from '@strays/datadog';
+
+tracer.init({ service: 'api' });
+instrumentDatadog(tracer);
+```
+
+Mark entrypoints explicitly:
+
+```ts
+import { entrypointOwner } from '@strays/express';
+
+app.use('/api/accounts', entrypointOwner('Accounts'));
+```
+
+Annotate cross-team failures with the team that should respond:
+
+```ts
+import { OwnedError } from '@strays/core';
+
+throw new OwnedError('Ledger write failed', {
+  responderTeam: 'Billing',
+});
+```
+
+Telemetry for an Accounts request that fails inside Billing-owned code can now carry all relevant context:
+
+```json
+{
+  "strays.entrypoint_team": "Accounts",
+  "strays.code_team": "Billing",
+  "strays.responder_team": "Billing"
+}
+```
 
 ## License
 

@@ -1,4 +1,4 @@
-import { resolveOwnerWithSource } from '@strays/core/ownership';
+import { resolveOwnership } from '@strays/core/ownership';
 import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
 
 export interface DatadogSpan {
@@ -11,23 +11,24 @@ export interface DatadogTracer {
 
 export type InstrumentOptions = TagOptions;
 
-const INSTALLED = Symbol.for('strays.datadog.installed');
+const INSTRUMENTED = Symbol.for('strays.datadog.instrumented');
 
-type InstalledDatadogTracer = DatadogTracer & { [INSTALLED]?: true };
+type InstrumentedDatadogTracer = DatadogTracer & { [INSTRUMENTED]?: true };
 
 export function instrumentDatadog(tracer: DatadogTracer, options: InstrumentOptions = {}): void {
-  const installedTracer = tracer as InstalledDatadogTracer;
-  if (installedTracer[INSTALLED]) return;
-  installedTracer[INSTALLED] = true;
+  const instrumentedTracer = tracer as InstrumentedDatadogTracer;
+  if (instrumentedTracer[INSTRUMENTED]) return;
+  instrumentedTracer[INSTRUMENTED] = true;
 
-  const { fallback, tagKey, sourceTagKey, emitSource } = resolveTagOptions(options);
+  const { fallbackCodeTeam, tags } = resolveTagOptions(options);
 
   const original = tracer.startSpan.bind(tracer);
   tracer.startSpan = (name: string, opts?: unknown) => {
     const span = original(name, opts);
-    const { owner, source } = resolveOwnerWithSource({ fallback });
-    span.setTag(tagKey, owner);
-    if (emitSource) span.setTag(sourceTagKey, source);
+    const { ownership } = resolveOwnership({ fallbackCodeTeam });
+    if (ownership.entrypointTeam !== undefined) span.setTag(tags.entrypointTeam, ownership.entrypointTeam);
+    if (ownership.codeTeam !== undefined) span.setTag(tags.codeTeam, ownership.codeTeam);
+    if (ownership.responderTeam !== undefined) span.setTag(tags.responderTeam, ownership.responderTeam);
     return span;
   };
 }

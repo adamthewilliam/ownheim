@@ -2,7 +2,7 @@
 // package. We want to prove three things end-to-end:
 //
 //   1. After `instrumentDatadog(tracer)`, every `tracer.startSpan` call
-//      attaches a `team` tag derived from `runWithOwner` scope.
+//      attaches a `team` tag derived from `runWithEntrypointOwner` scope.
 //   2. The patch survives across both import orders (strays first vs.
 //      dd-trace first), and we document any constraint we find.
 //   3. AsyncLocalStorage propagation works across an async hop.
@@ -57,7 +57,7 @@ process.env.DD_TELEMETRY_HEARTBEAT_INTERVAL = '0';
 process.env.DD_REMOTE_CONFIGURATION_ENABLED = 'false';
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import { runWithOwner } from '@strays/core/ownership';
+import { runWithEntrypointOwner } from '@strays/core/ownership';
 import { instrumentDatadog, type DatadogTracer } from '@strays/datadog/install';
 
 // dd-trace's runtime types are not exported for our adapter shape, so
@@ -124,9 +124,9 @@ describe('@strays/datadog + real dd-trace (import order: strays-first)', () => {
     instrumentDatadog(tracer as unknown as DatadogTracer);
   });
 
-  it('tags spans with the active runWithOwner scope', () => {
+  it('tags spans with the active runWithEntrypointOwner scope', () => {
     let span: DdTraceSpan | undefined;
-    runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Billing', () => {
       span = tracer.startSpan('http.request');
     });
     expect(span).toBeDefined();
@@ -136,7 +136,7 @@ describe('@strays/datadog + real dd-trace (import order: strays-first)', () => {
 
   it('propagates the owner across an async hop', async () => {
     let span: DdTraceSpan | undefined;
-    await runWithOwner('Billing', async () => {
+    await runWithEntrypointOwner('Billing', async () => {
       await Promise.resolve();
       await new Promise((resolve) => setTimeout(resolve, 0));
       span = tracer.startSpan('async.work');
@@ -153,11 +153,11 @@ describe('@strays/datadog + real dd-trace (import order: strays-first)', () => {
     span.finish();
   });
 
-  it('honours nested runWithOwner — innermost wins', () => {
+  it('honours nested runWithEntrypointOwner — innermost wins', () => {
     let inner: DdTraceSpan | undefined;
     let outer: DdTraceSpan | undefined;
-    runWithOwner('Identity', () => {
-      runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Identity', () => {
+      runWithEntrypointOwner('Billing', () => {
         inner = tracer.startSpan('inner.span');
       });
       outer = tracer.startSpan('outer.span');
@@ -203,7 +203,7 @@ describe('@strays/datadog + real dd-trace (import order: dd-trace-first)', () =>
 
   it('still tags spans when strays is installed AFTER dd-trace.init', () => {
     let span: DdTraceSpan | undefined;
-    runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Billing', () => {
       span = tracer.startSpan('http.request');
     });
     expect(teamTag(span)).toBe('Billing');
@@ -212,7 +212,7 @@ describe('@strays/datadog + real dd-trace (import order: dd-trace-first)', () =>
 
   it('still propagates across an async hop in this order', async () => {
     let span: DdTraceSpan | undefined;
-    await runWithOwner('Identity', async () => {
+    await runWithEntrypointOwner('Identity', async () => {
       await Promise.resolve();
       span = tracer.startSpan('async.work');
     });

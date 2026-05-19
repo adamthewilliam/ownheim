@@ -2,30 +2,30 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { initTRPC, TRPCError } from '@trpc/server';
 import type { AnyTRPCMiddlewareFunction, TRPCProcedureBuilder } from '@trpc/server';
 import { createLogger } from '@strays/core/logging/createLogger';
-import { currentOwner } from '@strays/core/ownership';
+import { currentEntrypointOwner } from '@strays/core/ownership';
 import {
   captureStructuredLogs,
   type CapturedLogs,
 } from '@strays/test-utils/captureStructuredLogs';
-import { ownedProcedure } from '@strays/trpc/ownedProcedure';
-import { ownerMiddleware } from '@strays/trpc/ownerMiddleware';
+import { entrypointProcedure } from '@strays/trpc/ownedProcedure';
+import { entrypointOwner } from '@strays/trpc/ownerMiddleware';
 
 // A real tRPC server / caller harness. We exercise the middleware through the
-// public procedure builder API the README documents (`ownedProcedure(builder,
+// public procedure builder API the README documents (`entrypointProcedure(builder,
 // owner)`), then assert that logs emitted from inside the handler carry the
 // procedure's owner as the `team` field.
 //
-// Type note: `@strays/trpc`'s `ownerMiddleware` is structurally typed against
+// Type note: `@strays/trpc`'s `entrypointOwner` is structurally typed against
 // any framework whose middleware shape is `({ next }) => Promise<unknown>`.
 // tRPC v11's `MiddlewareFunction` has a stricter return type
 // (`Promise<MiddlewareResult>`), so we cast at the boundary. At runtime tRPC
 // just awaits the value `next()` returns, which is exactly what our wrapper
-// forwards through `runWithOwner`. The cast is the price of keeping the
+// forwards through `runWithEntrypointOwner`. The cast is the price of keeping the
 // strays middleware framework-agnostic.
 
 const t = initTRPC.create();
 
-// `ownedProcedure(t.procedure, owner)` mutates and returns the same builder
+// `entrypointProcedure(t.procedure, owner)` mutates and returns the same builder
 // instance, but its public signature returns the structural
 // `TrpcProcedureBuilder` (which has only `.use`). We adapt to tRPC's typed
 // builder so the rest of the test can use `.query` / `.mutation` directly.
@@ -42,11 +42,11 @@ type AnyProcedureBuilder = TRPCProcedureBuilder<
 >;
 
 function tagged<T extends AnyProcedureBuilder>(builder: T, owner: string): T {
-  return ownedProcedure(builder as never, owner) as never;
+  return entrypointProcedure(builder as never, owner) as never;
 }
 
 const useOwner = (owner: string): AnyTRPCMiddlewareFunction =>
-  ownerMiddleware(owner) as never;
+  entrypointOwner(owner) as never;
 
 let capture: CapturedLogs;
 
@@ -58,7 +58,7 @@ afterEach(() => {
   capture.restore();
 });
 
-describe('integration: real @trpc/server router + ownedProcedure', () => {
+describe('integration: real @trpc/server router + entrypointProcedure', () => {
   it('1. single mutation tags logs with the procedure owner', async () => {
     const log = createLogger('');
 
@@ -84,9 +84,9 @@ describe('integration: real @trpc/server router + ownedProcedure', () => {
 
     const router = t.router({
       slowCharge: tagged(t.procedure, 'Billing').mutation(async () => {
-        observed.push(currentOwner());
+        observed.push(currentEntrypointOwner());
         await new Promise((resolve) => setTimeout(resolve, 1));
-        observed.push(currentOwner());
+        observed.push(currentEntrypointOwner());
         log.info({ msg: 'slow-charged' });
         return { ok: true } as const;
       }),
@@ -117,7 +117,7 @@ describe('integration: real @trpc/server router + ownedProcedure', () => {
     // Interleave to ensure scopes do not leak between calls.
     await Promise.all([caller.getUser(), caller.charge(), caller.getUser()]);
 
-    expect(currentOwner()).toBeUndefined();
+    expect(currentEntrypointOwner()).toBeUndefined();
 
     const userEntries = capture.entries.filter(
       (e) => e.line.record['msg'] === 'getting-user',
@@ -225,7 +225,7 @@ describe('integration: real @trpc/server router + ownedProcedure', () => {
 
     const router = t.router({
       boom: tagged(t.procedure, 'Billing').mutation(() => {
-        ownerSeenAtThrow = currentOwner();
+        ownerSeenAtThrow = currentEntrypointOwner();
         log.error({ msg: 'about-to-throw' }, new Error('boom'));
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'boom' });
       }),
@@ -244,7 +244,7 @@ describe('integration: real @trpc/server router + ownedProcedure', () => {
     expect((caught as TRPCError).message).toBe('boom');
     expect(ownerSeenAtThrow).toBe('Billing');
     // Scope must unwind cleanly past the thrown error.
-    expect(currentOwner()).toBeUndefined();
+    expect(currentEntrypointOwner()).toBeUndefined();
 
     const errEntry = capture.entries.find(
       (e) => e.line.record['msg'] === 'about-to-throw',
@@ -253,7 +253,7 @@ describe('integration: real @trpc/server router + ownedProcedure', () => {
     expect(errEntry?.level).toBe('error');
   });
 
-  it('exposes the raw ownerMiddleware via .use() on a builder', async () => {
+  it('exposes the raw entrypointOwner via .use() on a builder', async () => {
     const log = createLogger('');
 
     const router = t.router({

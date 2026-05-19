@@ -2,7 +2,7 @@ import { OWNER_TAG } from '@strays/core/symbols';
 
 /**
  * Marks an error class as owned by a team. Sets `[OWNER_TAG]` on the prototype
- * so every instance carries it implicitly — picked up by `walkOwnedErrorChain`
+ * so every instance carries it implicitly — picked up by `walkResponderTeamChain`
  * and the Datadog/Sentry/OTel adapters.
  *
  * Usage with Schema.TaggedError:

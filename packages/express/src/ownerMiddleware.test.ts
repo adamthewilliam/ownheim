@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'bun:test';
-import { currentOwner } from '@strays/core/ownership';
-import { ownerMiddleware } from './ownerMiddleware.ts';
+import { currentEntrypointOwner } from '@strays/core/ownership';
+import { entrypointOwner } from './ownerMiddleware.ts';
 
-describe('express ownerMiddleware shape', () => {
+describe('express entrypointOwner shape', () => {
   it('extracts `next` from the (req, res, next) positional args and runs it under the owner scope', () => {
     let observed: string | undefined;
-    const result = ownerMiddleware('Billing')({}, {}, () => {
-      observed = currentOwner();
+    const result = entrypointOwner('Billing')({}, {}, () => {
+      observed = currentEntrypointOwner();
     });
     expect(observed).toBe('Billing');
     expect(result).toBeUndefined();

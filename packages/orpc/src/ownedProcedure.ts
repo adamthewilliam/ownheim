@@ -1,9 +1,9 @@
-import { ownerMiddleware } from './ownerMiddleware.ts';
+import { entrypointOwner } from './ownerMiddleware.ts';
 
 export interface OrpcProcedureBuilder {
-  use(middleware: ReturnType<typeof ownerMiddleware>): this;
+  use(middleware: ReturnType<typeof entrypointOwner>): this;
 }
 
-export function ownedProcedure<T extends OrpcProcedureBuilder>(builder: T, owner: string): T {
-  return builder.use(ownerMiddleware(owner));
+export function entrypointProcedure<T extends OrpcProcedureBuilder>(builder: T, team: string): T {
+  return builder.use(entrypointOwner(team));
 }

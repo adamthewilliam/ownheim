@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { Effect, Fiber, Layer, Logger as EffectLogger, Schema } from 'effect';
 import { OwnedError } from '@strays/core/OwnedError';
 import { makeMemorySink } from '@strays/core/logging/LogSink';
-import { walkOwnedErrorChain } from '@strays/core/resolution/walkOwnedErrorChain';
+import { walkResponderTeamChain } from '@strays/core/resolution/walkOwnedErrorChain';
 import { Owner, withOwner } from '@strays/effect/Owner';
 import { ownedBy } from '@strays/effect/ownedBy';
 import { makeOwnershipLogger } from '@strays/effect/Logger';
@@ -193,7 +193,7 @@ class BillingTaggedError extends Schema.TaggedError<BillingTaggedError>(
 ownedBy(BillingTaggedError, 'Billing');
 
 describe('integration: Effect.fail preserves owner via ownedBy / OwnedError', () => {
-  it('walkOwnedErrorChain finds the owner on a Schema.TaggedError marked with ownedBy', async () => {
+  it('walkResponderTeamChain finds the owner on a Schema.TaggedError marked with ownedBy', async () => {
     const program = Effect.gen(function* () {
       yield* Effect.fail(new BillingTaggedError({ code: 'CARD_DECLINED' }));
       return 'unreachable';
@@ -206,7 +206,7 @@ describe('integration: Effect.fail preserves owner via ownedBy / OwnedError', ()
       const cause = exit.cause as { _tag: string; error?: unknown };
       expect(cause._tag).toBe('Fail');
       const err = cause.error;
-      expect(walkOwnedErrorChain(err)).toBe('Billing');
+      expect(walkResponderTeamChain(err)).toBe('Billing');
     }
   });
 
@@ -217,7 +217,7 @@ describe('integration: Effect.fail preserves owner via ownedBy / OwnedError', ()
     const { sink, lines } = makeMemorySink();
     await Effect.runPromise(
       withOwner('Platform')(
-        Effect.fail(new OwnedError('boom', 'Identity')).pipe(
+        Effect.fail(new OwnedError('boom', { responderTeam: 'Identity' })).pipe(
           Effect.tapErrorCause((cause) => Effect.logError('failed', cause)),
           Effect.catchAll(() => Effect.void),
         ),

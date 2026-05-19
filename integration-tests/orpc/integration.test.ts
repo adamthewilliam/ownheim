@@ -6,39 +6,39 @@ import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
 import { BatchLinkPlugin } from '@orpc/client/plugins';
 import { createLogger } from '@strays/core/logging/createLogger';
-import { currentOwner } from '@strays/core/ownership';
+import { currentEntrypointOwner } from '@strays/core/ownership';
 import { captureStructuredLogs, type CapturedLogs } from '@strays/test-utils/captureStructuredLogs';
-import { ownedProcedure } from '@strays/orpc/ownedProcedure';
-import { ownerMiddleware } from '@strays/orpc/ownerMiddleware';
+import { entrypointProcedure } from '@strays/orpc/ownedProcedure';
+import { entrypointOwner } from '@strays/orpc/ownerMiddleware';
 
 // oRPC's `Builder.use` and `Builder.middleware` accept the rich
 // `Middleware<TInContext, TOutContext, TInput, TOutput, ...>` signature, but
-// our `ownerMiddleware` is structurally `({ next }) => Promise<unknown>`.
+// our `entrypointOwner` is structurally `({ next }) => Promise<unknown>`.
 // The runtime contract is identical (call `next()` inside the owner ALS
 // scope) and the README explicitly invites consumers to plug it into either
-// `os.use(...)` or `ownedProcedure(...)`. We coerce through `unknown` at the
+// `os.use(...)` or `entrypointProcedure(...)`. We coerce through `unknown` at the
 // boundary so the rest of the test stays oRPC-typed end-to-end.
 type OsBuilder = typeof os;
 const asOrpcMw = <Mw>(mw: Mw): Parameters<OsBuilder['use']>[0] =>
   mw as unknown as Parameters<OsBuilder['use']>[0];
 
-const billingMw = asOrpcMw(ownerMiddleware('Billing'));
-const identityMw = asOrpcMw(ownerMiddleware('Identity'));
-const platformMw = asOrpcMw(ownerMiddleware('Platform'));
+const billingMw = asOrpcMw(entrypointOwner('Billing'));
+const identityMw = asOrpcMw(entrypointOwner('Identity'));
+const platformMw = asOrpcMw(entrypointOwner('Platform'));
 
-// Mirrors the `ownedProcedure(builder, owner)` factory in `src/`. We exercise
+// Mirrors the `entrypointProcedure(builder, owner)` factory in `src/`. We exercise
 // it indirectly here (the structural builder it expects is incompatible with
 // oRPC's overloaded `Builder.use` signatures, so a one-line cast is required
 // either side of the call). `taggedOs(os, 'Owner')` is exactly what
-// `ownedProcedure(os, 'Owner')` does at runtime.
+// `entrypointProcedure(os, 'Owner')` does at runtime.
 const taggedOs = (builder: OsBuilder, owner: string): OsBuilder => {
-  // Round-trip through `ownedProcedure` so this file actually exercises the
-  // public factory, not just `ownerMiddleware`. Two coercions: one in to fit
+  // Round-trip through `entrypointProcedure` so this file actually exercises the
+  // public factory, not just `entrypointOwner`. Two coercions: one in to fit
   // oRPC's overloaded `Builder.use` into the package's narrower
   // `OrpcProcedureBuilder` shape, one out to recover `os`'s rich `.handler(...)`
   // typing. Runtime contract is identical.
-  const tagged = ownedProcedure(
-    builder as unknown as Parameters<typeof ownedProcedure>[0],
+  const tagged = entrypointProcedure(
+    builder as unknown as Parameters<typeof entrypointProcedure>[0],
     owner,
   );
   return tagged as unknown as OsBuilder;
@@ -86,7 +86,7 @@ describe('@strays/orpc — real oRPC integration', () => {
         logger.info({ msg: 'slow-charged' });
         await Promise.resolve();
         logger.warn({ msg: 'slow-charged-warn' });
-        return { ownerAfterAwaits: currentOwner() };
+        return { ownerAfterAwaits: currentEntrypointOwner() };
       }),
     };
 
@@ -121,7 +121,7 @@ describe('@strays/orpc — real oRPC integration', () => {
     await client.getUser();
     await client.health();
     // Outside any procedure: owner must be undefined.
-    expect(currentOwner()).toBeUndefined();
+    expect(currentEntrypointOwner()).toBeUndefined();
 
     const byCaller = new Map<string, string>();
     for (const entry of captured.entries) {
@@ -138,28 +138,28 @@ describe('@strays/orpc — real oRPC integration', () => {
     // Plain helpers an outer procedure invokes server-side. We cannot
     // recursively call into the same router's other procedures from a
     // handler without circular references, but the ALS contract is identical:
-    // it's about whether `runWithOwner` is re-entered, regardless of whether
+    // it's about whether `runWithEntrypointOwner` is re-entered, regardless of whether
     // the inner callee is "an oRPC procedure" or "a plain function".
     const innerNoOwner = () => {
-      logger.info({ msg: 'inner-no-owner', observed: currentOwner() ?? null });
+      logger.info({ msg: 'inner-no-owner', observed: currentEntrypointOwner() ?? null });
     };
 
     const innerWithOwnScope = async () => {
-      const before = currentOwner();
-      await ownerMiddleware('Identity')({
+      const before = currentEntrypointOwner();
+      await entrypointOwner('Identity')({
         next: async () => {
-          logger.info({ msg: 'inner-with-own', observed: currentOwner() ?? null });
+          logger.info({ msg: 'inner-with-own', observed: currentEntrypointOwner() ?? null });
         },
       });
       // After B exits, A's owner must be restored.
-      expect(currentOwner()).toBe(before);
+      expect(currentEntrypointOwner()).toBe(before);
     };
 
     const router = {
       outer: taggedOs(os, 'Billing').handler(async () => {
         innerNoOwner();
         await innerWithOwnScope();
-        logger.info({ msg: 'outer-after', observed: currentOwner() ?? null });
+        logger.info({ msg: 'outer-after', observed: currentEntrypointOwner() ?? null });
       }),
     };
 
@@ -183,7 +183,7 @@ describe('@strays/orpc — real oRPC integration', () => {
     expect(outerAfter?.line.record['observed']).toBe('Billing');
   });
 
-  it('raw `os.use(ownerMiddleware(...))` (without the ownedProcedure factory) tags logs identically', async () => {
+  it('raw `os.use(entrypointOwner(...))` (without the entrypointProcedure factory) tags logs identically', async () => {
     const router = {
       ping: os.use(billingMw).handler(() => {
         logger.info({ msg: 'pinged' });
@@ -203,15 +203,15 @@ describe('@strays/orpc — real oRPC integration', () => {
     const router = {
       billingOp: os.use(billingMw).handler(() => {
         logger.info({ msg: 'batched', proc: 'billingOp' });
-        return { team: currentOwner() };
+        return { team: currentEntrypointOwner() };
       }),
       identityOp: os.use(identityMw).handler(() => {
         logger.info({ msg: 'batched', proc: 'identityOp' });
-        return { team: currentOwner() };
+        return { team: currentEntrypointOwner() };
       }),
       platformOp: os.use(platformMw).handler(() => {
         logger.info({ msg: 'batched', proc: 'platformOp' });
-        return { team: currentOwner() };
+        return { team: currentEntrypointOwner() };
       }),
     };
 
@@ -264,6 +264,6 @@ describe('@strays/orpc — real oRPC integration', () => {
     expect(byProc.get('platformOp')).toBe('Platform');
 
     // Outside the batch, no scope leaks.
-    expect(currentOwner()).toBeUndefined();
+    expect(currentEntrypointOwner()).toBeUndefined();
   });
 });

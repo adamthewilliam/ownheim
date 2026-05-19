@@ -1,8 +1,8 @@
-import { withOwnerScope } from '@strays/core/ownership';
+import { withEntrypointOwnerScope } from '@strays/core/ownership';
 
-export const ownerMiddleware = withOwnerScope<
+export const entrypointOwner = withEntrypointOwnerScope<
   [unknown, unknown, (err?: unknown) => void],
   void
 >((_req, _res, next) => () => next());
 
-export type OwnerMiddleware = ReturnType<typeof ownerMiddleware>;
+export type EntrypointOwnerMiddleware = ReturnType<typeof entrypointOwner>;

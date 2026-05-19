@@ -1,5 +1,5 @@
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
-import { resolveOwner } from '../ownership.ts';
+import { resolveOwnership } from '../ownership.ts';
 
 export interface TracedSpan {
   setAttribute(key: string, value: string | number | boolean): void;
@@ -16,23 +16,25 @@ export interface Tracer {
 
 export interface CreateTracerOptions {
   readonly factory: SpanFactory;
-  readonly fallback?: string;
+  readonly fallbackCodeTeam?: string;
   readonly registry?: ManifestRegistry;
 }
 
 export function createTracer(moduleOwner: string, options: CreateTracerOptions): Tracer {
-  const fallback = options.fallback ?? 'unowned';
+  const fallbackCodeTeam = options.fallbackCodeTeam ?? 'unowned';
   const normalisedOwner = moduleOwner === '' ? undefined : moduleOwner;
 
   return {
     startSpan(name) {
       const span = options.factory.start(name);
-      const team = resolveOwner({
+      const { ownership } = resolveOwnership({
         ...(normalisedOwner === undefined ? {} : { moduleOwner: normalisedOwner }),
         ...(options.registry === undefined ? {} : { registry: options.registry }),
-        fallback,
+        fallbackCodeTeam,
       });
-      span.setAttribute('team', team);
+      if (ownership.entrypointTeam !== undefined) span.setAttribute('strays.entrypoint_team', ownership.entrypointTeam);
+      if (ownership.codeTeam !== undefined) span.setAttribute('strays.code_team', ownership.codeTeam);
+      if (ownership.responderTeam !== undefined) span.setAttribute('strays.responder_team', ownership.responderTeam);
       return span;
     },
   };

@@ -1,22 +1,22 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 import { createLogger } from '@strays/core/logging/createLogger';
-import { currentOwner } from '@strays/core/ownership';
+import { currentEntrypointOwner } from '@strays/core/ownership';
 import { captureStructuredLogs } from '@strays/test-utils/captureStructuredLogs';
 import { Hono } from 'hono';
-import { ownerMiddleware } from '@strays/hono/ownerMiddleware';
+import { entrypointOwner } from '@strays/hono/ownerMiddleware';
 
-// The middleware factory in src/ownerMiddleware.ts is typed against an arbitrary
+// The middleware factory in src/entrypointOwner.ts is typed against an arbitrary
 // `(c, next) => Promise<void>` shape; Hono's actual middleware signature is the
 // same positionally so we cast at the call site to keep Hono's typing happy.
 type HonoMiddleware = Parameters<Hono['use']>[1];
 const honoOwnerMiddleware = (owner: string): HonoMiddleware =>
-  ownerMiddleware(owner) as unknown as HonoMiddleware;
+  entrypointOwner(owner) as unknown as HonoMiddleware;
 
 // Per @strays/core/logging/formatOwnedLogEntry the `team` field is the OwnerId
 // verbatim (e.g. 'Billing'), not lowercased — the prompt's `'billing'`
 // expectation predates that rename.
 
-describe('hono ownerMiddleware integration (real Hono server)', () => {
+describe('hono entrypointOwner integration (real Hono server)', () => {
   let activeCapture: ReturnType<typeof captureStructuredLogs> | undefined;
 
   const startCapture = () => {
@@ -110,7 +110,7 @@ describe('hono ownerMiddleware integration (real Hono server)', () => {
     expect(refundEntry?.line.team).toBe('Billing');
   });
 
-  it('nested ownerMiddleware: innermost owner wins for handler logs', async () => {
+  it('nested entrypointOwner: innermost owner wins for handler logs', async () => {
     const capture = startCapture();
     const log = createLogger('Billing');
 
@@ -127,9 +127,9 @@ describe('hono ownerMiddleware integration (real Hono server)', () => {
     expect(res.status).toBe(200);
 
     const entry = capture.entries.find((e) => e.line.record.msg === 'innermost-wins');
-    // ALS shadowing: the second `runWithOwner('Identity', ...)` runs inside the
-    // first scope, and `currentOwner()` inside the handler reflects the
-    // innermost scope. This locks the documented `runWithOwner` shadowing
+    // ALS shadowing: the second `runWithEntrypointOwner('Identity', ...)` runs inside the
+    // first scope, and `currentEntrypointOwner()` inside the handler reflects the
+    // innermost scope. This locks the documented `runWithEntrypointOwner` shadowing
     // behaviour through the hono middleware chain.
     expect(entry?.line.team).toBe('Identity');
   });
@@ -146,9 +146,9 @@ describe('hono ownerMiddleware integration (real Hono server)', () => {
     });
     app.onError((err, c) => {
       // Hono runs onError synchronously after the handler rejects, while we
-      // are still inside the middleware's `runWithOwner` frame, so the scope
+      // are still inside the middleware's `runWithEntrypointOwner` frame, so the scope
       // is still 'Billing'.
-      log.error({ msg: 'request failed', scopeAtErrorHandler: currentOwner() }, err);
+      log.error({ msg: 'request failed', scopeAtErrorHandler: currentEntrypointOwner() }, err);
       return c.json({ error: String(err) }, 500);
     });
 

@@ -1,9 +1,5 @@
-import { resolveOwnerWithSource } from '@strays/core/ownership';
-import {
-  DEFAULT_FALLBACK,
-  DEFAULT_SOURCE_TAG_KEY,
-  DEFAULT_TAG_KEY,
-} from '@strays/core/tracing/resolveTagOptions';
+import { resolveOwnership } from '@strays/core/ownership';
+import { resolveTagOptions, type TagOptions } from '@strays/core/tracing/resolveTagOptions';
 
 export interface OtelSpan {
   setAttribute(key: string, value: string | number | boolean): void;
@@ -16,25 +12,18 @@ export interface OtelSpanProcessor {
   forceFlush(): Promise<void>;
 }
 
-export interface OwnershipSpanProcessorOptions {
-  readonly fallback?: string;
-  readonly attributeKey?: string;
-  readonly sourceAttributeKey?: string;
-  readonly emitSource?: boolean;
-}
+export type OwnershipSpanProcessorOptions = TagOptions;
 
 export class OwnershipSpanProcessor implements OtelSpanProcessor {
   constructor(private readonly options: OwnershipSpanProcessorOptions = {}) {}
 
   onStart(span: OtelSpan, _parentContext?: unknown): void {
-    const fallback = this.options.fallback ?? DEFAULT_FALLBACK;
-    const key = this.options.attributeKey ?? DEFAULT_TAG_KEY;
-    const sourceKey = this.options.sourceAttributeKey ?? DEFAULT_SOURCE_TAG_KEY;
-    const emitSource = this.options.emitSource ?? false;
+    const { fallbackCodeTeam, tags } = resolveTagOptions(this.options);
+    const { ownership } = resolveOwnership({ fallbackCodeTeam });
 
-    const { owner, source } = resolveOwnerWithSource({ fallback });
-    span.setAttribute(key, owner);
-    if (emitSource) span.setAttribute(sourceKey, source);
+    if (ownership.entrypointTeam !== undefined) span.setAttribute(tags.entrypointTeam, ownership.entrypointTeam);
+    if (ownership.codeTeam !== undefined) span.setAttribute(tags.codeTeam, ownership.codeTeam);
+    if (ownership.responderTeam !== undefined) span.setAttribute(tags.responderTeam, ownership.responderTeam);
   }
 
   onEnd(): void {}

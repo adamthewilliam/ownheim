@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'bun:test';
-import { currentOwner } from '@strays/core/ownership';
-import { ownerMiddleware } from './ownerMiddleware.ts';
+import { currentEntrypointOwner } from '@strays/core/ownership';
+import { entrypointOwner } from './ownerMiddleware.ts';
 
-describe('orpc ownerMiddleware shape', () => {
+describe('orpc entrypointOwner shape', () => {
   it('extracts `next` from the opts object and runs it under the owner scope', async () => {
     let observed: string | undefined;
-    await ownerMiddleware('Billing')({
+    await entrypointOwner('Billing')({
       next: async () => {
-        observed = currentOwner();
+        observed = currentEntrypointOwner();
       },
     });
     expect(observed).toBe('Billing');

@@ -1,5 +1,3 @@
-import { walkOwnedErrorChain } from '../resolution/walkOwnedErrorChain.ts';
-
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 export interface OwnedLogEntry {
@@ -7,9 +5,9 @@ export interface OwnedLogEntry {
   readonly message: string;
   readonly fields?: Readonly<Record<string, unknown>>;
   readonly error?: unknown;
-  readonly scopeOwner?: string;
-  readonly moduleOwner?: string;
-  readonly fallback?: string;
+  readonly entrypointTeam?: string;
+  readonly codeTeam?: string;
+  readonly responderTeam?: string;
 }
 
 export interface FormattedLogLine {
@@ -43,17 +41,18 @@ function serialiseError(value: unknown): unknown {
 }
 
 export function formatOwnedLogEntry(entry: OwnedLogEntry): FormattedLogLine {
-  const causeOwner = entry.error !== undefined ? walkOwnedErrorChain(entry.error) : undefined;
-  // Owner-side identifier crosses the input/output boundary here: the resolved
-  // OwnerId is emitted as the `team` field per observability-vendor convention.
-  const team =
-    causeOwner ?? entry.scopeOwner ?? entry.moduleOwner ?? entry.fallback ?? 'unowned';
-
+  const entrypointTeam = entry.entrypointTeam;
+  const codeTeam = entry.codeTeam;
+  const responderTeam = entry.responderTeam;
+  const team = responderTeam ?? entrypointTeam ?? codeTeam ?? 'unowned';
   const record: Record<string, unknown> = {
     level: entry.level,
     msg: entry.message,
     ...entry.fields,
     ...(entry.error !== undefined ? { err: serialiseError(entry.error) } : {}),
+    ...(entrypointTeam === undefined ? {} : { strays_entrypoint_team: entrypointTeam }),
+    ...(codeTeam === undefined ? {} : { strays_code_team: codeTeam }),
+    ...(responderTeam === undefined ? {} : { strays_responder_team: responderTeam }),
     team,
   };
 

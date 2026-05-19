@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { OwnedError } from '@strays/core/OwnedError';
 import { resetDefaultRegistry } from '@strays/core/manifest/defaultRegistry';
-import { runWithOwner } from '@strays/core/ownership';
+import { runWithEntrypointOwner } from '@strays/core/ownership';
 import * as Sentry from '@sentry/node';
 import { parseEnvelope } from '@sentry/core';
 import type {
@@ -89,12 +89,12 @@ afterEach(async () => {
 });
 
 describe('@strays/sentry integration with real @sentry/node', () => {
-  it('tags captured events with the active runWithOwner team', async () => {
+  it('tags captured events with the active runWithEntrypointOwner team', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
     installSentry(asStraysClient(client));
 
-    runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Billing', () => {
       Sentry.captureException(new Error('boom'));
     });
 
@@ -111,9 +111,9 @@ describe('@strays/sentry integration with real @sentry/node', () => {
     if (!client) throw new Error('Sentry client not initialised');
     installSentry(asStraysClient(client));
 
-    const owned = new OwnedError('explicit', 'Payments');
+    const owned = new OwnedError('explicit', { responderTeam: 'Payments' });
 
-    runWithOwner('Identity', () => {
+    runWithEntrypointOwner('Identity', () => {
       Sentry.captureException(owned);
     });
 
@@ -127,7 +127,7 @@ describe('@strays/sentry integration with real @sentry/node', () => {
   it('falls back when capturing outside any owner scope', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
-    installSentry(asStraysClient(client), { fallback: 'platform-default' });
+    installSentry(asStraysClient(client), { fallbackCodeTeam: 'platform-default' });
 
     Sentry.captureException(new Error('orphan'));
 
@@ -152,7 +152,7 @@ describe('@strays/sentry integration with real @sentry/node', () => {
     // in registration order and the last writer to `event.tags.team` wins.
     installSentry(asStraysClient(client));
 
-    runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Billing', () => {
       Sentry.captureException(new Error('order matters'));
     });
 
@@ -176,7 +176,7 @@ describe('@strays/sentry integration with real @sentry/node', () => {
       return event;
     }) as EventProcessor);
 
-    runWithOwner('Billing', () => {
+    runWithEntrypointOwner('Billing', () => {
       Sentry.captureException(new Error('install order matters'));
     });
 
