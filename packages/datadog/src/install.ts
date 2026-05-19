@@ -1,4 +1,4 @@
-import { applyOwnershipTags, resolveOwnershipTags } from '@ownheim/core/tracing/ownershipTags';
+import { applyProjectedOwnership } from '@ownheim/core/tracing/projectOwnership';
 import { type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface DatadogSpan {
@@ -23,9 +23,7 @@ export function instrumentDatadog(tracer: DatadogTracer, options: InstrumentOpti
   const original = tracer.startSpan.bind(tracer);
   tracer.startSpan = (name: string, opts?: unknown) => {
     const span = original(name, opts);
-    applyOwnershipTags(span, resolveOwnershipTags(options), (target, key, value) =>
-      target.setTag(key, value),
-    );
+    applyProjectedOwnership(span, options, (target, key, value) => target.setTag(key, value));
     return span;
   };
 }

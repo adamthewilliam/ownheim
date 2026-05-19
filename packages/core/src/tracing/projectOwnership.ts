@@ -16,7 +16,9 @@ export function projectOwnershipToTags(
   return ownershipContextToTags(ownership, tags);
 }
 
-export function resolveProjectedOwnershipTags(input: ProjectOwnershipInput = {}): OwnershipTags {
+export function resolveProjectedOwnershipContext(
+  input: ProjectOwnershipInput = {},
+): OwnershipContext {
   const tagOptions: TagOptions = {
     ...(input.fallbackCodeTeam === undefined ? {} : { fallbackCodeTeam: input.fallbackCodeTeam }),
     ...(input.tags === undefined ? {} : { tags: input.tags }),
@@ -29,7 +31,15 @@ export function resolveProjectedOwnershipTags(input: ProjectOwnershipInput = {})
     ...(input.registry === undefined ? {} : { registry: input.registry }),
     fallbackCodeTeam,
   });
-  return projectOwnershipToTags(ownership, tagOptions);
+  return ownership;
+}
+
+export function resolveProjectedOwnershipTags(input: ProjectOwnershipInput = {}): OwnershipTags {
+  const tagOptions: TagOptions = {
+    ...(input.fallbackCodeTeam === undefined ? {} : { fallbackCodeTeam: input.fallbackCodeTeam }),
+    ...(input.tags === undefined ? {} : { tags: input.tags }),
+  };
+  return projectOwnershipToTags(resolveProjectedOwnershipContext(input), tagOptions);
 }
 
 export function applyProjectedOwnership<TTarget>(

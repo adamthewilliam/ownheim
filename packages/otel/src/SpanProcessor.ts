@@ -1,4 +1,4 @@
-import { applyOwnershipTags, resolveOwnershipTags } from '@ownheim/core/tracing/ownershipTags';
+import { applyProjectedOwnership } from '@ownheim/core/tracing/projectOwnership';
 import { type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface OtelSpan {
@@ -18,7 +18,7 @@ export class OwnershipSpanProcessor implements OtelSpanProcessor {
   constructor(private readonly options: OwnershipSpanProcessorOptions = {}) {}
 
   onStart(span: OtelSpan, _parentContext?: unknown): void {
-    applyOwnershipTags(span, resolveOwnershipTags(this.options), (target, key, value) =>
+    applyProjectedOwnership(span, this.options, (target, key, value) =>
       target.setAttribute(key, value),
     );
   }

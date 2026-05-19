@@ -2,7 +2,7 @@ import { getDefaultLogSink } from './defaultLogSink.ts';
 import { formatOwnedLogEntry, type LogLevel } from './formatOwnedLogEntry.ts';
 import type { LogSink } from './LogSink.ts';
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
-import { resolveOwnership } from '../ownership.ts';
+import { resolveProjectedOwnershipContext } from '../tracing/projectOwnership.ts';
 
 export type LogValue =
   | string
@@ -35,7 +35,7 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
 
   const emit = (level: LogLevel, record: LogRecord, err?: unknown) => {
     const { msg, ...fields } = record;
-    const { ownership } = resolveOwnership({
+    const ownership = resolveProjectedOwnershipContext({
       ...(err === undefined ? {} : { error: err }),
       ...(normalisedModuleOwner === undefined ? {} : { moduleOwner: normalisedModuleOwner }),
       ...(options.registry === undefined ? {} : { registry: options.registry }),

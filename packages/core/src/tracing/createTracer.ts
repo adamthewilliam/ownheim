@@ -1,5 +1,5 @@
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
-import { applyOwnershipTags, resolveOwnershipTags } from './ownershipTags.ts';
+import { applyProjectedOwnership } from './projectOwnership.ts';
 
 export interface TracedSpan {
   setAttribute(key: string, value: string | number | boolean): void;
@@ -27,13 +27,13 @@ export function createTracer(moduleOwner: string, options: CreateTracerOptions):
   return {
     startSpan(name) {
       const span = options.factory.start(name);
-      applyOwnershipTags(
+      applyProjectedOwnership(
         span,
-        resolveOwnershipTags({
+        {
           ...(normalisedOwner === undefined ? {} : { moduleOwner: normalisedOwner }),
           ...(options.registry === undefined ? {} : { registry: options.registry }),
           fallbackCodeTeam,
-        }),
+        },
         (target, key, value) => target.setAttribute(key, value),
       );
       return span;

@@ -96,6 +96,7 @@ export {
 } from './tracing/ownershipTags.ts';
 export {
   projectOwnershipToTags,
+  resolveProjectedOwnershipContext,
   resolveProjectedOwnershipTags,
   applyProjectedOwnership,
   type ProjectOwnershipInput,

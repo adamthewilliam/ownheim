@@ -1,5 +1,5 @@
 import { fromSentryFrames, type SentryStacktrace } from '@ownheim/core/resolution/frames';
-import { resolveOwnershipTags } from '@ownheim/core/tracing/ownershipTags';
+import { resolveProjectedOwnershipTags } from '@ownheim/core/tracing/projectOwnership';
 import { type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface SentryEvent {
@@ -35,7 +35,7 @@ export function installSentry(client: SentryClient, options: InstallOptions = {}
     const stacktrace = event.exception?.values?.[0]?.stacktrace;
     event.tags = {
       ...event.tags,
-      ...resolveOwnershipTags({
+      ...resolveProjectedOwnershipTags({
         ...options,
         error: hint?.originalException,
         frameSource: fromSentryFrames(stacktrace),

@@ -1,4 +1,4 @@
-import { resolveOwnershipTags } from '@ownheim/core/tracing/ownershipTags';
+import { resolveProjectedOwnershipTags } from '@ownheim/core/tracing/projectOwnership';
 
 export interface OwnershipMixinOptions {
   readonly fallbackCodeTeam?: string;
@@ -33,12 +33,12 @@ function toTagOptions(options: OwnershipMixinOptions) {
 export function ownershipMixin(options: OwnershipMixinOptions = {}) {
   const tagOptions = toTagOptions(options);
 
-  return (): Record<string, string> => resolveOwnershipTags(tagOptions);
+  return (): Record<string, string> => resolveProjectedOwnershipTags(tagOptions);
 }
 
 export function ownershipFromError(
   error: unknown,
   options: OwnershipMixinOptions = {},
 ): Record<string, string> {
-  return resolveOwnershipTags({ ...toTagOptions(options), error });
+  return resolveProjectedOwnershipTags({ ...toTagOptions(options), error });
 }
