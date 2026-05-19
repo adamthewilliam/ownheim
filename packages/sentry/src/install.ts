@@ -1,6 +1,6 @@
 import { fromSentryFrames, type SentryStacktrace } from '@ownheim/core/resolution/frames';
-import { resolveOwnership } from '@ownheim/core/ownership';
-import { resolveTagOptions, type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
+import { resolveOwnershipTags } from '@ownheim/core/tracing/ownershipTags';
+import { type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface SentryEvent {
   tags?: Record<string, string>;
@@ -31,20 +31,16 @@ export function installSentry(client: SentryClient, options: InstallOptions = {}
   if (installedClient[INSTALLED]) return;
   installedClient[INSTALLED] = true;
 
-  const { fallbackCodeTeam, tags: tagKeys } = resolveTagOptions(options);
-
   client.addEventProcessor((event, hint) => {
     const stacktrace = event.exception?.values?.[0]?.stacktrace;
-    const { ownership } = resolveOwnership({
-      error: hint?.originalException,
-      frameSource: fromSentryFrames(stacktrace),
-      fallbackCodeTeam,
-    });
-    const tags: Record<string, string> = { ...event.tags };
-    if (ownership.entrypointTeam !== undefined) tags[tagKeys.entrypointTeam] = ownership.entrypointTeam;
-    if (ownership.codeTeam !== undefined) tags[tagKeys.codeTeam] = ownership.codeTeam;
-    if (ownership.responderTeam !== undefined) tags[tagKeys.responderTeam] = ownership.responderTeam;
-    event.tags = tags;
+    event.tags = {
+      ...event.tags,
+      ...resolveOwnershipTags({
+        ...options,
+        error: hint?.originalException,
+        frameSource: fromSentryFrames(stacktrace),
+      }),
+    };
     return event;
   });
 }

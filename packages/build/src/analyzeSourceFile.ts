@@ -53,10 +53,19 @@ export interface OwnedErrorConstruction {
   readonly line: number;
 }
 
+export type SourceAnalysisFindingCode = 'namespace-runtime-import' | 'runtime-re-export';
+
+export interface SourceAnalysisFinding {
+  readonly code: SourceAnalysisFindingCode;
+  readonly message: string;
+  readonly line: number;
+}
+
 export interface FileExtraction {
   readonly filePath: string;
   readonly jsdocOwner: string | undefined;
   readonly ownedErrorConstructions: readonly OwnedErrorConstruction[];
+  readonly findings: readonly SourceAnalysisFinding[];
 }
 
 export interface AnalyzedFile extends FileExtraction {
@@ -97,6 +106,7 @@ function parseAndExtract(filePath: string, sourceText: string): ParsedAndExtract
       filePath: sourceFile.getFilePath(),
       jsdocOwner: extractFileLevelOwner(sourceFile),
       ownedErrorConstructions: extractOwnedErrorConstructions(sourceFile),
+      findings: extractSourceAnalysisFindings(sourceFile),
     },
   };
 }
@@ -159,6 +169,36 @@ function extractOwnedErrorConstructions(sourceFile: SourceFile): OwnedErrorConst
   }
 
   return results;
+}
+
+function extractSourceAnalysisFindings(sourceFile: SourceFile): SourceAnalysisFinding[] {
+  const findings: SourceAnalysisFinding[] = [];
+
+  for (const decl of sourceFile.getImportDeclarations()) {
+    if (!isRuntimeSpecifier(decl.getModuleSpecifierValue())) continue;
+    if (decl.isTypeOnly()) continue;
+    if (decl.getNamespaceImport()) {
+      findings.push({
+        code: 'namespace-runtime-import',
+        message:
+          'Namespace imports from @ownheim/core are not rewritten by the Ownheim source transform. Use named imports for runtime factories.',
+        line: decl.getStartLineNumber(),
+      });
+    }
+  }
+
+  for (const decl of sourceFile.getExportDeclarations()) {
+    if (!isRuntimeSpecifier(decl.getModuleSpecifierValue())) continue;
+    if (decl.isTypeOnly()) continue;
+    findings.push({
+      code: 'runtime-re-export',
+      message:
+        'Re-exports from @ownheim/core are not rewritten by the Ownheim source transform. Export factory-bound values from a local module instead.',
+      line: decl.getStartLineNumber(),
+    });
+  }
+
+  return findings;
 }
 
 function readStringLiteral(node: ts.Node | undefined): string | undefined {

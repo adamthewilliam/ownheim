@@ -1,6 +1,5 @@
-import type { OwnershipContext, ResolveOwnershipInput } from '../ownership.ts';
-import { resolveOwnership } from '../ownership.ts';
-import { resolveTagOptions, type TagOptions } from './resolveTagOptions.ts';
+import type { OwnershipContext } from '../ownership.ts';
+import { resolveProjectedOwnershipTags, type ProjectOwnershipInput } from './projectOwnership.ts';
 
 export interface OwnershipTagNames {
   readonly entrypointTeam: string;
@@ -8,10 +7,7 @@ export interface OwnershipTagNames {
   readonly responderTeam: string;
 }
 
-export interface ResolveOwnershipTagsInput extends Omit<ResolveOwnershipInput, 'fallbackCodeTeam'> {
-  readonly fallbackCodeTeam?: string;
-  readonly tags?: TagOptions['tags'];
-}
+export interface ResolveOwnershipTagsInput extends ProjectOwnershipInput {}
 
 export type OwnershipTags = Record<string, string>;
 
@@ -27,19 +23,7 @@ export function ownershipContextToTags(
 }
 
 export function resolveOwnershipTags(input: ResolveOwnershipTagsInput = {}): OwnershipTags {
-  const tagOptions: TagOptions = {
-    ...(input.fallbackCodeTeam === undefined ? {} : { fallbackCodeTeam: input.fallbackCodeTeam }),
-    ...(input.tags === undefined ? {} : { tags: input.tags }),
-  };
-  const { fallbackCodeTeam, tags } = resolveTagOptions(tagOptions);
-  const { ownership } = resolveOwnership({
-    ...(input.error === undefined ? {} : { error: input.error }),
-    ...(input.frameSource === undefined ? {} : { frameSource: input.frameSource }),
-    ...(input.moduleOwner === undefined ? {} : { moduleOwner: input.moduleOwner }),
-    ...(input.registry === undefined ? {} : { registry: input.registry }),
-    fallbackCodeTeam,
-  });
-  return ownershipContextToTags(ownership, tags);
+  return resolveProjectedOwnershipTags(input);
 }
 
 export function applyOwnershipTags<TTarget>(

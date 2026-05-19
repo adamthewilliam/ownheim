@@ -188,6 +188,16 @@
         "types": "./dist/tracing/ownershipTags.d.cts",
         "default": "./dist/tracing/ownershipTags.cjs"
       }
+    },
+    "./tracing/projectOwnership": {
+      "import": {
+        "types": "./dist/tracing/projectOwnership.d.mts",
+        "default": "./dist/tracing/projectOwnership.mjs"
+      },
+      "require": {
+        "types": "./dist/tracing/projectOwnership.d.cts",
+        "default": "./dist/tracing/projectOwnership.cjs"
+      }
     }
   },
   "scripts": {

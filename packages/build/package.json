@@ -69,6 +69,16 @@
         "default": "./dist/generateManifest.cjs"
       }
     },
+    "./generateArtifacts": {
+      "import": {
+        "types": "./dist/generateArtifacts.d.mts",
+        "default": "./dist/generateArtifacts.mjs"
+      },
+      "require": {
+        "types": "./dist/generateArtifacts.d.cts",
+        "default": "./dist/generateArtifacts.cjs"
+      }
+    },
     "./esbuildPlugin": {
       "import": {
         "types": "./dist/esbuildPlugin.d.mts",

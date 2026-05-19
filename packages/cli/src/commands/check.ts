@@ -41,10 +41,9 @@ export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
   }
 
   const drift = actual !== expected;
-  const result: CheckResult = drift
+  return drift
     ? { drift, diff: simpleDiff(actual ?? '', expected), ownheimCount: ownheimFiles.length, ownheimFiles }
     : { drift, ownheimCount: ownheimFiles.length, ownheimFiles };
-  return result;
 }
 
 function simpleDiff(actual: string, expected: string): string {

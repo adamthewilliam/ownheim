@@ -19,6 +19,12 @@ export type NextThunk = () => unknown;
 export function withEntrypointOwnerScope<TArgs extends readonly unknown[], TReturn = unknown>(
   pickNext: (...args: TArgs) => NextThunk,
 ): (team: string) => (...args: TArgs) => TReturn {
+  return createEntrypointOwnerAdapter(pickNext);
+}
+
+export function createEntrypointOwnerAdapter<TArgs extends readonly unknown[], TReturn = unknown>(
+  pickNext: (...args: TArgs) => NextThunk,
+): (team: string) => (...args: TArgs) => TReturn {
   return (team) =>
     ((...args: TArgs) => runWithEntrypointOwner(team, () => pickNext(...args)())) as (
       ...args: TArgs

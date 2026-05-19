@@ -15,6 +15,7 @@ export {
   runWithEntrypointOwner,
   currentEntrypointOwner,
   withEntrypointOwnerScope,
+  createEntrypointOwnerAdapter,
   resolveOwnership,
   type NextThunk,
   type CodeOwnerSource,
@@ -93,3 +94,9 @@ export {
   type ResolveOwnershipTagsInput,
   type OwnershipTags,
 } from './tracing/ownershipTags.ts';
+export {
+  projectOwnershipToTags,
+  resolveProjectedOwnershipTags,
+  applyProjectedOwnership,
+  type ProjectOwnershipInput,
+} from './tracing/projectOwnership.ts';
