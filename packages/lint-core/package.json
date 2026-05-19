@@ -5,25 +5,113 @@
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./src/index.ts",
-    "./types": "./src/types.ts",
-    "./adapter": "./src/adapter.ts",
-    "./validateFileOwnership": "./src/validateFileOwnership.ts",
-    "./validateCodeownersEdit": "./src/validateCodeownersEdit.ts",
-    "./rules/noOwnheim": "./src/rules/noOwnheim.ts",
-    "./rules/noCodeownersEdit": "./src/rules/noCodeownersEdit.ts",
-    "./rules/registry": "./src/rules/registry.ts"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/types.mjs"
+      },
+      "require": {
+        "types": "./dist/types.d.cts",
+        "default": "./dist/types.cjs"
+      }
+    },
+    "./adapter": {
+      "import": {
+        "types": "./dist/adapter.d.mts",
+        "default": "./dist/adapter.mjs"
+      },
+      "require": {
+        "types": "./dist/adapter.d.cts",
+        "default": "./dist/adapter.cjs"
+      }
+    },
+    "./validateFileOwnership": {
+      "import": {
+        "types": "./dist/validateFileOwnership.d.mts",
+        "default": "./dist/validateFileOwnership.mjs"
+      },
+      "require": {
+        "types": "./dist/validateFileOwnership.d.cts",
+        "default": "./dist/validateFileOwnership.cjs"
+      }
+    },
+    "./validateCodeownersEdit": {
+      "import": {
+        "types": "./dist/validateCodeownersEdit.d.mts",
+        "default": "./dist/validateCodeownersEdit.mjs"
+      },
+      "require": {
+        "types": "./dist/validateCodeownersEdit.d.cts",
+        "default": "./dist/validateCodeownersEdit.cjs"
+      }
+    },
+    "./rules/noOwnheim": {
+      "import": {
+        "types": "./dist/rules/noOwnheim.d.mts",
+        "default": "./dist/rules/noOwnheim.mjs"
+      },
+      "require": {
+        "types": "./dist/rules/noOwnheim.d.cts",
+        "default": "./dist/rules/noOwnheim.cjs"
+      }
+    },
+    "./rules/noCodeownersEdit": {
+      "import": {
+        "types": "./dist/rules/noCodeownersEdit.d.mts",
+        "default": "./dist/rules/noCodeownersEdit.mjs"
+      },
+      "require": {
+        "types": "./dist/rules/noCodeownersEdit.d.cts",
+        "default": "./dist/rules/noCodeownersEdit.cjs"
+      }
+    },
+    "./rules/registry": {
+      "import": {
+        "types": "./dist/rules/registry.d.mts",
+        "default": "./dist/rules/registry.mjs"
+      },
+      "require": {
+        "types": "./dist/rules/registry.d.cts",
+        "default": "./dist/rules/registry.cjs"
+      }
+    }
   },
   "scripts": {
+    "build": "tsdown",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ownheim/build": "workspace:*",
     "@ownheim/core": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ownheim/ownheim.git",
+    "directory": "packages/lint-core"
+  },
+  "homepage": "https://github.com/ownheim/ownheim#readme",
+  "bugs": {
+    "url": "https://github.com/ownheim/ownheim/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
   }
 }

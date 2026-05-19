@@ -30,7 +30,6 @@ export interface CreateLoggerOptions {
 }
 
 export function createLogger(moduleOwner: string, options: CreateLoggerOptions = {}): Logger {
-  const sink = options.sink ?? getDefaultLogSink();
   const fallbackCodeTeam = options.fallbackCodeTeam ?? 'unowned';
   const normalisedModuleOwner = moduleOwner === '' ? undefined : moduleOwner;
 
@@ -49,7 +48,7 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
       ...(err === undefined ? {} : { error: err }),
       ...ownership,
     });
-    sink.write(line, level);
+    (options.sink ?? getDefaultLogSink()).write(line, level);
   };
 
   return {

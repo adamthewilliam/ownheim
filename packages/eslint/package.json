@@ -5,15 +5,43 @@
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./src/index.ts",
-    "./plugin": "./src/plugin.ts",
-    "./adapter": "./src/adapter.ts"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./plugin": {
+      "import": {
+        "types": "./dist/plugin.d.mts",
+        "default": "./dist/plugin.mjs"
+      },
+      "require": {
+        "types": "./dist/plugin.d.cts",
+        "default": "./dist/plugin.cjs"
+      }
+    },
+    "./adapter": {
+      "import": {
+        "types": "./dist/adapter.d.mts",
+        "default": "./dist/adapter.mjs"
+      },
+      "require": {
+        "types": "./dist/adapter.d.cts",
+        "default": "./dist/adapter.cjs"
+      }
+    }
   },
   "scripts": {
+    "build": "tsdown",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
@@ -23,5 +51,20 @@
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ownheim/ownheim.git",
+    "directory": "packages/eslint"
+  },
+  "homepage": "https://github.com/ownheim/ownheim#readme",
+  "bugs": {
+    "url": "https://github.com/ownheim/ownheim/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
   }
 }

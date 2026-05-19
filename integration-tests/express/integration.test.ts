@@ -118,21 +118,23 @@ describe('@ownheim/express integration (real Express + supertest)', () => {
 
     const billingRouter = Router();
     billingRouter.use(entrypointOwner('Billing'));
-    billingRouter.get('/op', async (req: Request, res: Response) => {
+    billingRouter.get('/op', (req: Request, res: Response) => {
       // Random async stagger to maximise interleaving across handlers.
-      await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * 8)));
-      const marker = String(req.query.id);
-      logger.info({ msg: 'concurrent', expected: 'Billing', marker });
-      res.status(200).json({ ok: true });
+      setTimeout(() => {
+        const marker = String(req.query.id);
+        logger.info({ msg: 'concurrent', expected: 'Billing', marker });
+        res.status(200).json({ ok: true });
+      }, Math.floor(Math.random() * 8));
     });
 
     const platformRouter = Router();
     platformRouter.use(entrypointOwner('Platform'));
-    platformRouter.get('/op', async (req: Request, res: Response) => {
-      await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * 8)));
-      const marker = String(req.query.id);
-      logger.info({ msg: 'concurrent', expected: 'Platform', marker });
-      res.status(200).json({ ok: true });
+    platformRouter.get('/op', (req: Request, res: Response) => {
+      setTimeout(() => {
+        const marker = String(req.query.id);
+        logger.info({ msg: 'concurrent', expected: 'Platform', marker });
+        res.status(200).json({ ok: true });
+      }, Math.floor(Math.random() * 8));
     });
 
     app.use('/billing', billingRouter);

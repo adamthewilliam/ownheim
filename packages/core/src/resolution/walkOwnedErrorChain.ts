@@ -25,3 +25,5 @@ export function walkResponderTeamChain(value: unknown): string | undefined {
 
   return undefined;
 }
+
+export const walkOwnedErrorChain = walkResponderTeamChain;

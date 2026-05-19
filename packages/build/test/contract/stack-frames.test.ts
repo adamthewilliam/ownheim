@@ -95,7 +95,7 @@ export function callLookupFromFeature() {
 }
 
 export function throwOwned() {
-  throw new OwnedError('boom from feature', 'Billing');
+  throw new OwnedError('boom from feature', { responderTeam: 'Billing' });
 }
 `;
 

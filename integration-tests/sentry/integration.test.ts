@@ -103,7 +103,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
     const events = eventsFromEnvelopes(captured);
     expect(events.length).toBeGreaterThanOrEqual(1);
     const event = events[events.length - 1]!;
-    expect(event.tags?.team).toBe('Billing');
+    expect(event.tags?.['ownheim.entrypoint_team']).toBe('Billing');
   });
 
   it('honours OwnedError owner over the active scope', async () => {
@@ -121,7 +121,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
 
     const events = eventsFromEnvelopes(captured);
     const event = events[events.length - 1]!;
-    expect(event.tags?.team).toBe('Payments');
+    expect(event.tags?.['ownheim.responder_team']).toBe('Payments');
   });
 
   it('falls back when capturing outside any owner scope', async () => {
@@ -135,16 +135,16 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
 
     const events = eventsFromEnvelopes(captured);
     const event = events[events.length - 1]!;
-    expect(event.tags?.team).toBe('platform-default');
+    expect(event.tags?.['ownheim.code_team']).toBe('platform-default');
   });
 
   it('ownheim processor wins when installed after a processor that sets team', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
 
-    // Pre-existing processor tries to claim the `team` tag for itself.
+    // Pre-existing processor tries to claim the Ownheim entrypoint tag for itself.
     client.addEventProcessor(((event) => {
-      event.tags = { ...event.tags, team: 'legacy-overwrite' };
+      event.tags = { ...event.tags, 'ownheim.entrypoint_team': 'legacy-overwrite' };
       return event;
     }) as EventProcessor);
 
@@ -160,7 +160,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
 
     const events = eventsFromEnvelopes(captured);
     const event = events[events.length - 1]!;
-    expect(event.tags?.team).toBe('Billing');
+    expect(event.tags?.['ownheim.entrypoint_team']).toBe('Billing');
   });
 
   it('does NOT win when installed BEFORE another processor that sets team (documents order requirement)', async () => {
@@ -172,7 +172,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
 
     // Foreign processor runs after ownheim and clobbers the tag.
     client.addEventProcessor(((event) => {
-      event.tags = { ...event.tags, team: 'usurper' };
+      event.tags = { ...event.tags, 'ownheim.entrypoint_team': 'usurper' };
       return event;
     }) as EventProcessor);
 
@@ -185,7 +185,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
     const events = eventsFromEnvelopes(captured);
     const event = events[events.length - 1]!;
     // Documents the requirement: install ownheim last.
-    expect(event.tags?.team).toBe('usurper');
+    expect(event.tags?.['ownheim.entrypoint_team']).toBe('usurper');
   });
 });
 

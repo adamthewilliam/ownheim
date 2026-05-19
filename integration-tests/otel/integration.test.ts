@@ -34,7 +34,7 @@ describe('@ownheim/otel integration with real SDK', () => {
 
     const finished = exporter.getFinishedSpans();
     expect(finished.length).toBe(1);
-    expect(finished[0]?.attributes.team).toBe('Billing');
+    expect(finished[0]?.attributes['ownheim.entrypoint_team']).toBe('Billing');
   });
 
   it('does not tag spans created outside any runWithEntrypointOwner scope (uses default fallback)', async () => {
@@ -43,7 +43,7 @@ describe('@ownheim/otel integration with real SDK', () => {
 
     const finished = exporter.getFinishedSpans();
     expect(finished.length).toBe(1);
-    expect(finished[0]?.attributes.team).toBe('unowned');
+    expect(finished[0]?.attributes['ownheim.code_team']).toBe('unowned');
   });
 
   it('preserves owner across async hop within runWithEntrypointOwner', async () => {
@@ -56,7 +56,7 @@ describe('@ownheim/otel integration with real SDK', () => {
 
     const finished = exporter.getFinishedSpans();
     expect(finished.length).toBe(1);
-    expect(finished[0]?.attributes.team).toBe('Billing');
+    expect(finished[0]?.attributes['ownheim.entrypoint_team']).toBe('Billing');
   });
 
   it('handles nested runWithEntrypointOwner correctly (innermost wins)', async () => {
@@ -69,7 +69,7 @@ describe('@ownheim/otel integration with real SDK', () => {
     await provider.forceFlush();
 
     const finished = exporter.getFinishedSpans();
-    const byName = Object.fromEntries(finished.map((s) => [s.name, s.attributes.team]));
+    const byName = Object.fromEntries(finished.map((s) => [s.name, s.attributes['ownheim.entrypoint_team']]));
     expect(byName.inner).toBe('Identity');
     expect(byName.outer).toBe('Billing');
   });
@@ -86,7 +86,7 @@ describe('@ownheim/otel integration with real SDK', () => {
 
     const finished = exporter.getFinishedSpans();
     expect(finished.length).toBe(1);
-    expect(finished[0]?.attributes.team).toBe('unowned');
+    expect(finished[0]?.attributes['ownheim.code_team']).toBe('unowned');
   });
 
   it('honours a custom attribute key when configured', async () => {

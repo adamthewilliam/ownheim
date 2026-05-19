@@ -5,14 +5,33 @@
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./src/index.ts",
-    "./mixin": "./src/mixin.ts"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./mixin": {
+      "import": {
+        "types": "./dist/mixin.d.mts",
+        "default": "./dist/mixin.mjs"
+      },
+      "require": {
+        "types": "./dist/mixin.d.cts",
+        "default": "./dist/mixin.cjs"
+      }
+    }
   },
   "scripts": {
+    "build": "tsdown",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
@@ -23,9 +42,26 @@
     "pino": ">=8.0.0"
   },
   "peerDependenciesMeta": {
-    "pino": { "optional": true }
+    "pino": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "pino": "^9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ownheim/ownheim.git",
+    "directory": "packages/pino"
+  },
+  "homepage": "https://github.com/ownheim/ownheim#readme",
+  "bugs": {
+    "url": "https://github.com/ownheim/ownheim/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
   }
 }

@@ -5,18 +5,73 @@
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./src/index.ts",
-    "./analyzeSourceFile": "./src/analyzeSourceFile.ts",
-    "./resolveRules": "./src/resolveRules.ts",
-    "./generateCodeowners": "./src/generateCodeowners.ts",
-    "./generateManifest": "./src/generateManifest.ts",
-    "./esbuildPlugin": "./src/esbuildPlugin.ts"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./analyzeSourceFile": {
+      "import": {
+        "types": "./dist/analyzeSourceFile.d.mts",
+        "default": "./dist/analyzeSourceFile.mjs"
+      },
+      "require": {
+        "types": "./dist/analyzeSourceFile.d.cts",
+        "default": "./dist/analyzeSourceFile.cjs"
+      }
+    },
+    "./resolveRules": {
+      "import": {
+        "types": "./dist/resolveRules.d.mts",
+        "default": "./dist/resolveRules.mjs"
+      },
+      "require": {
+        "types": "./dist/resolveRules.d.cts",
+        "default": "./dist/resolveRules.cjs"
+      }
+    },
+    "./generateCodeowners": {
+      "import": {
+        "types": "./dist/generateCodeowners.d.mts",
+        "default": "./dist/generateCodeowners.mjs"
+      },
+      "require": {
+        "types": "./dist/generateCodeowners.d.cts",
+        "default": "./dist/generateCodeowners.cjs"
+      }
+    },
+    "./generateManifest": {
+      "import": {
+        "types": "./dist/generateManifest.d.mts",
+        "default": "./dist/generateManifest.mjs"
+      },
+      "require": {
+        "types": "./dist/generateManifest.d.cts",
+        "default": "./dist/generateManifest.cjs"
+      }
+    },
+    "./esbuildPlugin": {
+      "import": {
+        "types": "./dist/esbuildPlugin.d.mts",
+        "default": "./dist/esbuildPlugin.mjs"
+      },
+      "require": {
+        "types": "./dist/esbuildPlugin.d.cts",
+        "default": "./dist/esbuildPlugin.cjs"
+      }
+    }
   },
   "scripts": {
+    "build": "tsdown",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
@@ -30,5 +85,20 @@
   },
   "devDependencies": {
     "@types/picomatch": "^3.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ownheim/ownheim.git",
+    "directory": "packages/build"
+  },
+  "homepage": "https://github.com/ownheim/ownheim#readme",
+  "bugs": {
+    "url": "https://github.com/ownheim/ownheim/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
   }
 }

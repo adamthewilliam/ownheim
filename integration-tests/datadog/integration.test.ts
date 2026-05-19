@@ -2,7 +2,7 @@
 // package. We want to prove three things end-to-end:
 //
 //   1. After `instrumentDatadog(tracer)`, every `tracer.startSpan` call
-//      attaches a `team` tag derived from `runWithEntrypointOwner` scope.
+//      attaches Ownheim ownership tags derived from `runWithEntrypointOwner` scope.
 //   2. The patch survives across both import orders (ownheim first vs.
 //      dd-trace first), and we document any constraint we find.
 //   3. AsyncLocalStorage propagation works across an async hop.
@@ -75,11 +75,12 @@ interface DdTraceTracer extends DatadogTracer {
   startSpan(name: string, options?: unknown): DdTraceSpan;
 }
 
-// Read the team tag straight off the span context. This is the same
-// place `setTag('team', …)` writes (see span.js#setTag → _addTags).
+// Read the effective owner straight off the span context. This is the same
+// place `setTag(...)` writes (see span.js#setTag → _addTags).
 function teamTag(span: unknown): unknown {
   const s = span as DdTraceSpan;
-  return s.context()._tags.team;
+  const tags = s.context()._tags;
+  return tags['ownheim.entrypoint_team'] ?? tags['ownheim.code_team'];
 }
 
 // Workaround #2: load dd-trace so that its src/index.js dispatch is

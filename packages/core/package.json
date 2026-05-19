@@ -5,30 +5,199 @@
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./src/index.ts",
-    "./defineOwnheim": "./src/defineOwnheim.ts",
-    "./OwnedError": "./src/OwnedError.ts",
-    "./symbols": "./src/symbols.ts",
-    "./types": "./src/types.ts",
-    "./ownership": "./src/ownership.ts",
-    "./resolution/frames": "./src/resolution/frames.ts",
-    "./resolution/walkOwnedErrorChain": "./src/resolution/walkOwnedErrorChain.ts",
-    "./resolution/lookupCallerOwner": "./src/resolution/lookupCallerOwner.ts",
-    "./manifest/ManifestRegistry": "./src/manifest/ManifestRegistry.ts",
-    "./manifest/defaultRegistry": "./src/manifest/defaultRegistry.ts",
-    "./logging/createLogger": "./src/logging/createLogger.ts",
-    "./logging/formatOwnedLogEntry": "./src/logging/formatOwnedLogEntry.ts",
-    "./logging/LogSink": "./src/logging/LogSink.ts",
-    "./logging/defaultLogSink": "./src/logging/defaultLogSink.ts",
-    "./tracing/createTracer": "./src/tracing/createTracer.ts",
-    "./tracing/resolveTagOptions": "./src/tracing/resolveTagOptions.ts"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./defineOwnheim": {
+      "import": {
+        "types": "./dist/defineOwnheim.d.mts",
+        "default": "./dist/defineOwnheim.mjs"
+      },
+      "require": {
+        "types": "./dist/defineOwnheim.d.cts",
+        "default": "./dist/defineOwnheim.cjs"
+      }
+    },
+    "./OwnedError": {
+      "import": {
+        "types": "./dist/OwnedError.d.mts",
+        "default": "./dist/OwnedError.mjs"
+      },
+      "require": {
+        "types": "./dist/OwnedError.d.cts",
+        "default": "./dist/OwnedError.cjs"
+      }
+    },
+    "./symbols": {
+      "import": {
+        "types": "./dist/symbols.d.mts",
+        "default": "./dist/symbols.mjs"
+      },
+      "require": {
+        "types": "./dist/symbols.d.cts",
+        "default": "./dist/symbols.cjs"
+      }
+    },
+    "./types": {
+      "import": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/types.mjs"
+      },
+      "require": {
+        "types": "./dist/types.d.cts",
+        "default": "./dist/types.cjs"
+      }
+    },
+    "./ownership": {
+      "import": {
+        "types": "./dist/ownership.d.mts",
+        "default": "./dist/ownership.mjs"
+      },
+      "require": {
+        "types": "./dist/ownership.d.cts",
+        "default": "./dist/ownership.cjs"
+      }
+    },
+    "./resolution/frames": {
+      "import": {
+        "types": "./dist/resolution/frames.d.mts",
+        "default": "./dist/resolution/frames.mjs"
+      },
+      "require": {
+        "types": "./dist/resolution/frames.d.cts",
+        "default": "./dist/resolution/frames.cjs"
+      }
+    },
+    "./resolution/walkOwnedErrorChain": {
+      "import": {
+        "types": "./dist/resolution/walkOwnedErrorChain.d.mts",
+        "default": "./dist/resolution/walkOwnedErrorChain.mjs"
+      },
+      "require": {
+        "types": "./dist/resolution/walkOwnedErrorChain.d.cts",
+        "default": "./dist/resolution/walkOwnedErrorChain.cjs"
+      }
+    },
+    "./resolution/lookupCallerOwner": {
+      "import": {
+        "types": "./dist/resolution/lookupCallerOwner.d.mts",
+        "default": "./dist/resolution/lookupCallerOwner.mjs"
+      },
+      "require": {
+        "types": "./dist/resolution/lookupCallerOwner.d.cts",
+        "default": "./dist/resolution/lookupCallerOwner.cjs"
+      }
+    },
+    "./manifest/ManifestRegistry": {
+      "import": {
+        "types": "./dist/manifest/ManifestRegistry.d.mts",
+        "default": "./dist/manifest/ManifestRegistry.mjs"
+      },
+      "require": {
+        "types": "./dist/manifest/ManifestRegistry.d.cts",
+        "default": "./dist/manifest/ManifestRegistry.cjs"
+      }
+    },
+    "./manifest/defaultRegistry": {
+      "import": {
+        "types": "./dist/manifest/defaultRegistry.d.mts",
+        "default": "./dist/manifest/defaultRegistry.mjs"
+      },
+      "require": {
+        "types": "./dist/manifest/defaultRegistry.d.cts",
+        "default": "./dist/manifest/defaultRegistry.cjs"
+      }
+    },
+    "./logging/createLogger": {
+      "import": {
+        "types": "./dist/logging/createLogger.d.mts",
+        "default": "./dist/logging/createLogger.mjs"
+      },
+      "require": {
+        "types": "./dist/logging/createLogger.d.cts",
+        "default": "./dist/logging/createLogger.cjs"
+      }
+    },
+    "./logging/formatOwnedLogEntry": {
+      "import": {
+        "types": "./dist/logging/formatOwnedLogEntry.d.mts",
+        "default": "./dist/logging/formatOwnedLogEntry.mjs"
+      },
+      "require": {
+        "types": "./dist/logging/formatOwnedLogEntry.d.cts",
+        "default": "./dist/logging/formatOwnedLogEntry.cjs"
+      }
+    },
+    "./logging/LogSink": {
+      "import": {
+        "types": "./dist/logging/LogSink.d.mts",
+        "default": "./dist/logging/LogSink.mjs"
+      },
+      "require": {
+        "types": "./dist/logging/LogSink.d.cts",
+        "default": "./dist/logging/LogSink.cjs"
+      }
+    },
+    "./logging/defaultLogSink": {
+      "import": {
+        "types": "./dist/logging/defaultLogSink.d.mts",
+        "default": "./dist/logging/defaultLogSink.mjs"
+      },
+      "require": {
+        "types": "./dist/logging/defaultLogSink.d.cts",
+        "default": "./dist/logging/defaultLogSink.cjs"
+      }
+    },
+    "./tracing/createTracer": {
+      "import": {
+        "types": "./dist/tracing/createTracer.d.mts",
+        "default": "./dist/tracing/createTracer.mjs"
+      },
+      "require": {
+        "types": "./dist/tracing/createTracer.d.cts",
+        "default": "./dist/tracing/createTracer.cjs"
+      }
+    },
+    "./tracing/resolveTagOptions": {
+      "import": {
+        "types": "./dist/tracing/resolveTagOptions.d.mts",
+        "default": "./dist/tracing/resolveTagOptions.mjs"
+      },
+      "require": {
+        "types": "./dist/tracing/resolveTagOptions.d.cts",
+        "default": "./dist/tracing/resolveTagOptions.cjs"
+      }
+    }
   },
   "scripts": {
+    "build": "tsdown",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ownheim/ownheim.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/ownheim/ownheim#readme",
+  "bugs": {
+    "url": "https://github.com/ownheim/ownheim/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
   }
 }

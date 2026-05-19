@@ -5,17 +5,63 @@
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./src/index.ts",
-    "./Owner": "./src/Owner.ts",
-    "./ownedBy": "./src/ownedBy.ts",
-    "./Logger": "./src/Logger.ts",
-    "./Tracer": "./src/Tracer.ts"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./Owner": {
+      "import": {
+        "types": "./dist/Owner.d.mts",
+        "default": "./dist/Owner.mjs"
+      },
+      "require": {
+        "types": "./dist/Owner.d.cts",
+        "default": "./dist/Owner.cjs"
+      }
+    },
+    "./ownedBy": {
+      "import": {
+        "types": "./dist/ownedBy.d.mts",
+        "default": "./dist/ownedBy.mjs"
+      },
+      "require": {
+        "types": "./dist/ownedBy.d.cts",
+        "default": "./dist/ownedBy.cjs"
+      }
+    },
+    "./Logger": {
+      "import": {
+        "types": "./dist/Logger.d.mts",
+        "default": "./dist/Logger.mjs"
+      },
+      "require": {
+        "types": "./dist/Logger.d.cts",
+        "default": "./dist/Logger.cjs"
+      }
+    },
+    "./Tracer": {
+      "import": {
+        "types": "./dist/Tracer.d.mts",
+        "default": "./dist/Tracer.mjs"
+      },
+      "require": {
+        "types": "./dist/Tracer.d.cts",
+        "default": "./dist/Tracer.cjs"
+      }
+    }
   },
   "scripts": {
+    "build": "tsdown",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
@@ -24,5 +70,20 @@
   },
   "peerDependencies": {
     "effect": "^3.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ownheim/ownheim.git",
+    "directory": "packages/effect"
+  },
+  "homepage": "https://github.com/ownheim/ownheim#readme",
+  "bugs": {
+    "url": "https://github.com/ownheim/ownheim/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
   }
 }

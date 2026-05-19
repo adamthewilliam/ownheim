@@ -1,6 +1,6 @@
 import type { FormattedLogLine, LogLevel } from '@ownheim/core/logging/formatOwnedLogEntry';
 import type { LogSink } from '@ownheim/core/logging/LogSink';
-import { resetDefaultLogSink, setDefaultLogSink } from '@ownheim/core/logging/defaultLogSink';
+import { getDefaultLogSink, resetDefaultLogSink, setDefaultLogSink } from '@ownheim/core/logging/defaultLogSink';
 
 // Re-shape: a captured log entry pairs the formatter output with the level
 // the logger emitted it at. Wave 2 contract tests assert on `.level` and
@@ -35,6 +35,9 @@ export function captureStructuredLogs(): CapturedLogs {
   };
 
   setDefaultLogSink(sink);
+  if (getDefaultLogSink() !== sink) {
+    throw new Error('Failed to install Ownheim log capture sink');
+  }
 
   return {
     get entries(): readonly CapturedLogEntry[] {

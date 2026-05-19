@@ -1,14 +1,36 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalDependencies": ["tsconfig.base.json", "bunfig.toml", ".oxlintrc.json"],
+  "globalDependencies": [
+    "tsconfig.base.json",
+    "bunfig.toml",
+    ".oxlintrc.json"
+  ],
   "tasks": {
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": [
+        "^typecheck"
+      ],
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "check:publish": {
+      "dependsOn": [
+        "build"
+      ],
       "outputs": []
     }
   }
