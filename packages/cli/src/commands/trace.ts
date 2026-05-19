@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join, relative } from 'node:path';
-import { auditSourceFile, type OwnershipAuditStatus } from '@ownheim/build/auditOwnership';
+import { auditSourceFile, explainOwnershipAudit } from '@ownheim/build/auditOwnership';
 import type { ResolvedOwner } from '@ownheim/core/types';
 import type { LoadedConfig } from '../loadConfig.ts';
 
@@ -25,28 +25,6 @@ export async function runTrace(loaded: LoadedConfig, filePath: string): Promise<
     file: rel,
     resolved: audit.resolved,
     jsdocOwner: audit.jsdocOwner,
-    explanation: explain(rel, audit.jsdocOwner, audit.resolved, audit.status),
+    explanation: explainOwnershipAudit(audit).explanation,
   };
-}
-
-function explain(
-  file: string,
-  jsdocOwner: string | undefined,
-  resolved: ResolvedOwner | undefined,
-  status: OwnershipAuditStatus,
-): string {
-  if (status === 'invalid-jsdoc-owner') {
-    return `${file} -> INVALID @owner '${jsdocOwner}' (team not found in ownheim.config.ts)`;
-  }
-  if (resolved === undefined) {
-    return `${file} -> UNOWNED (no rule matched and no fallback)`;
-  }
-  if (resolved.source === 'jsdoc') {
-    return `${file} -> ${resolved.teams.join(', ')} (via @owner JSDoc)`;
-  }
-  if (resolved.source === 'fallback') {
-    return `${file} -> ${resolved.teams.join(', ')} (FALLBACK '${resolved.matchedGlob}')`;
-  }
-  const jsdocNote = jsdocOwner ? ` (jsdoc '@owner ${jsdocOwner}' was unknown, ignored)` : '';
-  return `${file} -> ${resolved.teams.join(', ')} (rule '${resolved.matchedGlob}')${jsdocNote}`;
 }

@@ -31,6 +31,15 @@ export function createEntrypointOwnerAdapter<TArgs extends readonly unknown[], T
     ) => TReturn;
 }
 
+export interface NextContainer<TReturn = unknown> {
+  readonly next: () => TReturn;
+}
+
+export const promiseNextEntrypointOwner = withEntrypointOwnerScope<
+  [NextContainer<Promise<unknown>>],
+  Promise<unknown>
+>(({ next }) => next);
+
 export type CodeOwnerSource = 'module' | 'frame' | 'fallback';
 
 export interface OwnershipContext {

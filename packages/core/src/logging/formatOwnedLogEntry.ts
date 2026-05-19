@@ -1,3 +1,5 @@
+import { ownershipContextToTags } from '../tracing/ownershipTags.ts';
+
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 export interface OwnedLogEntry {
@@ -41,18 +43,22 @@ function serialiseError(value: unknown): unknown {
 }
 
 export function formatOwnedLogEntry(entry: OwnedLogEntry): FormattedLogLine {
-  const entrypointTeam = entry.entrypointTeam;
-  const codeTeam = entry.codeTeam;
-  const responderTeam = entry.responderTeam;
-  const team = responderTeam ?? entrypointTeam ?? codeTeam ?? 'unowned';
+  const ownership = {
+    ...(entry.entrypointTeam === undefined ? {} : { entrypointTeam: entry.entrypointTeam }),
+    ...(entry.codeTeam === undefined ? {} : { codeTeam: entry.codeTeam }),
+    ...(entry.responderTeam === undefined ? {} : { responderTeam: entry.responderTeam }),
+  };
+  const team = entry.responderTeam ?? entry.entrypointTeam ?? entry.codeTeam ?? 'unowned';
   const record: Record<string, unknown> = {
     level: entry.level,
     msg: entry.message,
     ...entry.fields,
     ...(entry.error !== undefined ? { err: serialiseError(entry.error) } : {}),
-    ...(entrypointTeam === undefined ? {} : { ownheim_entrypoint_team: entrypointTeam }),
-    ...(codeTeam === undefined ? {} : { ownheim_code_team: codeTeam }),
-    ...(responderTeam === undefined ? {} : { ownheim_responder_team: responderTeam }),
+    ...ownershipContextToTags(ownership, {
+      entrypointTeam: 'ownheim_entrypoint_team',
+      codeTeam: 'ownheim_code_team',
+      responderTeam: 'ownheim_responder_team',
+    }),
     team,
   };
 

@@ -1,45 +1,10 @@
 import type { ResolvedOwnership, OwnheimConfig, Team } from '@ownheim/core/types';
-import { matches, compareSpecificity } from './globMatcher.ts';
+import { matches } from './globMatcher.ts';
+import { getFallbackTeam, mostSpecificRulesFirst, planOwnershipRules } from './ownershipRules.ts';
 
 export interface ResolveInput {
   readonly filePath: string;
   readonly jsdocOwner?: string | undefined;
-}
-
-interface InternalRule {
-  readonly glob: string;
-  readonly teams: readonly string[];
-}
-
-function flattenRules<TTeams extends Record<string, Team>>(
-  config: OwnheimConfig<TTeams>,
-): readonly InternalRule[] {
-  const rules: InternalRule[] = [];
-
-  for (const [teamId, team] of Object.entries(config.teams)) {
-    if (team.owns) {
-      for (const glob of team.owns) {
-        rules.push({ glob, teams: [teamId] });
-      }
-    }
-  }
-
-  if (config.shared) {
-    for (const rule of config.shared) {
-      rules.push({ glob: rule.glob, teams: rule.owners });
-    }
-  }
-
-  return rules;
-}
-
-function getFallbackTeam<TTeams extends Record<string, Team>>(
-  config: OwnheimConfig<TTeams>,
-): string | undefined {
-  for (const [teamId, team] of Object.entries(config.teams)) {
-    if (team.fallback) return teamId;
-  }
-  return undefined;
 }
 
 export function resolveOwnerForFile<TTeams extends Record<string, Team>>(
@@ -57,10 +22,9 @@ export function resolveOwnerForFile<TTeams extends Record<string, Team>>(
     return undefined;
   }
 
-  const rules = flattenRules(config);
-  const matched = rules
-    .filter((r) => matches(r.glob, input.filePath))
-    .sort((a, b) => compareSpecificity(b.glob, a.glob));
+  const matched = mostSpecificRulesFirst(
+    planOwnershipRules(config).filter((r) => matches(r.glob, input.filePath)),
+  );
 
   if (matched.length > 0) {
     const best = matched[0]!;

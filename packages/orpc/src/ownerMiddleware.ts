@@ -1,8 +1,5 @@
-import { withEntrypointOwnerScope } from '@ownheim/core/ownership';
+import { promiseNextEntrypointOwner } from '@ownheim/core/ownership';
 
-export const entrypointOwner = withEntrypointOwnerScope<
-  [{ next: () => Promise<unknown> }],
-  Promise<unknown>
->(({ next }) => next);
+export const entrypointOwner = promiseNextEntrypointOwner;
 
 export type EntrypointOwnerMiddleware = ReturnType<typeof entrypointOwner>;

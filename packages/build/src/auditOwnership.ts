@@ -19,6 +19,18 @@ export interface AuditSourceFileInput {
   readonly sourceText: string;
 }
 
+export interface OwnershipAttentionFinding {
+  readonly file: string;
+  readonly status: Exclude<OwnershipAuditStatus, 'explicit'>;
+  readonly message: string;
+  readonly fixable: boolean;
+}
+
+export interface OwnershipTrace {
+  readonly file: string;
+  readonly explanation: string;
+}
+
 export interface OwnershipAuditReport {
   readonly files: readonly OwnershipAudit[];
   readonly resolved: readonly ResolvedOwnership[];
@@ -27,6 +39,7 @@ export interface OwnershipAuditReport {
   readonly unownedFiles: readonly string[];
   readonly invalidOwnerFiles: readonly string[];
   readonly needsAttentionFiles: readonly string[];
+  readonly attentionFindings: readonly OwnershipAttentionFinding[];
   readonly total: number;
   readonly explicit: number;
   readonly fallback: number;
@@ -76,10 +89,14 @@ export function summarizeOwnershipAudits(
   const unownedFiles: string[] = [];
   const invalidOwnerFiles: string[] = [];
   const needsAttentionFiles: string[] = [];
+  const attentionFindings: OwnershipAttentionFinding[] = [];
 
   for (const audit of audits) {
     if (audit.resolved !== undefined) resolved.push(audit.resolved);
-    if (audit.needsAttention) needsAttentionFiles.push(audit.file);
+    if (audit.needsAttention) {
+      needsAttentionFiles.push(audit.file);
+      attentionFindings.push(createAttentionFinding(audit));
+    }
 
     if (audit.status === 'explicit') explicitFiles.push(audit.file);
     else if (audit.status === 'fallback') fallbackFiles.push(audit.file);
@@ -98,6 +115,7 @@ export function summarizeOwnershipAudits(
     unownedFiles,
     invalidOwnerFiles,
     needsAttentionFiles,
+    attentionFindings,
     total,
     explicit,
     fallback: fallbackFiles.length,
@@ -105,6 +123,63 @@ export function summarizeOwnershipAudits(
     invalidOwner: invalidOwnerFiles.length,
     needsAttention: needsAttentionFiles.length,
     coveragePercent: total === 0 ? 100 : Math.round((explicit / total) * 1000) / 10,
+  };
+}
+
+export function explainOwnershipAudit(audit: OwnershipAudit): OwnershipTrace {
+  if (audit.status === 'invalid-jsdoc-owner') {
+    return {
+      file: audit.file,
+      explanation: `${audit.file} -> INVALID @owner '${audit.jsdocOwner}' (team not found in ownheim.config.ts)`,
+    };
+  }
+  if (audit.resolved === undefined) {
+    return {
+      file: audit.file,
+      explanation: `${audit.file} -> UNOWNED (no rule matched and no fallback)`,
+    };
+  }
+  if (audit.resolved.source === 'jsdoc') {
+    return {
+      file: audit.file,
+      explanation: `${audit.file} -> ${audit.resolved.teams.join(', ')} (via @owner JSDoc)`,
+    };
+  }
+  if (audit.resolved.source === 'fallback') {
+    return {
+      file: audit.file,
+      explanation: `${audit.file} -> ${audit.resolved.teams.join(', ')} (FALLBACK '${audit.resolved.matchedGlob}')`,
+    };
+  }
+  const jsdocNote = audit.jsdocOwner ? ` (jsdoc '@owner ${audit.jsdocOwner}' was unknown, ignored)` : '';
+  return {
+    file: audit.file,
+    explanation: `${audit.file} -> ${audit.resolved.teams.join(', ')} (rule '${audit.resolved.matchedGlob}')${jsdocNote}`,
+  };
+}
+
+export function createAttentionFinding(audit: OwnershipAudit): OwnershipAttentionFinding {
+  if (audit.status === 'invalid-jsdoc-owner') {
+    return {
+      file: audit.file,
+      status: audit.status,
+      fixable: false,
+      message: `${audit.file} references unknown owner '${audit.jsdocOwner}' in /** @owner ${audit.jsdocOwner} */. Use a team from ownheim.config.ts.`,
+    };
+  }
+  if (audit.status === 'fallback') {
+    return {
+      file: audit.file,
+      status: audit.status,
+      fixable: true,
+      message: `${audit.file} only matches the fallback rule (${audit.resolved?.matchedGlob ?? '**'}). Add a directory rule for this path or annotate the file with /** @owner <Team> */.`,
+    };
+  }
+  return {
+    file: audit.file,
+    status: 'unowned',
+    fixable: true,
+    message: `${audit.file} has no owner: no rule matched and no fallback is configured. Add a directory rule to ownheim.config.ts or annotate the file with /** @owner <Team> */.`,
   };
 }
 
