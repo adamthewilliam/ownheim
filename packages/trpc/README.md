@@ -70,14 +70,14 @@ In practice this means: do a one-time audit, replace every `t.procedure` with an
 
 ## Pairing it with `@strays/sentry` and `@strays/datadog`
 
-Nothing extra to do. Once `installSentry` / `installDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope. The owner flows through:
+Nothing extra to do. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope. The owner flows through:
 
 ```
 ownedProcedure(builder, 'Billing')
     → runWithOwner('Billing', () => handler())
         → handler does work
             → throws or starts a span
-                → installSentry / installDatadog reads currentOwner()
+                → installSentry / instrumentDatadog reads currentOwner()
                     → tag = 'Billing'
 ```
 

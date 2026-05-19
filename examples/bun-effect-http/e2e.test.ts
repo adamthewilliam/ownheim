@@ -39,7 +39,7 @@ describe('bun-effect-http example end-to-end', () => {
 
   it('strays trace explains why src/billing/admin/refund.ts is Platform-owned', async () => {
     const result = await runTrace(loaded, 'src/billing/admin/refund.ts');
-    expect(result.resolved?.owners).toEqual(['Platform']);
+    expect(result.resolved?.teams).toEqual(['Platform']);
     expect(result.resolved?.matchedGlob).toBe('src/billing/admin/**');
     expect(result.explanation).toContain('Platform');
     expect(result.explanation).toContain('src/billing/admin/**');

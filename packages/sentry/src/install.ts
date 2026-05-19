@@ -22,7 +22,15 @@ export interface SentryClient {
 
 export type InstallOptions = TagOptions;
 
+const INSTALLED = Symbol.for('strays.sentry.installed');
+
+type InstalledSentryClient = SentryClient & { [INSTALLED]?: true };
+
 export function installSentry(client: SentryClient, options: InstallOptions = {}): void {
+  const installedClient = client as InstalledSentryClient;
+  if (installedClient[INSTALLED]) return;
+  installedClient[INSTALLED] = true;
+
   const { fallback, tagKey, sourceTagKey, emitSource } = resolveTagOptions(options);
 
   client.addEventProcessor((event, hint) => {

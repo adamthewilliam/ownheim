@@ -39,6 +39,7 @@ export function createLogger(moduleOwner: string, options: CreateLoggerOptions =
     const owner = resolveOwner({
       ...(err === undefined ? {} : { error: err }),
       ...(normalisedModuleOwner === undefined ? {} : { moduleOwner: normalisedModuleOwner }),
+      ...(options.registry === undefined ? {} : { registry: options.registry }),
       fallback,
     });
     const line = formatOwnedLogEntry({

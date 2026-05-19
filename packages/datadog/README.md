@@ -16,10 +16,10 @@ You also need `dd-trace` (server) or `@datadog/browser-rum` (browser). Strays do
 
 ```ts
 import tracer from 'dd-trace';
-import { installDatadog } from '@strays/datadog/install';
+import { instrumentDatadog } from '@strays/datadog/install';
 
 tracer.init({ service: 'api' });
-installDatadog(tracer);
+instrumentDatadog(tracer);
 ```
 
 That one call patches `tracer.startSpan` so every span gets a `team` tag added after it's created. You don't have to touch any of your existing instrumentation.
@@ -52,7 +52,7 @@ Resolution order is: `OwnedError` on the in-flight error → `runWithOwner` scop
 ### Options
 
 ```ts
-installDatadog(tracer, {
+instrumentDatadog(tracer, {
   fallback: 'platform',  // tag value when nothing resolves
   tagKey: 'dd.team',     // change the tag key (default: 'team')
 });
@@ -76,7 +76,7 @@ Every error reported through `datadogRum.addError(err)` now gets `team` attached
 
 ## How resolution actually works
 
-When a span starts, `installDatadog` calls `resolveOwner()`, which checks in order:
+When a span starts, `instrumentDatadog` calls `resolveOwner()`, which checks in order:
 
 1. The error chain for an `OwnedError` (only useful in error-spans, mostly relevant for RUM)
 2. `currentOwner()` — the value set by the active `runWithOwner` scope, via AsyncLocalStorage
@@ -87,7 +87,7 @@ Step 3 is the quiet workhorse. If you've loaded an ownership manifest (built fro
 
 ## Caveats
 
-- `installDatadog` mutates the tracer. Calling it twice will double-tag every span. Call it once at startup.
+- `instrumentDatadog` mutates the tracer. Calling it twice will double-tag every span. Call it once at startup.
 - The wrapper runs `setTag` after `startSpan` returns. If something else is reading the span synchronously between `startSpan` and the next tick, the tag won't be there yet. In practice this hasn't bitten anyone.
 - RUM's `addError` is patched the same way. Calling `installDatadogRum` twice shows the team field twice in the context. Don't.
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { runWithOwner } from '@strays/core/ownership';
-import { installDatadog, type DatadogSpan, type DatadogTracer } from './install.ts';
+import { instrumentDatadog, type DatadogSpan, type DatadogTracer } from './install.ts';
 
 function makeMockTracer() {
   const spans: Array<{ name: string; tags: Record<string, string> }> = [];
@@ -19,10 +19,10 @@ function makeMockTracer() {
   return { spans, tracer };
 }
 
-describe('installDatadog', () => {
+describe('instrumentDatadog', () => {
   it('tags every span with the current owner from scope', () => {
     const { spans, tracer } = makeMockTracer();
-    installDatadog(tracer);
+    instrumentDatadog(tracer);
 
     runWithOwner('Billing', () => {
       tracer.startSpan('http.request');
@@ -33,7 +33,7 @@ describe('installDatadog', () => {
 
   it('tags with the fallback when no scope is active', () => {
     const { spans, tracer } = makeMockTracer();
-    installDatadog(tracer, { fallback: 'platform-default' });
+    instrumentDatadog(tracer, { fallback: 'platform-default' });
 
     tracer.startSpan('background.job');
 
@@ -42,7 +42,7 @@ describe('installDatadog', () => {
 
   it('uses a custom tag key when provided', () => {
     const { spans, tracer } = makeMockTracer();
-    installDatadog(tracer, { tagKey: 'dd.team' });
+    instrumentDatadog(tracer, { tagKey: 'dd.team' });
 
     runWithOwner('Identity', () => {
       tracer.startSpan('db.query');
@@ -53,7 +53,7 @@ describe('installDatadog', () => {
 
   it('omits team_source by default to keep cardinality minimal', () => {
     const { spans, tracer } = makeMockTracer();
-    installDatadog(tracer);
+    instrumentDatadog(tracer);
 
     runWithOwner('Billing', () => {
       tracer.startSpan('http.request');
@@ -65,7 +65,7 @@ describe('installDatadog', () => {
 
   it('emits team_source when emitSource is opted in (source: scope)', () => {
     const { spans, tracer } = makeMockTracer();
-    installDatadog(tracer, { emitSource: true });
+    instrumentDatadog(tracer, { emitSource: true });
 
     runWithOwner('Billing', () => {
       tracer.startSpan('http.request');
@@ -77,7 +77,7 @@ describe('installDatadog', () => {
 
   it('emits team_source as "fallback" when opted in and no scope is active', () => {
     const { spans, tracer } = makeMockTracer();
-    installDatadog(tracer, { emitSource: true, fallback: 'platform-default' });
+    instrumentDatadog(tracer, { emitSource: true, fallback: 'platform-default' });
 
     tracer.startSpan('background.job');
 
@@ -87,12 +87,22 @@ describe('installDatadog', () => {
 
   it('honours a custom sourceTagKey when emitSource is opted in', () => {
     const { spans, tracer } = makeMockTracer();
-    installDatadog(tracer, { emitSource: true, sourceTagKey: 'dd.team_source' });
+    instrumentDatadog(tracer, { emitSource: true, sourceTagKey: 'dd.team_source' });
 
     runWithOwner('Billing', () => {
       tracer.startSpan('http.request');
     });
 
     expect(spans[0]?.tags['dd.team_source']).toBe('scope');
+  });
+
+  it('is idempotent', () => {
+    const { spans, tracer } = makeMockTracer();
+    instrumentDatadog(tracer, { emitSource: true });
+    instrumentDatadog(tracer, { emitSource: true });
+
+    tracer.startSpan('background.job');
+
+    expect(Object.keys(spans[0]!.tags).sort()).toEqual(['team', 'team_source']);
   });
 });

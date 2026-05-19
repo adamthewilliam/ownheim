@@ -5,14 +5,10 @@ import { rules } from '@strays/lint-core/rules/registry';
 import { projectOxlintRule, type OxlintRuleContext } from './adapter.ts';
 
 const config = defineStrays({
-  owners: {
-    Billing: { id: 'Billing', github: '@org/billing' },
-    Platform: { id: 'Platform', github: '@org/platform' },
+  teams: {
+    Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
+    Platform: { github: '@org/platform', fallback: true },
   },
-  rules: [
-    { glob: 'packages/billing/**', owner: 'Billing' },
-    { glob: '**', owner: 'Platform', fallback: true },
-  ],
 }) as unknown as StraysConfig<Record<string, Owner>>;
 
 describe('projectOxlintRule', () => {

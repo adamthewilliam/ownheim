@@ -1,5 +1,7 @@
+export type OwnerAttributes = Record<string, string | number | boolean | undefined>;
+
 export interface ResourceLike {
-  attributes: Record<string, string | number | boolean | undefined>;
+  attributes: OwnerAttributes;
 }
 
 export function decorateResource(

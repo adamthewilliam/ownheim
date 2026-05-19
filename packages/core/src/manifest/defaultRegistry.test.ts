@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'bun:test';
 import { ManifestRegistry } from './ManifestRegistry.ts';
 import {
   getDefaultRegistry,
+  registerOwnershipManifest,
   resetDefaultRegistry,
   setDefaultRegistry,
 } from './defaultRegistry.ts';
@@ -35,6 +36,16 @@ describe('defaultRegistry', () => {
     expect(after).toBe(next);
     expect(after).not.toBe(before);
     expect(after.lookupOwner('src/billing.ts')).toBe('Billing');
+  });
+
+  it('registers a manifest and returns the registered registry', () => {
+    const registry = registerOwnershipManifest({
+      version: 1,
+      files: { 'src/billing.ts': 'Billing' },
+    });
+
+    expect(getDefaultRegistry()).toBe(registry);
+    expect(registry.lookupOwner('src/billing.ts')).toBe('Billing');
   });
 
   it('resetDefaultRegistry restores an empty default', () => {

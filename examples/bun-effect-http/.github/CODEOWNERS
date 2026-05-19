@@ -2,10 +2,10 @@
 # Source of truth: strays.config.ts and per-file @owner JSDoc.
 # Run `strays generate` to regenerate.
 
+# Fallback
+* @org/platform
+
 # Directory rules (most specific wins; CODEOWNERS uses last-match)
 /src/auth/ @org/identity
 /src/billing/ @org/billing
 /src/billing/admin/ @org/platform
-
-# Fallback
-* @org/platform

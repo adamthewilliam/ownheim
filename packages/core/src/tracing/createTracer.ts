@@ -27,7 +27,11 @@ export function createTracer(moduleOwner: string, options: CreateTracerOptions):
   return {
     startSpan(name) {
       const span = options.factory.start(name);
-      const team = resolveOwner({ moduleOwner: normalisedOwner, fallback });
+      const team = resolveOwner({
+        ...(normalisedOwner === undefined ? {} : { moduleOwner: normalisedOwner }),
+        ...(options.registry === undefined ? {} : { registry: options.registry }),
+        fallback,
+      });
       span.setAttribute('team', team);
       return span;
     },

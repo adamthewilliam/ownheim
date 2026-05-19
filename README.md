@@ -60,13 +60,14 @@ bun add @strays/otel      # OpenTelemetry
 import { defineStrays } from '@strays/core';
 
 export default defineStrays({
-  owners: {
-    Billing: { github: '@org/billing', pagerduty: 'billing-primary', tier: 1 },
+  teams: {
+    Billing: {
+      github: '@org/billing',
+      handles: { pagerduty: 'billing-primary' },
+      owns: ['packages/billing/**'],
+      fallback: true,
+    },
   },
-  rules: [
-    { glob: 'packages/billing/**', owner: 'Billing' },
-    { glob: '**', owner: 'Billing', fallback: true },
-  ],
 });
 ```
 
@@ -79,7 +80,16 @@ app.use((req, _res, next) => {
 });
 ```
 
-That's it. Logs, spans, and errors emitted inside the scope carry `team=billing` automatically.
+If you also want spans/errors emitted outside an explicit request scope to resolve ownership from stack frames, load the generated manifest once at process startup:
+
+```ts
+import manifest from './.strays/ownership.json' with { type: 'json' };
+import { registerOwnershipManifest } from '@strays/core';
+
+registerOwnershipManifest(manifest);
+```
+
+That's it. Logs, spans, and errors emitted inside the scope carry `team=Billing` automatically.
 
 ## License
 

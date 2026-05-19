@@ -62,14 +62,14 @@ Order doesn't really matter for correctness, but registering `contextStorage()` 
 
 ## Pairing with `@strays/sentry` and `@strays/datadog`
 
-Nothing extra to wire up. Once `installSentry` / `installDatadog` are running, every error and span emitted from a route picks up the owner from the scope:
+Nothing extra to wire up. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the owner from the scope:
 
 ```
 ownerMiddleware('Billing')
     → runWithOwner('Billing', () => next())
         → handler runs
             → throws or starts a span
-                → installSentry / installDatadog reads currentOwner()
+                → installSentry / instrumentDatadog reads currentOwner()
                     → tag = 'Billing'
 ```
 

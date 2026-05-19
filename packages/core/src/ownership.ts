@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { callerFrameSource, findOwnedFrame, type FrameSource } from './resolution/frames.ts';
 import { getDefaultRegistry } from './manifest/defaultRegistry.ts';
+import type { ManifestRegistry } from './manifest/ManifestRegistry.ts';
 import { walkOwnedErrorChain } from './resolution/walkOwnedErrorChain.ts';
 
 /**
@@ -86,9 +87,11 @@ export interface ResolveOwnerInput {
   readonly frameSource?: FrameSource | undefined;
   /**
    * Owner declared at module scope (e.g. via `defineStrays` / OWNER constant).
-   * Used as a tier-2 fallback before the frame source is consulted.
+   * Used before stack-frame lookup because it is explicit at the call site.
    */
   readonly moduleOwner?: string | undefined;
+  /** Registry used for stack-frame ownership lookup. Defaults to the process-wide registry. */
+  readonly registry?: ManifestRegistry | undefined;
   /** Final fallback when no tier yields a team. Defaults to `'unowned'`. */
   readonly fallback?: string | undefined;
 }
@@ -104,16 +107,16 @@ export function resolveOwnerWithSource(input: ResolveOwnerInput = {}): OwnerReso
   const fromScope = ownerStore.getStore();
   if (fromScope !== undefined) return { owner: fromScope, source: 'scope' };
 
-  // 3. Frame source -> manifest. Default: caller stack, skipping
-  //    [resolveOwnerWithSource, this caller] => skip 2.
-  const frameSource: FrameSource = input.frameSource ?? callerFrameSource(2);
-  const fromFrame = findOwnedFrame(frameSource, getDefaultRegistry());
-  if (fromFrame !== undefined) return { owner: fromFrame, source: 'frame' };
-
-  // 4. Module-declared owner.
+  // 3. Module-declared owner.
   if (input.moduleOwner !== undefined && input.moduleOwner !== '') {
     return { owner: input.moduleOwner, source: 'module' };
   }
+
+  // 4. Frame source -> manifest. Default: caller stack, skipping
+  //    [resolveOwnerWithSource, this caller] => skip 2.
+  const frameSource: FrameSource = input.frameSource ?? callerFrameSource(2);
+  const fromFrame = findOwnedFrame(frameSource, input.registry ?? getDefaultRegistry());
+  if (fromFrame !== undefined) return { owner: fromFrame, source: 'frame' };
 
   // 5. Final fallback.
   return { owner: input.fallback ?? 'unowned', source: 'fallback' };

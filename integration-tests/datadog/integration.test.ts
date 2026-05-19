@@ -1,7 +1,7 @@
 // Integration test for `@strays/datadog` against the real `dd-trace`
 // package. We want to prove three things end-to-end:
 //
-//   1. After `installDatadog(tracer)`, every `tracer.startSpan` call
+//   1. After `instrumentDatadog(tracer)`, every `tracer.startSpan` call
 //      attaches a `team` tag derived from `runWithOwner` scope.
 //   2. The patch survives across both import orders (strays first vs.
 //      dd-trace first), and we document any constraint we find.
@@ -58,13 +58,14 @@ process.env.DD_REMOTE_CONFIGURATION_ENABLED = 'false';
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { runWithOwner } from '@strays/core/ownership';
-import { installDatadog, type DatadogTracer } from '@strays/datadog/install';
+import { instrumentDatadog, type DatadogTracer } from '@strays/datadog/install';
 
 // dd-trace's runtime types are not exported for our adapter shape, so
 // we type the imported tracer through our adapter's structural
 // interface plus a minimal extension for `init` and the internal
 // context accessor.
 interface DdTraceSpan {
+  setTag(key: string, value: string): void;
   context(): { _tags: Record<string, unknown> };
   finish(): void;
 }
@@ -120,7 +121,7 @@ describe('@strays/datadog + real dd-trace (import order: strays-first)', () => {
       plugins: false,
       logInjection: false,
     });
-    installDatadog(tracer as unknown as DatadogTracer);
+    instrumentDatadog(tracer as unknown as DatadogTracer);
   });
 
   it('tags spans with the active runWithOwner scope', () => {
@@ -172,13 +173,13 @@ describe('@strays/datadog + real dd-trace (import order: dd-trace-first)', () =>
   // dd-trace was already imported by the previous describe block (its
   // module state is process-global). To exercise the "dd-trace import
   // happened first, then we install strays" code path we re-resolve
-  // the same tracer instance and re-apply installDatadog.
+  // the same tracer instance and re-apply instrumentDatadog.
   //
   // Note: the dd-trace shimmer monkey-patches Module._compile at
   // require time, before any user code can intervene. So in practice
   // the only import-order dimension that matters for users is whether
-  // `installDatadog` is called before or after `tracer.init()`. Both
-  // work, because `installDatadog` patches the proxy's `startSpan`
+  // `instrumentDatadog` is called before or after `tracer.init()`. Both
+  // work, because `instrumentDatadog` patches the proxy's `startSpan`
   // method, and the proxy is the same singleton instance whether or
   // not `init()` has been called.
   let tracer: DdTraceTracer;
@@ -187,12 +188,12 @@ describe('@strays/datadog + real dd-trace (import order: dd-trace-first)', () =>
   beforeAll(() => {
     tracer = loadRealDdTrace();
 
-    // The previous describe's installDatadog already wrapped startSpan
+    // The previous describe's instrumentDatadog already wrapped startSpan
     // on this singleton. Snapshot the wrapped version so we can restore
     // it after this block, then install AGAIN to model "user installs
     // strays after dd-trace was already initialized elsewhere".
     stackedStartSpan = tracer.startSpan.bind(tracer);
-    installDatadog(tracer as unknown as DatadogTracer);
+    instrumentDatadog(tracer as unknown as DatadogTracer);
   });
 
   afterAll(() => {

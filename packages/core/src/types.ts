@@ -5,6 +5,8 @@ export interface Team {
   readonly fallback?: boolean;
 }
 
+export type Owner = Team;
+
 export type TeamId<TTeams extends Record<string, Team>> = Extract<keyof TTeams, string>;
 
 export interface SharedRule<TKey extends string = string> {
@@ -23,3 +25,5 @@ export interface ResolvedOwnership {
   readonly source: 'jsdoc' | 'rule' | 'fallback';
   readonly matchedGlob?: string;
 }
+
+export type ResolvedOwner = ResolvedOwnership;

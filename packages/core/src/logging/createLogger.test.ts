@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { createLogger } from './createLogger.ts';
 import { makeMemorySink } from './LogSink.ts';
+import { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
 import { runWithOwner } from '../ownership.ts';
 
 describe('createLogger (wiring)', () => {
@@ -25,6 +26,19 @@ describe('createLogger (wiring)', () => {
     expect(lines[0]?.team).toBe('Billing');
     expect(lines[0]?.record.msg).toBe('no-scope');
     expect(lines[0]?.record.level).toBe('info');
+  });
+
+  it('uses the provided registry for stack-frame ownership lookup', () => {
+    const { sink, lines } = makeMemorySink();
+    const registry = ManifestRegistry.fromManifest({
+      version: 1,
+      files: { [import.meta.path]: 'Frames' },
+    });
+    const logger = createLogger('', { sink, registry });
+
+    logger.info({ msg: 'from-frame' });
+
+    expect(lines[0]?.team).toBe('Frames');
   });
 
   it('calls sink.write once per call with the correct level', () => {

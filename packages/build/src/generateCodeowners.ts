@@ -50,20 +50,14 @@ export function generateCodeowners<TTeams extends Record<string, Team>>(
     .sort((a, b) => compareSpecificity(a.glob, b.glob));
 
   const ruleLines = sortedRules.map((r) => {
-    const owners = r.teamIds
-      .map((id) => config.teams[id]?.github)
-      .filter((g): g is string => typeof g === 'string')
-      .join(' ');
+    const owners = githubOwners(config, r.teamIds, r.glob);
     return `${globToCodeownersPath(r.glob)} ${owners}`;
   });
 
   const overrideLines = resolved
     .filter((r) => r.source === 'jsdoc')
     .map((r) => {
-      const owners = r.teams
-        .map((id) => config.teams[id]?.github)
-        .filter((g): g is string => typeof g === 'string')
-        .join(' ');
+      const owners = githubOwners(config, r.teams, r.file);
       return `/${normalisePath(r.file)} ${owners}`;
     });
 
@@ -72,23 +66,43 @@ export function generateCodeowners<TTeams extends Record<string, Team>>(
     ? `* ${config.teams[fallbackEntry[0]]?.github}`
     : undefined;
 
-  const sections: string[] = [
-    header.trimEnd(),
+  const sections: string[] = [header.trimEnd()];
+
+  // CODEOWNERS uses last-match-wins semantics. Emit the fallback first so
+  // explicit directory rules and per-file overrides can supersede it.
+  if (fallbackLine) {
+    sections.push('', '# Fallback', fallbackLine);
+  }
+
+  sections.push(
     '',
     '# Directory rules (most specific wins; CODEOWNERS uses last-match)',
     ...ruleLines,
-  ];
+  );
 
   if (overrideLines.length > 0) {
     sections.push('', '# File-level overrides from @owner JSDoc');
     sections.push(...overrideLines);
   }
 
-  if (fallbackLine) {
-    sections.push('', '# Fallback', fallbackLine);
-  }
-
   return sections.join('\n') + '\n';
+}
+
+function githubOwners<TTeams extends Record<string, Team>>(
+  config: StraysConfig<TTeams>,
+  teamIds: readonly string[],
+  context: string,
+): string {
+  const owners = teamIds.map((id) => {
+    const github = config.teams[id]?.github;
+    if (typeof github !== 'string' || github.trim() === '') {
+      throw new Error(
+        `generateCodeowners: team '${id}' for '${context}' is missing a GitHub CODEOWNERS handle`,
+      );
+    }
+    return github;
+  });
+  return owners.join(' ');
 }
 
 function globToCodeownersPath(glob: string): string {

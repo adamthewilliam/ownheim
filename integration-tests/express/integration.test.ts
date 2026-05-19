@@ -152,7 +152,7 @@ describe('@strays/express integration (real Express + supertest)', () => {
     expect(concurrentEntries).toHaveLength(total);
 
     for (const entry of concurrentEntries) {
-      expect(entry.line.team).toBe(entry.line.record.expected);
+      expect(entry.line.team).toBe(entry.line.record.expected as string);
     }
 
     const billingCount = concurrentEntries.filter((e) => e.line.team === 'Billing').length;

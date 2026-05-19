@@ -40,11 +40,11 @@ function explain(
     return `${file} -> UNOWNED (no rule matched and no fallback)`;
   }
   if (resolved.source === 'jsdoc') {
-    return `${file} -> ${resolved.owners.join(', ')} (via @owner JSDoc)`;
+    return `${file} -> ${resolved.teams.join(', ')} (via @owner JSDoc)`;
   }
   if (resolved.source === 'fallback') {
-    return `${file} -> ${resolved.owners.join(', ')} (FALLBACK '${resolved.matchedGlob}')`;
+    return `${file} -> ${resolved.teams.join(', ')} (FALLBACK '${resolved.matchedGlob}')`;
   }
   const jsdocNote = jsdocOwner ? ` (jsdoc '@owner ${jsdocOwner}' was unknown, ignored)` : '';
-  return `${file} -> ${resolved.owners.join(', ')} (rule '${resolved.matchedGlob}')${jsdocNote}`;
+  return `${file} -> ${resolved.teams.join(', ')} (rule '${resolved.matchedGlob}')${jsdocNote}`;
 }

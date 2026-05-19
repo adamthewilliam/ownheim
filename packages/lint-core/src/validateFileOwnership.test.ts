@@ -3,21 +3,16 @@ import { defineStrays } from '@strays/core/defineStrays';
 import { validateFileOwnership } from './validateFileOwnership.ts';
 
 const config = defineStrays({
-  owners: {
-    Billing: { id: 'Billing', github: '@org/billing' },
-    Platform: { id: 'Platform', github: '@org/platform' },
+  teams: {
+    Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
+    Platform: { github: '@org/platform', fallback: true },
   },
-  rules: [
-    { glob: 'packages/billing/**', owner: 'Billing' },
-    { glob: '**', owner: 'Platform', fallback: true },
-  ],
 });
 
 const configNoFallback = defineStrays({
-  owners: {
-    Billing: { id: 'Billing', github: '@org/billing' },
+  teams: {
+    Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
   },
-  rules: [{ glob: 'packages/billing/**', owner: 'Billing' }],
 });
 
 describe('validateFileOwnership', () => {

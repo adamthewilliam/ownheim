@@ -25,10 +25,12 @@ describe('generateCodeowners', () => {
     expect(out).toContain('* @org/platform');
   });
 
-  it('emits more-specific rules later so CODEOWNERS last-match wins', () => {
+  it('emits fallback before explicit rules so CODEOWNERS last-match wins correctly', () => {
     const out = generateCodeowners({ config, resolved: [] });
+    const fallbackIdx = out.indexOf('* @org/platform');
     const billingIdx = out.indexOf('/packages/billing/ @org/billing');
     const adminIdx = out.indexOf('/packages/billing/admin/ @org/platform');
+    expect(fallbackIdx).toBeLessThan(billingIdx);
     expect(adminIdx).toBeGreaterThan(billingIdx);
   });
 
@@ -48,5 +50,17 @@ describe('generateCodeowners', () => {
   it('does not emit override section when there are no jsdoc resolutions', () => {
     const out = generateCodeowners({ config, resolved: [] });
     expect(out).not.toContain('File-level overrides');
+  });
+
+  it('throws instead of emitting an empty CODEOWNERS owner line', () => {
+    const malformed = {
+      teams: {
+        Billing: { github: '', owns: ['packages/billing/**'] },
+      },
+    };
+
+    expect(() => generateCodeowners({ config: malformed, resolved: [] })).toThrow(
+      /missing a GitHub CODEOWNERS handle/,
+    );
   });
 });

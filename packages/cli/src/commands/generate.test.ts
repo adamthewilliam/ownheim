@@ -35,16 +35,11 @@ describe('runGenerate (integration)', () => {
     await writeFile(join(root, 'tools/deploy.ts'), `export const w = 4;\n`);
 
     const config = defineStrays({
-      owners: {
-        Billing: { id: 'Billing', github: '@org/billing' },
-        Identity: { id: 'Identity', github: '@org/identity' },
-        Platform: { id: 'Platform', github: '@org/platform' },
+      teams: {
+        Billing: { github: '@org/billing', owns: ['packages/billing/**'] },
+        Identity: { github: '@org/identity', owns: ['packages/auth/**'] },
+        Platform: { github: '@org/platform', fallback: true },
       },
-      rules: [
-        { glob: 'packages/billing/**', owner: 'Billing' },
-        { glob: 'packages/auth/**', owner: 'Identity' },
-        { glob: '**', owner: 'Platform', fallback: true },
-      ],
     });
 
     const result = await runGenerate({

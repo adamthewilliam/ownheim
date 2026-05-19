@@ -66,14 +66,14 @@ oRPC supports both shapes natively. `os.use(...)` is the single-line case; defin
 
 ## Pairing it with `@strays/sentry` and `@strays/datadog`
 
-Nothing extra to do. Once `installSentry` / `installDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope:
+Nothing extra to do. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope:
 
 ```
 ownedProcedure(os, 'Billing')
     → runWithOwner('Billing', () => next())
         → handler does work
             → throws or starts a span
-                → installSentry / installDatadog reads currentOwner()
+                → installSentry / instrumentDatadog reads currentOwner()
                     → tag = 'Billing'
 ```
 

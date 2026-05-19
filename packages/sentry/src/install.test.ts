@@ -157,4 +157,12 @@ describe('installSentry', () => {
     const event = runWithOwner('Billing', () => processors[0]!({}, {}));
     expect(event?.tags?.['sentry.team_source']).toBe('scope');
   });
+
+  it('is idempotent', () => {
+    const { processors, client } = makeMockClient();
+    installSentry(client);
+    installSentry(client);
+
+    expect(processors).toHaveLength(1);
+  });
 });

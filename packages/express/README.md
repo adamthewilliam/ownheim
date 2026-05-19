@@ -71,14 +71,14 @@ Express 4 works too, but if your handlers return promises and you don't `.catch`
 
 ## Pairing with `@strays/sentry` and `@strays/datadog`
 
-Nothing extra to wire up. Once `installSentry` / `installDatadog` are running, every error and span emitted from a route picks up the team from the scope:
+Nothing extra to wire up. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the team from the scope:
 
 ```
 ownerMiddleware('Billing')
     → runWithOwner('Billing', () => next())
         → handler runs
             → throws or starts a span
-                → installSentry / installDatadog reads currentOwner()
+                → installSentry / instrumentDatadog reads currentOwner()
                     → tag = 'Billing'
 ```
 
