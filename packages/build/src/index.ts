@@ -6,7 +6,19 @@ export { resolveOwnerForFile, resolveAll } from './resolveRules.ts';
 export type { ResolveInput } from './resolveRules.ts';
 export { generateCodeowners } from './generateCodeowners.ts';
 export { generateManifest } from './generateManifest.ts';
-export { generateOwnershipArtifacts, compareGeneratedText } from './generateArtifacts.ts';
-export type { GeneratedOwnershipArtifacts, GenerateOwnershipArtifactsInput, ArtifactDrift } from './generateArtifacts.ts';
+export {
+  compareGeneratedText,
+  defaultOwnershipArtifactPaths,
+  generateOwnershipArtifacts,
+  planOwnershipArtifacts,
+} from './generateArtifacts.ts';
+export type {
+  ArtifactDrift,
+  GeneratedOwnershipArtifacts,
+  GenerateOwnershipArtifactsInput,
+  OwnershipArtifactPathOptions,
+  OwnershipArtifactPaths,
+  OwnershipArtifactPlan,
+} from './generateArtifacts.ts';
 export { ownheim } from './esbuildPlugin.ts';
 export type { OwnheimPluginOptions } from './esbuildPlugin.ts';

@@ -1,3 +1,4 @@
+import { join } from 'node:path';
 import type { OwnheimConfig, ResolvedOwnership, Team } from '@ownheim/core/types';
 import { generateCodeowners } from './generateCodeowners.ts';
 import { generateManifest, type ManifestOutput } from './generateManifest.ts';
@@ -8,9 +9,31 @@ export interface GeneratedOwnershipArtifacts {
   readonly manifestText: string;
 }
 
+export interface OwnershipArtifactPaths {
+  readonly codeownersPath: string;
+  readonly manifestPath: string;
+}
+
+export interface OwnershipArtifactPathOptions {
+  readonly codeownersPath?: string;
+  readonly manifestPath?: string;
+}
+
+export interface OwnershipArtifactPlan extends GeneratedOwnershipArtifacts, OwnershipArtifactPaths {}
+
 export interface GenerateOwnershipArtifactsInput<TTeams extends Record<string, Team>> {
   readonly config: OwnheimConfig<TTeams>;
   readonly resolved: readonly ResolvedOwnership[];
+}
+
+export function defaultOwnershipArtifactPaths(
+  projectRoot: string,
+  options: OwnershipArtifactPathOptions = {},
+): OwnershipArtifactPaths {
+  return {
+    codeownersPath: options.codeownersPath ?? join(projectRoot, '.github/CODEOWNERS'),
+    manifestPath: options.manifestPath ?? join(projectRoot, 'dist/ownheim-manifest.json'),
+  };
 }
 
 export function generateOwnershipArtifacts<TTeams extends Record<string, Team>>(
@@ -21,6 +44,17 @@ export function generateOwnershipArtifacts<TTeams extends Record<string, Team>>(
     codeownersText: generateCodeowners({ config: input.config, resolved: input.resolved }),
     manifest,
     manifestText: JSON.stringify(manifest, null, 2) + '\n',
+  };
+}
+
+export function planOwnershipArtifacts<TTeams extends Record<string, Team>>(
+  projectRoot: string,
+  input: GenerateOwnershipArtifactsInput<TTeams>,
+  options: OwnershipArtifactPathOptions = {},
+): OwnershipArtifactPlan {
+  return {
+    ...defaultOwnershipArtifactPaths(projectRoot, options),
+    ...generateOwnershipArtifacts(input),
   };
 }
 

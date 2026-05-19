@@ -92,8 +92,8 @@ instrumentDatadog(tracer, {
 
 ```ts
 import { datadogRum } from '@datadog/browser-rum';
-import { installDatadogRum } from '@ownheim/datadog/rum';
+import { instrumentDatadogRum } from '@ownheim/datadog/rum';
 
 datadogRum.init({ applicationId: '...', clientToken: '...', service: 'web' });
-installDatadogRum(datadogRum, 'web-platform');
+instrumentDatadogRum(datadogRum, { fallbackCodeTeam: 'web-platform' });
 ```

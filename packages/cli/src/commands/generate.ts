@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { generateOwnershipArtifacts } from '@ownheim/build/generateArtifacts';
+import { dirname } from 'node:path';
+import { planOwnershipArtifacts } from '@ownheim/build/generateArtifacts';
 import type { ResolvedOwner } from '@ownheim/core/types';
 import { auditProjectOwnership } from '../auditProject.ts';
 import type { LoadedConfig } from '../loadConfig.ts';
@@ -22,24 +22,25 @@ export async function runGenerate(
   loaded: LoadedConfig,
   options: GenerateOptions = {},
 ): Promise<GenerateResult> {
-  const codeownersPath = options.codeownersPath ?? join(loaded.projectRoot, '.github/CODEOWNERS');
-  const manifestPath = options.manifestPath ?? join(loaded.projectRoot, 'dist/ownheim-manifest.json');
-
   const audit = await auditProjectOwnership(loaded);
   const resolved = audit.resolved as readonly ResolvedOwner[];
-  const artifacts = generateOwnershipArtifacts({ config: loaded.config, resolved: audit.resolved });
+  const plan = planOwnershipArtifacts(
+    loaded.projectRoot,
+    { config: loaded.config, resolved: audit.resolved },
+    options,
+  );
 
-  await mkdir(dirname(codeownersPath), { recursive: true });
-  await writeFile(codeownersPath, artifacts.codeownersText, 'utf8');
+  await mkdir(dirname(plan.codeownersPath), { recursive: true });
+  await writeFile(plan.codeownersPath, plan.codeownersText, 'utf8');
 
-  await mkdir(dirname(manifestPath), { recursive: true });
-  await writeFile(manifestPath, artifacts.manifestText, 'utf8');
+  await mkdir(dirname(plan.manifestPath), { recursive: true });
+  await writeFile(plan.manifestPath, plan.manifestText, 'utf8');
 
   return {
     resolved,
-    codeownersText: artifacts.codeownersText,
-    codeownersPath,
-    manifestPath,
+    codeownersText: plan.codeownersText,
+    codeownersPath: plan.codeownersPath,
+    manifestPath: plan.manifestPath,
     ownheimCount: audit.needsAttention,
   };
 }

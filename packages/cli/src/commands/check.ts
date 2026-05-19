@@ -1,6 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { compareGeneratedText, generateOwnershipArtifacts } from '@ownheim/build/generateArtifacts';
+import { compareGeneratedText, planOwnershipArtifacts } from '@ownheim/build/generateArtifacts';
 import { auditProjectOwnership } from '../auditProject.ts';
 import type { LoadedConfig } from '../loadConfig.ts';
 
@@ -12,21 +11,19 @@ export interface CheckResult {
 }
 
 export async function runCheck(loaded: LoadedConfig): Promise<CheckResult> {
-  const codeownersPath = join(loaded.projectRoot, '.github/CODEOWNERS');
-
   const audit = await auditProjectOwnership(loaded);
-  const expected = generateOwnershipArtifacts({
+  const plan = planOwnershipArtifacts(loaded.projectRoot, {
     config: loaded.config,
     resolved: audit.resolved,
-  }).codeownersText;
+  });
   let actual: string | undefined;
   try {
-    actual = await readFile(codeownersPath, 'utf8');
+    actual = await readFile(plan.codeownersPath, 'utf8');
   } catch {
     actual = undefined;
   }
 
-  const drift = compareGeneratedText(actual, expected);
+  const drift = compareGeneratedText(actual, plan.codeownersText);
   return drift.drift
     ? {
         drift: true,
