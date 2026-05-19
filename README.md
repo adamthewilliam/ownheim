@@ -121,6 +121,14 @@ Telemetry for an Accounts request that fails inside Billing-owned code can now c
 }
 ```
 
+## Examples
+
+- [`examples/turborepo-monorepo`](./examples/turborepo-monorepo) — generated CODEOWNERS and manifest in a Turborepo-style workspace.
+- [`examples/bun-effect-http`](./examples/bun-effect-http) — Bun HTTP service with Effect-oriented ownership helpers.
+- [`examples/express-pino-sentry`](./examples/express-pino-sentry) — Express route owners with Pino log fields and Sentry event tags.
+- [`examples/trpc-api`](./examples/trpc-api) — owner-tagged tRPC procedure builders.
+- [`examples/hono-otel`](./examples/hono-otel) — Hono prefix owners with OpenTelemetry span attributes.
+
 ## License
 
 MIT

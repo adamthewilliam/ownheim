@@ -1,0 +1,23 @@
+{
+  "name": "@ownheim/example-express-pino-sentry",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "generate": "bunx ownheim generate"
+  },
+  "dependencies": {
+    "@ownheim/core": "workspace:*",
+    "@ownheim/express": "workspace:*",
+    "@ownheim/pino": "workspace:*",
+    "@ownheim/sentry": "workspace:*",
+    "@sentry/node": "^10.30.0",
+    "express": "^5.2.1",
+    "pino": "^10.1.0"
+  },
+  "devDependencies": {
+    "@ownheim/cli": "workspace:*",
+    "@types/express": "^5.0.6"
+  }
+}
