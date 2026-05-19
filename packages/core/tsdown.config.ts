@@ -18,7 +18,8 @@ export default defineConfig({
     'src/logging/LogSink.ts',
     'src/logging/defaultLogSink.ts',
     'src/tracing/createTracer.ts',
-    'src/tracing/resolveTagOptions.ts'
+    'src/tracing/resolveTagOptions.ts',
+    'src/tracing/ownershipTags.ts'
 ],
   format: ['esm', 'cjs'],
   dts: true,

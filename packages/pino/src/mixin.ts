@@ -1,4 +1,4 @@
-import { resolveOwnership } from '@ownheim/core/ownership';
+import { resolveOwnershipTags } from '@ownheim/core/tracing/ownershipTags';
 
 export interface OwnershipMixinOptions {
   readonly fallbackCodeTeam?: string;
@@ -23,29 +23,22 @@ function fieldNames(options: OwnershipMixinOptions) {
   };
 }
 
-export function ownershipMixin(options: OwnershipMixinOptions = {}) {
-  const fields = fieldNames(options);
-  const fallbackCodeTeam = options.fallbackCodeTeam ?? 'unowned';
-
-  return (): Record<string, string> => {
-    const { ownership } = resolveOwnership({ fallbackCodeTeam });
-    return {
-      ...(ownership.entrypointTeam === undefined ? {} : { [fields.entrypointTeam]: ownership.entrypointTeam }),
-      ...(ownership.codeTeam === undefined ? {} : { [fields.codeTeam]: ownership.codeTeam }),
-      ...(ownership.responderTeam === undefined ? {} : { [fields.responderTeam]: ownership.responderTeam }),
-    };
+function toTagOptions(options: OwnershipMixinOptions) {
+  return {
+    fallbackCodeTeam: options.fallbackCodeTeam ?? 'unowned',
+    tags: fieldNames(options),
   };
+}
+
+export function ownershipMixin(options: OwnershipMixinOptions = {}) {
+  const tagOptions = toTagOptions(options);
+
+  return (): Record<string, string> => resolveOwnershipTags(tagOptions);
 }
 
 export function ownershipFromError(
   error: unknown,
   options: OwnershipMixinOptions = {},
 ): Record<string, string> {
-  const fields = fieldNames(options);
-  const { ownership } = resolveOwnership({ error, fallbackCodeTeam: options.fallbackCodeTeam ?? 'unowned' });
-  return {
-    ...(ownership.entrypointTeam === undefined ? {} : { [fields.entrypointTeam]: ownership.entrypointTeam }),
-    ...(ownership.codeTeam === undefined ? {} : { [fields.codeTeam]: ownership.codeTeam }),
-    ...(ownership.responderTeam === undefined ? {} : { [fields.responderTeam]: ownership.responderTeam }),
-  };
+  return resolveOwnershipTags({ ...toTagOptions(options), error });
 }

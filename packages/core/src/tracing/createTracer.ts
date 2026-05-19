@@ -1,5 +1,5 @@
 import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
-import { resolveOwnership } from '../ownership.ts';
+import { applyOwnershipTags, resolveOwnershipTags } from './ownershipTags.ts';
 
 export interface TracedSpan {
   setAttribute(key: string, value: string | number | boolean): void;
@@ -27,14 +27,15 @@ export function createTracer(moduleOwner: string, options: CreateTracerOptions):
   return {
     startSpan(name) {
       const span = options.factory.start(name);
-      const { ownership } = resolveOwnership({
-        ...(normalisedOwner === undefined ? {} : { moduleOwner: normalisedOwner }),
-        ...(options.registry === undefined ? {} : { registry: options.registry }),
-        fallbackCodeTeam,
-      });
-      if (ownership.entrypointTeam !== undefined) span.setAttribute('ownheim.entrypoint_team', ownership.entrypointTeam);
-      if (ownership.codeTeam !== undefined) span.setAttribute('ownheim.code_team', ownership.codeTeam);
-      if (ownership.responderTeam !== undefined) span.setAttribute('ownheim.responder_team', ownership.responderTeam);
+      applyOwnershipTags(
+        span,
+        resolveOwnershipTags({
+          ...(normalisedOwner === undefined ? {} : { moduleOwner: normalisedOwner }),
+          ...(options.registry === undefined ? {} : { registry: options.registry }),
+          fallbackCodeTeam,
+        }),
+        (target, key, value) => target.setAttribute(key, value),
+      );
       return span;
     },
   };

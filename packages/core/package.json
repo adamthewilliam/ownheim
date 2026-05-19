@@ -178,6 +178,16 @@
         "types": "./dist/tracing/resolveTagOptions.d.cts",
         "default": "./dist/tracing/resolveTagOptions.cjs"
       }
+    },
+    "./tracing/ownershipTags": {
+      "import": {
+        "types": "./dist/tracing/ownershipTags.d.mts",
+        "default": "./dist/tracing/ownershipTags.mjs"
+      },
+      "require": {
+        "types": "./dist/tracing/ownershipTags.d.cts",
+        "default": "./dist/tracing/ownershipTags.cjs"
+      }
     }
   },
   "scripts": {

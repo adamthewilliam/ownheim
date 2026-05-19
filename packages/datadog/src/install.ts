@@ -1,5 +1,5 @@
-import { resolveOwnership } from '@ownheim/core/ownership';
-import { resolveTagOptions, type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
+import { applyOwnershipTags, resolveOwnershipTags } from '@ownheim/core/tracing/ownershipTags';
+import { type TagOptions } from '@ownheim/core/tracing/resolveTagOptions';
 
 export interface DatadogSpan {
   setTag(key: string, value: string): void;
@@ -20,15 +20,12 @@ export function instrumentDatadog(tracer: DatadogTracer, options: InstrumentOpti
   if (instrumentedTracer[INSTRUMENTED]) return;
   instrumentedTracer[INSTRUMENTED] = true;
 
-  const { fallbackCodeTeam, tags } = resolveTagOptions(options);
-
   const original = tracer.startSpan.bind(tracer);
   tracer.startSpan = (name: string, opts?: unknown) => {
     const span = original(name, opts);
-    const { ownership } = resolveOwnership({ fallbackCodeTeam });
-    if (ownership.entrypointTeam !== undefined) span.setTag(tags.entrypointTeam, ownership.entrypointTeam);
-    if (ownership.codeTeam !== undefined) span.setTag(tags.codeTeam, ownership.codeTeam);
-    if (ownership.responderTeam !== undefined) span.setTag(tags.responderTeam, ownership.responderTeam);
+    applyOwnershipTags(span, resolveOwnershipTags(options), (target, key, value) =>
+      target.setTag(key, value),
+    );
     return span;
   };
 }

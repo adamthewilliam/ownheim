@@ -85,3 +85,11 @@ export {
   DEFAULT_CODE_TEAM_TAG,
   DEFAULT_RESPONDER_TEAM_TAG,
 } from './tracing/resolveTagOptions.ts';
+export {
+  ownershipContextToTags,
+  resolveOwnershipTags,
+  applyOwnershipTags,
+  type OwnershipTagNames,
+  type ResolveOwnershipTagsInput,
+  type OwnershipTags,
+} from './tracing/ownershipTags.ts';
