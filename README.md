@@ -2,62 +2,35 @@
 
 > Find a home for every line of code.
 
-Code-first team ownership for TypeScript monorepos. `ownheim.config.ts` is the source of truth for code ownership, generated CODEOWNERS, ownership coverage checks, and ownership-aware telemetry.
+Code-first team ownership for TypeScript monorepos. Ownheim uses `ownheim.config.ts` as the source of truth for generated `CODEOWNERS`, ownership coverage checks, and ownership-aware telemetry.
 
-Ownheim emits explicit ownership layers instead of one ambiguous `team` field:
+## Install
 
-| Concept | Meaning | Tag |
-|---|---|---|
-| Entrypoint owner | Team accountable for the request, job, procedure, event, or command that started this work | `ownheim.entrypoint_team` |
-| Code owner | Team accountable for the source file or package emitting telemetry | `ownheim.code_team` |
-| Responder | Team best positioned to investigate, mitigate, or remediate a failure | `ownheim.responder_team` |
-
-See [docs/ownership-model.md](./docs/ownership-model.md) for the full terminology guide.
-
-## Installation
+Install the core package plus the adapters you need:
 
 ```bash
-# Core package
-bun add @ownheim/core
+bun add @ownheim/core @ownheim/cli
 
-# With build tooling
-bun add @ownheim/core @ownheim/build @ownheim/cli
+# Optional build-time support
+bun add @ownheim/build
 
-# Framework integrations
-bun add @ownheim/hono
-bun add @ownheim/express
-bun add @ownheim/trpc
-bun add @ownheim/orpc
+# Optional framework adapters
+bun add @ownheim/express @ownheim/hono @ownheim/trpc @ownheim/orpc
 
-# Observability integrations
-bun add @ownheim/datadog
-bun add @ownheim/pino
-bun add @ownheim/sentry
-bun add @ownheim/otel
+# Optional observability adapters
+bun add @ownheim/datadog @ownheim/otel @ownheim/pino @ownheim/sentry
+
+# Optional lint adapters
+bun add @ownheim/eslint @ownheim/oxlint
 ```
 
-> These packages export TypeScript source files directly and require a bundler with TypeScript support (Bun, esbuild, Vite, etc.) or `allowImportingTsExtensions` in your tsconfig.
+> Ownheim packages are ESM-first TypeScript packages. Use a TypeScript-aware runtime/bundler such as Bun, Vite, esbuild, tsdown, or enable TypeScript import support in your project.
 
-## Packages
+## Setup
 
-| Package | Purpose |
-|---|---|
-| `@ownheim/core` | `defineOwnheim`, `OwnedError`, `runWithEntrypointOwner`, `registerOwnershipManifest`, logger/tracer factories |
-| `@ownheim/build` | esbuild plugin + AST extractor |
-| `@ownheim/cli` | `ownheim generate \| check \| coverage \| trace \| diff` |
-| `@ownheim/trpc` | tRPC entrypoint ownership helpers |
-| `@ownheim/orpc` | oRPC entrypoint ownership helpers |
-| `@ownheim/hono` | Hono entrypoint ownership middleware |
-| `@ownheim/express` | Express entrypoint ownership middleware |
-| `@ownheim/datadog` | dd-trace + RUM integration |
-| `@ownheim/pino` | Pino ownership mixin |
-| `@ownheim/sentry` | Sentry event processor + CODEOWNERS sync |
-| `@ownheim/otel` | OpenTelemetry SpanProcessor |
-
-## Quick start
+Create `ownheim.config.ts` at the root of your repository:
 
 ```ts
-// ownheim.config.ts
 import { defineOwnheim } from '@ownheim/core';
 
 export default defineOwnheim({
@@ -74,60 +47,36 @@ export default defineOwnheim({
 });
 ```
 
-Load the generated ownership manifest once at process startup so Ownheim can resolve code ownership from stack frames:
+Generate ownership artifacts:
+
+```bash
+bunx ownheim generate
+```
+
+Add checks to CI:
+
+```bash
+bunx ownheim check
+bunx ownheim coverage
+```
+
+Register the generated runtime manifest once during application startup:
 
 ```ts
-import manifest from './.ownheim/ownership.json' with { type: 'json' };
 import { registerOwnershipManifest } from '@ownheim/core';
+import manifest from './.ownheim/ownership.json' with { type: 'json' };
 
 registerOwnershipManifest(manifest);
 ```
 
-Instrument telemetry:
+## Learn more
 
-```ts
-import tracer from 'dd-trace';
-import { instrumentDatadog } from '@ownheim/datadog';
-
-tracer.init({ service: 'api' });
-instrumentDatadog(tracer);
-```
-
-Mark entrypoints explicitly:
-
-```ts
-import { entrypointOwner } from '@ownheim/express';
-
-app.use('/api/accounts', entrypointOwner('Accounts'));
-```
-
-Annotate cross-team failures with the team that should respond:
-
-```ts
-import { OwnedError } from '@ownheim/core';
-
-throw new OwnedError('Ledger write failed', {
-  responderTeam: 'Billing',
-});
-```
-
-Telemetry for an Accounts request that fails inside Billing-owned code can now carry all relevant context:
-
-```json
-{
-  "ownheim.entrypoint_team": "Accounts",
-  "ownheim.code_team": "Billing",
-  "ownheim.responder_team": "Billing"
-}
-```
-
-## Examples
-
-- [`examples/turborepo-monorepo`](./examples/turborepo-monorepo) — generated CODEOWNERS and manifest in a Turborepo-style workspace.
-- [`examples/bun-effect-http`](./examples/bun-effect-http) — Bun HTTP service with Effect-oriented ownership helpers.
-- [`examples/express-pino-sentry`](./examples/express-pino-sentry) — Express route owners with Pino log fields and Sentry event tags.
-- [`examples/trpc-api`](./examples/trpc-api) — owner-tagged tRPC procedure builders.
-- [`examples/hono-otel`](./examples/hono-otel) — Hono prefix owners with OpenTelemetry span attributes.
+- [Getting started](./docs/getting-started.md)
+- [Ownership model](./docs/ownership-model.md)
+- [Configuration guide](./docs/configuration.md)
+- [Runtime instrumentation](./docs/runtime-instrumentation.md)
+- [Package reference](./docs/packages.md)
+- [Examples](./docs/examples.md)
 
 ## License
 
