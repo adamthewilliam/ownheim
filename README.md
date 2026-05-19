@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/ownheim-logo.png" alt="Ownheim logo" width="420" />
+</p>
+
 # ownheim
 
 > Find a home for every line of code.
