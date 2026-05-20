@@ -1,10 +1,22 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Logger as EffectLogger } from 'effect';
 import { OwnedError } from '@ownheim/core/OwnedError';
-import { makeMemorySink } from '@ownheim/core/logging/LogSink';
-import { makeOwnershipLogger } from './Logger.ts';
+import type { FormattedLogLine, LogLevel } from '@ownheim/core/logging/formatOwnedLogEntry';
+import { makeOwnershipLogger, type OwnershipLogSink } from './Logger.ts';
 
-const provideTestLogger = (sink: ReturnType<typeof makeMemorySink>['sink']) =>
+function makeMemorySink(): { readonly sink: OwnershipLogSink; readonly lines: readonly FormattedLogLine[] } {
+  const lines: FormattedLogLine[] = [];
+  return {
+    sink: {
+      write: (line: FormattedLogLine, _level: LogLevel) => {
+        lines.push(line);
+      },
+    },
+    lines,
+  };
+}
+
+const provideTestLogger = (sink: OwnershipLogSink) =>
   EffectLogger.replace(EffectLogger.defaultLogger, makeOwnershipLogger(sink));
 
 describe('ownership Logger (wiring)', () => {

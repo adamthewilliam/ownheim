@@ -46,37 +46,12 @@ export {
 } from './manifest/defaultRegistry.ts';
 
 export {
-  createLogger,
-  type Logger,
-  type LogRecord,
-  type LogValue,
-  type CreateLoggerOptions,
-} from './logging/createLogger.ts';
-export {
   formatOwnedLogEntry,
   type LogLevel,
   type OwnedLogEntry,
   type FormattedLogLine,
 } from './logging/formatOwnedLogEntry.ts';
-export {
-  type LogSink,
-  stdoutJsonSink,
-  makeMemorySink,
-  type MemorySink,
-} from './logging/LogSink.ts';
-export {
-  getDefaultLogSink,
-  setDefaultLogSink,
-  resetDefaultLogSink,
-} from './logging/defaultLogSink.ts';
 
-export {
-  createTracer,
-  type Tracer,
-  type TracedSpan,
-  type SpanFactory,
-  type CreateTracerOptions,
-} from './tracing/createTracer.ts';
 export {
   resolveTagOptions,
   type TagOptions,

@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/core",
   "version": "0.1.0",
-  "description": "ownheim — ownership resolution, scope propagation, logging, and tracing",
+  "description": "ownheim \u2014 ownership resolution, scope propagation, logging, and tracing",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -119,16 +119,6 @@
         "default": "./dist/manifest/defaultRegistry.cjs"
       }
     },
-    "./logging/createLogger": {
-      "import": {
-        "types": "./dist/logging/createLogger.d.mts",
-        "default": "./dist/logging/createLogger.mjs"
-      },
-      "require": {
-        "types": "./dist/logging/createLogger.d.cts",
-        "default": "./dist/logging/createLogger.cjs"
-      }
-    },
     "./logging/formatOwnedLogEntry": {
       "import": {
         "types": "./dist/logging/formatOwnedLogEntry.d.mts",
@@ -137,36 +127,6 @@
       "require": {
         "types": "./dist/logging/formatOwnedLogEntry.d.cts",
         "default": "./dist/logging/formatOwnedLogEntry.cjs"
-      }
-    },
-    "./logging/LogSink": {
-      "import": {
-        "types": "./dist/logging/LogSink.d.mts",
-        "default": "./dist/logging/LogSink.mjs"
-      },
-      "require": {
-        "types": "./dist/logging/LogSink.d.cts",
-        "default": "./dist/logging/LogSink.cjs"
-      }
-    },
-    "./logging/defaultLogSink": {
-      "import": {
-        "types": "./dist/logging/defaultLogSink.d.mts",
-        "default": "./dist/logging/defaultLogSink.mjs"
-      },
-      "require": {
-        "types": "./dist/logging/defaultLogSink.d.cts",
-        "default": "./dist/logging/defaultLogSink.cjs"
-      }
-    },
-    "./tracing/createTracer": {
-      "import": {
-        "types": "./dist/tracing/createTracer.d.mts",
-        "default": "./dist/tracing/createTracer.mjs"
-      },
-      "require": {
-        "types": "./dist/tracing/createTracer.d.cts",
-        "default": "./dist/tracing/createTracer.cjs"
       }
     },
     "./tracing/resolveTagOptions": {

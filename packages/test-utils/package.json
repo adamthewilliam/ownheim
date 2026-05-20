@@ -13,7 +13,6 @@
     ".": "./src/index.ts",
     "./buildBundleFixture": "./src/buildBundleFixture.ts",
     "./runBundleInSubprocess": "./src/runBundleInSubprocess.ts",
-    "./captureStructuredLogs": "./src/captureStructuredLogs.ts",
     "./createInMemoryOtelExporter": "./src/createInMemoryOtelExporter.ts",
     "./RecordedSpan": "./src/RecordedSpan.ts"
   },

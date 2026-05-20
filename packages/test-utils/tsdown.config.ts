@@ -5,7 +5,6 @@ export default defineConfig({
     'src/index.ts',
     'src/buildBundleFixture.ts',
     'src/runBundleInSubprocess.ts',
-    'src/captureStructuredLogs.ts',
     'src/createInMemoryOtelExporter.ts',
     'src/RecordedSpan.ts'
 ],

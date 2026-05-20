@@ -13,11 +13,7 @@ export default defineConfig({
     'src/resolution/lookupCallerOwner.ts',
     'src/manifest/ManifestRegistry.ts',
     'src/manifest/defaultRegistry.ts',
-    'src/logging/createLogger.ts',
     'src/logging/formatOwnedLogEntry.ts',
-    'src/logging/LogSink.ts',
-    'src/logging/defaultLogSink.ts',
-    'src/tracing/createTracer.ts',
     'src/tracing/resolveTagOptions.ts',
     'src/tracing/ownershipTags.ts',
     'src/tracing/projectOwnership.ts'

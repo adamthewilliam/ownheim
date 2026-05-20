@@ -1,14 +1,25 @@
 import { Logger as EffectLogger } from 'effect';
-import { formatOwnedLogEntry, type LogLevel } from '@ownheim/core/logging/formatOwnedLogEntry';
-import { stdoutJsonSink, type LogSink } from '@ownheim/core/logging/LogSink';
+import { formatOwnedLogEntry, type FormattedLogLine, type LogLevel } from '@ownheim/core/logging/formatOwnedLogEntry';
 import { resolveOwnership } from '@ownheim/core/ownership';
+
+export interface OwnershipLogSink {
+  write(line: FormattedLogLine, level: LogLevel): void;
+}
+
+export const stdoutOwnershipLogSink: OwnershipLogSink = {
+  write: (line, level) => {
+    if (level === 'error' || level === 'fatal') console.error(line.json);
+    else if (level === 'warn') console.warn(line.json);
+    else console.info(line.json);
+  },
+};
 
 const LOG_LEVELS = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 
 const levelFromLabel = (label: string): LogLevel =>
   LOG_LEVELS.find((l) => l === label.toLowerCase()) ?? 'info';
 
-export const makeOwnershipLogger = (sink: LogSink = stdoutJsonSink) =>
+export const makeOwnershipLogger = (sink: OwnershipLogSink = stdoutOwnershipLogSink) =>
   EffectLogger.make(({ logLevel, message, annotations, cause }) => {
     const annotationsObj = Object.fromEntries(annotations);
     const annotatedCodeTeam =
