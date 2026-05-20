@@ -88,7 +88,7 @@ describe('auditSourceFile', () => {
       sourceText: 'export const deploy = true;',
     });
 
-    expect(explainOwnershipAudit(audit).explanation).toBe('tools/deploy.ts -> Platform (fallback)');
+    expect(explainOwnershipAudit(audit).explanation).toBe('tools/deploy.ts -> Platform (FALLBACK)');
   });
 
   it('summarizes project ownership audits for downstream callers', () => {

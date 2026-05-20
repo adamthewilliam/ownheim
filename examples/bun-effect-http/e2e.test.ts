@@ -4,7 +4,6 @@ import { join, resolve } from 'node:path';
 import { runCheck } from '@ownheim/cli/commands/check';
 import { runCoverage } from '@ownheim/cli/commands/coverage';
 import { runGenerate } from '@ownheim/cli/commands/generate';
-import { runTrace } from '@ownheim/cli/commands/trace';
 import ownheimConfig from './ownheim.config.ts';
 
 const projectRoot = resolve(import.meta.dir);
@@ -35,20 +34,6 @@ describe('bun-effect-http example end-to-end', () => {
     expect(manifest.files['src/billing/charge.ts']).toBe('Billing');
     expect(manifest.files['src/auth/session.ts']).toBe('Identity');
     expect(manifest.files['src/billing/admin/refund.ts']).toBe('Platform');
-  });
-
-  it('ownheim trace explains why src/billing/admin/refund.ts is Platform-owned', async () => {
-    const result = await runTrace(loaded, 'src/billing/admin/refund.ts');
-    expect(result.resolved?.teams).toEqual(['Platform']);
-    expect(result.resolved?.matchedGlob).toBe('src/billing/admin/**');
-    expect(result.explanation).toContain('Platform');
-    expect(result.explanation).toContain('src/billing/admin/**');
-  });
-
-  it('ownheim trace identifies a fallback-only file as a stray', async () => {
-    const result = await runTrace(loaded, 'src/start.ts');
-    expect(result.resolved?.source).toBe('fallback');
-    expect(result.explanation).toContain('FALLBACK');
   });
 
   it('ownheim coverage reports the example layout correctly', async () => {

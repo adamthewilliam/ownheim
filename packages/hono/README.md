@@ -7,7 +7,7 @@ This is a Hono middleware. It wraps the rest of the request chain in a `runWithE
 ## Install
 
 ```bash
-bun add @ownheim/hono @ownheim/runtime @ownheim/core
+bun add @ownheim/hono @ownheim/core
 ```
 
 You also need `hono`. Ownheim doesn't pin a version. Anything with the standard `(c, next)` middleware shape works.
@@ -16,7 +16,7 @@ You also need `hono`. Ownheim doesn't pin a version. Anything with the standard 
 
 ```ts
 import { Hono } from 'hono';
-import { entrypointOwner } from '@ownheim/hono/entrypointOwner';
+import { entrypointOwner } from '@ownheim/hono';
 
 const app = new Hono();
 
@@ -62,14 +62,14 @@ Order doesn't really matter for correctness, but registering `contextStorage()` 
 
 ## Pairing with `@ownheim/sentry` and `@ownheim/datadog`
 
-Nothing extra to wire up. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the owner from the scope:
+Nothing extra to wire up. Once `instrumentSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the owner from the scope:
 
 ```
 entrypointOwner('Billing')
     → runWithEntrypointOwner('Billing', () => next())
         → handler runs
             → throws or starts a span
-                → installSentry / instrumentDatadog reads currentEntrypointOwner()
+                → instrumentSentry / instrumentDatadog reads currentEntrypointOwner()
                     → tag = 'Billing'
 ```
 
@@ -80,4 +80,4 @@ entrypointOwner('Billing')
 
 ## Testing without `hono`
 
-The exported types (`HonoMiddleware`, `HonoNext`) are structural — `c` is typed as `unknown` because the middleware never reads it. Pass any object as `c` and an async function as `next`. The package's own tests do this. See `src/entrypointOwner.test.ts`.
+The exported types (`HonoMiddleware`, `HonoNext`) are structural — `c` is typed as `unknown` because the middleware never reads it. Pass any object as `c` and an async function as `next`. The package's own tests do this. See `test/ownerMiddleware.test.ts`.

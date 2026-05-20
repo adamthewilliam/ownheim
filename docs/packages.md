@@ -5,7 +5,7 @@ Install `@ownheim/core` first, then add only the adapters your project needs.
 | Package | Purpose |
 |---|---|
 | `@ownheim/core` | Configuration helpers, ownership scope propagation, `OwnedError`, manifest registration, logging and tracing primitives |
-| `@ownheim/cli` | `ownheim generate`, `check`, `coverage`, and `trace` commands |
+| `@ownheim/cli` | `ownheim generate`, `check`, and `coverage` commands |
 | `@ownheim/build` | Source analysis, artifact generation helpers, and esbuild plugin |
 | `@ownheim/express` | Express entrypoint owner middleware |
 | `@ownheim/hono` | Hono entrypoint owner middleware |

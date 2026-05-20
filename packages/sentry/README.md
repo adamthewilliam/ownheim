@@ -1,16 +1,16 @@
 # @ownheim/sentry
 
-Tag every Sentry event with the team that owns the code, and push your `CODEOWNERS` file to Sentry so issues route to the right GitHub team automatically.
+Tag Sentry events with Ownheim ownership context.
 
-This is an adapter — `@sentry/*` is your dependency, not ours. The runtime piece registers an event processor on the Sentry client you already have. The build-time piece is a one-shot helper for your release pipeline.
+This is an adapter — `@sentry/*` is your dependency, not ours. Ownheim only needs a client with `addEventProcessor`.
 
 ## Install
 
 ```bash
-bun add @ownheim/sentry @ownheim/runtime @ownheim/core
+bun add @ownheim/sentry @ownheim/core
 ```
 
-You'll also need whichever Sentry SDK you're using (`@sentry/node`, `@sentry/bun`, `@sentry/browser`, etc.). Ownheim doesn't pin a version. The adapter only needs `client.addEventProcessor`, which has been stable for a long time.
+You'll also need whichever Sentry SDK you're using (`@sentry/node`, `@sentry/bun`, `@sentry/browser`, etc.).
 
 ## Tag events at runtime
 
@@ -22,19 +22,17 @@ Sentry.init({ dsn: process.env.SENTRY_DSN });
 instrumentSentry(Sentry.getClient()!);
 ```
 
-That's it. Every event Sentry sends (exceptions, messages, transactions) now carries a `team` tag. You can filter, alert, and route on it from the Sentry UI.
+Every processed event is merged with Ownheim tags such as `ownheim.entrypoint_team`, `ownheim.code_team`, and `ownheim.responder_team`.
 
-There are three ways the team gets resolved, in order:
+Ownership is resolved from three layers:
 
-1. **`OwnedError`** on the captured exception. Throw `new OwnedError('msg', 'Billing')` and the team rides with the error wherever it goes.
-2. **`runWithEntrypointOwner` scope.** Wrap a request handler and any error captured inside picks up the scope's owner.
-3. **Stack-frame manifest lookup.** If you've loaded a manifest (built from `ownheim.config.ts`), the processor walks the event's stack frames bottom-up, skips `node_modules` / `node:` internals / `in_app: false` frames, and asks the manifest who owns the first file that matches.
-
-If none of those resolve, you get the fallback (`'unowned'` by default).
+1. **Responder ownership** from an `OwnedError` or an error annotated with `withResponderTeam`.
+2. **Entrypoint ownership** from `runWithEntrypointOwner` scope.
+3. **Code ownership** from stack-frame manifest lookup, falling back to `unowned` by default.
 
 ```ts
-// scope-based
-import { runWithEntrypointOwner } from '@ownheim/runtime/runWithEntrypointOwner';
+import { OwnedError } from '@ownheim/core/OwnedError';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 
 app.get('/users/:id', (req, res) =>
   runWithEntrypointOwner('Identity', async () => {
@@ -42,63 +40,43 @@ app.get('/users/:id', (req, res) =>
   }),
 );
 
-// error-based
-import { OwnedError } from '@ownheim/core/OwnedError';
-throw new OwnedError('user not found', 'Identity');
+throw new OwnedError('user not found', {
+  responderTeam: 'Identity',
+});
 ```
 
-### Options
+## Options
 
 ```ts
 instrumentSentry(client, {
-  fallback: 'platform',     // default tag value when nothing resolves
-  tagKey: 'sentry.team',    // override the tag key (default: 'team')
+  fallbackCodeTeam: 'platform',
+  tags: {
+    entrypointTeam: 'ownheim.entrypoint_team',
+    codeTeam: 'ownheim.code_team',
+    responderTeam: 'ownheim.responder_team',
+  },
 });
 ```
 
-I'd leave `tagKey` alone unless `team` is already meaningful in your Sentry org. Sentry's built-in alert routing and search work with any tag, but other tools assume the conventional name.
+## Manifest lookup
 
-### Why the manifest lookup matters
-
-The `OwnedError` and `runWithEntrypointOwner` paths cover the cases you instrument explicitly. The stack-frame fallback covers everything else — uncaught errors from cron jobs, third-party callbacks, anywhere you forgot to wrap. If you've generated an ownership manifest from `ownheim.config.ts`, you get sensible team tagging on errors you didn't even know existed. That's most of the value of this package.
-
-Without a manifest loaded, the third step is a no-op and you fall through to the fallback. That's fine for getting started. Add the manifest later.
-
-## Sync CODEOWNERS to Sentry
-
-Sentry has its own ownership system. If you point it at your `CODEOWNERS` file, it'll auto-assign issues to the matching GitHub team. The `syncCodeowners` helper pushes the file to Sentry's API so you don't have to paste it into the UI every time it changes.
-
-This is a build-time / CI utility, not something you call from your app:
+Register the generated ownership manifest during application startup to let Sentry events resolve `ownheim.code_team` from stack frames:
 
 ```ts
-// scripts/sync-sentry-codeowners.ts
-import { readFile } from 'node:fs/promises';
-import { syncCodeowners } from '@ownheim/sentry/syncCodeowners';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
+import manifest from './dist/ownheim-manifest.json' with { type: 'json' };
 
-const result = await syncCodeowners({
-  authToken: process.env.SENTRY_AUTH_TOKEN!,
-  organization: 'acme',
-  project: 'api',
-  codeowners: await readFile('.github/CODEOWNERS', 'utf8'),
-});
-
-if (!result.ok) {
-  console.error(`Sentry rejected the codeowners file: ${result.status}`);
-  process.exit(1);
-}
+registerOwnershipManifest(manifest);
 ```
 
-Run it from a GitHub Action after `ownheim generate` regenerates `.github/CODEOWNERS`. The token needs `project:write` scope.
-
-The function takes an optional `endpoint` (defaults to `https://sentry.io/api/0`) for self-hosted Sentry, and an optional `fetchImpl` mostly for testing.
+Without a manifest, Sentry still gets responder and entrypoint ownership. Code ownership falls back to `fallbackCodeTeam` or `unowned`.
 
 ## Caveats
 
-- Calling `instrumentSentry` twice registers two processors and you'll merge `team` twice. Idempotent it isn't. Call it once at boot.
-- The processor mutates `event.tags` directly rather than returning a new event. Sentry's contract allows this; just be aware if you're chaining processors.
-- Stack-frame lookup needs filenames Sentry can match against your manifest keys. If your build mangles paths (bundling, sourcemap stripping), the manifest fallback will miss. The `OwnedError` and scope paths still work.
-- `syncCodeowners` overwrites the project's codeowners config. There's no diff. If someone edited it in the Sentry UI, that edit goes away on the next sync. This is the point. `ownheim.config.ts` is the source of truth.
+- `instrumentSentry` is idempotent for a client; calling it twice registers one processor.
+- The processor mutates `event.tags` directly rather than returning a new event object. Sentry's processor contract allows this.
+- Stack-frame lookup needs filenames Sentry can match against your manifest keys. If your build mangles paths, responder and entrypoint ownership still work.
 
 ## Testing without Sentry
 
-`SentryClient` and `SentryEventProcessor` are structural types. You can build a mock client with a single `addEventProcessor` method, capture the registered processor, and call it directly with synthetic events. The package's tests do exactly this. See `src/instrument.test.ts`.
+`SentryClient` and `SentryEventProcessor` are structural types. You can build a mock client with a single `addEventProcessor` method, capture the registered processor, and call it directly with synthetic events. The package's tests do exactly this.

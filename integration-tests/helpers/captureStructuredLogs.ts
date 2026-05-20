@@ -23,12 +23,13 @@ export function createCapturedLogger(capture: CapturedLogs): TestLogger {
   const write = (level: LogLevel, fields: Readonly<Record<string, unknown>>, error?: unknown) => {
     const message = typeof fields.msg === 'string' ? fields.msg : '';
     const responderTeam = walkResponderTeamChain(error);
+    const entrypointTeam = currentEntrypointOwner();
     const line = formatOwnedLogEntry({
       level,
       message,
       fields,
       error,
-      entrypointTeam: currentEntrypointOwner(),
+      ...(entrypointTeam === undefined ? {} : { entrypointTeam }),
       ...(responderTeam === undefined ? {} : { responderTeam }),
     });
     (capture.entries as CapturedLogEntry[]).push({ level, line });

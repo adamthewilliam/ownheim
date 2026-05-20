@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/cli",
   "version": "0.1.0",
-  "description": "ownheim CLI: generate | check | coverage | trace | diff",
+  "description": "ownheim CLI: generate | check | coverage",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -49,16 +49,6 @@
       "require": {
         "types": "./dist/commands/coverage.d.cts",
         "default": "./dist/commands/coverage.cjs"
-      }
-    },
-    "./commands/trace": {
-      "import": {
-        "types": "./dist/commands/trace.d.mts",
-        "default": "./dist/commands/trace.mjs"
-      },
-      "require": {
-        "types": "./dist/commands/trace.d.cts",
-        "default": "./dist/commands/trace.cjs"
       }
     }
   },

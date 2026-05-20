@@ -106,7 +106,6 @@ Ownheim generates:
 bunx ownheim generate      # regenerate CODEOWNERS + runtime manifest
 bunx ownheim check         # fail if generated ownership artifacts drift
 bunx ownheim coverage      # report explicit ownership coverage
-bunx ownheim trace <file>  # explain why a path resolves to an owner
 ```
 
 ## Recommended CI policy
@@ -118,4 +117,3 @@ bunx ownheim check
 bunx ownheim coverage
 ```
 
-Use `trace` locally when a file resolves to an unexpected team.

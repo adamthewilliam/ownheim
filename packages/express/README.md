@@ -7,7 +7,7 @@ This is an Express middleware factory. It wraps the rest of the request chain in
 ## Install
 
 ```bash
-bun add @ownheim/express @ownheim/runtime @ownheim/core
+bun add @ownheim/express @ownheim/core
 ```
 
 You also need `express`. Ownheim doesn't pin a version. Anything with the standard `(req, res, next)` middleware shape works — including Express 4 and 5.
@@ -16,7 +16,7 @@ You also need `express`. Ownheim doesn't pin a version. Anything with the standa
 
 ```ts
 import express from 'express';
-import { entrypointOwner } from '@ownheim/express/entrypointOwner';
+import { entrypointOwner } from '@ownheim/express';
 
 const app = express();
 
@@ -71,14 +71,14 @@ Express 4 works too, but if your handlers return promises and you don't `.catch`
 
 ## Pairing with `@ownheim/sentry` and `@ownheim/datadog`
 
-Nothing extra to wire up. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the team from the scope:
+Nothing extra to wire up. Once `instrumentSentry` / `instrumentDatadog` are running, every error and span emitted from a route picks up the team from the scope:
 
 ```
 entrypointOwner('Billing')
     → runWithEntrypointOwner('Billing', () => next())
         → handler runs
             → throws or starts a span
-                → installSentry / instrumentDatadog reads currentEntrypointOwner()
+                → instrumentSentry / instrumentDatadog reads currentEntrypointOwner()
                     → tag = 'Billing'
 ```
 
@@ -89,4 +89,4 @@ entrypointOwner('Billing')
 
 ## Testing without `express`
 
-`ExpressMiddleware` and `ExpressNext` are structural — `req` and `res` are typed as `unknown` because the middleware never reads them. Pass empty objects and a callback. The package's own tests do this. See `src/entrypointOwner.test.ts`.
+`ExpressMiddleware` and `ExpressNext` are structural — `req` and `res` are typed as `unknown` because the middleware never reads them. Pass empty objects and a callback. The package's own tests do this. See `test/ownerMiddleware.test.ts`.

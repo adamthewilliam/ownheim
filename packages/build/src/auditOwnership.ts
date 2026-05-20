@@ -147,7 +147,7 @@ export function explainOwnershipAudit(audit: OwnershipAudit): OwnershipTrace {
   if (audit.resolved.source === 'fallback') {
     return {
       file: audit.file,
-      explanation: `${audit.file} -> ${audit.resolved.teams.join(', ')} (fallback)`,
+      explanation: `${audit.file} -> ${audit.resolved.teams.join(', ')} (FALLBACK)`,
     };
   }
   const jsdocNote = audit.jsdocOwner ? ` (jsdoc '@owner ${audit.jsdocOwner}' was unknown, ignored)` : '';

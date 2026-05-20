@@ -96,10 +96,10 @@ const logger = pino({ mixin: ownershipMixin() });
 
 ```ts
 import * as Sentry from '@sentry/node';
-import { installSentry } from '@ownheim/sentry';
+import { instrumentSentry } from '@ownheim/sentry';
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
-installSentry(Sentry);
+instrumentSentry(Sentry.getClient()!);
 ```
 
 ### OpenTelemetry

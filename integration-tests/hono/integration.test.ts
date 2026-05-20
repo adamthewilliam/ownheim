@@ -4,7 +4,7 @@ import { captureStructuredLogs, createCapturedLogger } from '../helpers/captureS
 import { Hono } from 'hono';
 import { entrypointOwner } from '@ownheim/hono/ownerMiddleware';
 
-// The middleware factory in src/entrypointOwner.ts is typed against an arbitrary
+// The middleware factory in src/ownerMiddleware.ts is typed against an arbitrary
 // `(c, next) => Promise<void>` shape; Hono's actual middleware signature is the
 // same positionally so we cast at the call site to keep Hono's typing happy.
 type HonoMiddleware = Parameters<Hono['use']>[1];

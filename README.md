@@ -144,7 +144,7 @@ bun run check:treeshaking
 | Package | Purpose |
 | --- | --- |
 | `@ownheim/core` | Ownership resolution, scope propagation, logging, and tracing primitives. |
-| `@ownheim/cli` | `generate`, `check`, `coverage`, `trace`, and `diff` commands. |
+| `@ownheim/cli` | `generate`, `check`, and `coverage` commands. |
 | `@ownheim/build` | AST walker, rule resolver, generators, and esbuild plugin. |
 | `@ownheim/express` / `@ownheim/hono` | Framework middleware for per-route team tagging. |
 | `@ownheim/trpc` / `@ownheim/orpc` | Procedure middleware for ownership-aware RPC telemetry. |

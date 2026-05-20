@@ -7,7 +7,7 @@ This is an oRPC middleware. It wraps the procedure's handler in a `runWithEntryp
 ## Install
 
 ```bash
-bun add @ownheim/orpc @ownheim/runtime @ownheim/core
+bun add @ownheim/orpc @ownheim/core
 ```
 
 You also need `@orpc/server`. Ownheim doesn't pin a version. Anything with the standard `.use(middleware)` builder API works.
@@ -20,7 +20,7 @@ You also need `@orpc/server`. Ownheim doesn't pin a version. Anything with the s
 
 ```ts
 import { os } from '@orpc/server';
-import { entrypointProcedure } from '@ownheim/orpc/entrypointProcedure';
+import { entrypointProcedure } from '@ownheim/orpc';
 
 const billing = entrypointProcedure(os, 'Billing');
 const identity = entrypointProcedure(os, 'Identity');
@@ -42,7 +42,7 @@ const billingAuthed = entrypointProcedure(protectedProcedure, 'Billing');
 If you'd rather use `.use()` yourself, `entrypointOwner(owner)` returns the bare middleware function:
 
 ```ts
-import { entrypointOwner } from '@ownheim/orpc/entrypointOwner';
+import { entrypointOwner } from '@ownheim/orpc';
 
 const billing = os
   .use(authMiddleware)
@@ -66,14 +66,14 @@ oRPC supports both shapes natively. `os.use(...)` is the single-line case; defin
 
 ## Pairing it with `@ownheim/sentry` and `@ownheim/datadog`
 
-Nothing extra to do. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope:
+Nothing extra to do. Once `instrumentSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope:
 
 ```
 entrypointProcedure(os, 'Billing')
     → runWithEntrypointOwner('Billing', () => next())
         → handler does work
             → throws or starts a span
-                → installSentry / instrumentDatadog reads currentEntrypointOwner()
+                → instrumentSentry / instrumentDatadog reads currentEntrypointOwner()
                     → tag = 'Billing'
 ```
 
@@ -87,4 +87,4 @@ If the handler throws an `OwnedError` with a *different* owner, that wins (error
 
 ## Testing without `@orpc/server`
 
-The exported types (`OrpcMiddleware`, `OrpcMiddlewareOpts`, `OrpcProcedureBuilder`) are structural. You can hand-roll a mock builder with a `.use()` method and test owner tagging without pulling oRPC in. The package's own tests do this. See `src/entrypointProcedure.test.ts` for a working example of a mock that runs a middleware chain.
+The exported types (`OrpcMiddleware`, `OrpcMiddlewareOpts`, `OrpcProcedureBuilder`) are structural. You can hand-roll a mock builder with a `.use()` method and test owner tagging without pulling oRPC in. The package's own tests do this. See `test/ownedProcedure.test.ts` for a working example of a mock that runs a middleware chain.

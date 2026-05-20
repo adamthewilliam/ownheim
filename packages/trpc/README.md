@@ -7,7 +7,7 @@ This is a tRPC middleware. It wraps the procedure's handler in a `runWithEntrypo
 ## Install
 
 ```bash
-bun add @ownheim/trpc @ownheim/runtime @ownheim/core
+bun add @ownheim/trpc @ownheim/core
 ```
 
 You also need `@trpc/server`. Ownheim doesn't pin a version. Anything with the standard `.use(middleware)` builder API (v10, v11) works.
@@ -20,7 +20,7 @@ You also need `@trpc/server`. Ownheim doesn't pin a version. Anything with the s
 
 ```ts
 import { initTRPC } from '@trpc/server';
-import { entrypointProcedure } from '@ownheim/trpc/entrypointProcedure';
+import { entrypointProcedure } from '@ownheim/trpc';
 
 const t = initTRPC.create();
 
@@ -44,7 +44,7 @@ const billingAuthed = entrypointProcedure(protectedProcedure, 'Billing');
 If you'd rather use `.use()` yourself, `entrypointOwner(owner)` returns the bare middleware function:
 
 ```ts
-import { entrypointOwner } from '@ownheim/trpc/entrypointOwner';
+import { entrypointOwner } from '@ownheim/trpc';
 
 const billingProcedure = t.procedure
   .use(authMiddleware)
@@ -70,14 +70,14 @@ In practice this means: do a one-time audit, replace every `t.procedure` with an
 
 ## Pairing it with `@ownheim/sentry` and `@ownheim/datadog`
 
-Nothing extra to do. Once `installSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope. The owner flows through:
+Nothing extra to do. Once `instrumentSentry` / `instrumentDatadog` are running, every error and span emitted from inside a procedure picks up the owner from the scope. The owner flows through:
 
 ```
 entrypointProcedure(builder, 'Billing')
     → runWithEntrypointOwner('Billing', () => handler())
         → handler does work
             → throws or starts a span
-                → installSentry / instrumentDatadog reads currentEntrypointOwner()
+                → instrumentSentry / instrumentDatadog reads currentEntrypointOwner()
                     → tag = 'Billing'
 ```
 
@@ -91,4 +91,4 @@ If the handler throws an `OwnedError` with a *different* owner, that wins (error
 
 ## Testing without `@trpc/server`
 
-The exported types (`TrpcMiddleware`, `TrpcMiddlewareOpts`, `TrpcProcedureBuilder`) are structural. You can hand-roll a mock builder with a `.use()` method and test owner tagging without pulling in tRPC. The package's own tests do this. See `src/entrypointProcedure.test.ts` for a working example of a mock that runs a middleware chain.
+The exported types (`TrpcMiddleware`, `TrpcMiddlewareOpts`, `TrpcProcedureBuilder`) are structural. You can hand-roll a mock builder with a `.use()` method and test owner tagging without pulling in tRPC. The package's own tests do this. See `test/ownedProcedure.test.ts` for a working example of a mock that runs a middleware chain.

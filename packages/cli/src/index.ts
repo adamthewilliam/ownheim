@@ -3,11 +3,10 @@ import { resolve } from 'node:path';
 import { runCheck } from './commands/check.ts';
 import { runCoverage } from './commands/coverage.ts';
 import { runGenerate } from './commands/generate.ts';
-import { runTrace } from './commands/trace.ts';
 import { loadConfig } from './loadConfig.ts';
 
 async function main(): Promise<number> {
-  const [command, ...args] = process.argv.slice(2);
+  const [command] = process.argv.slice(2);
   const projectRoot = resolve(process.cwd());
 
   if (!command || command === '--help' || command === '-h') {
@@ -22,8 +21,6 @@ async function main(): Promise<number> {
       return await cmdCheck(projectRoot);
     case 'coverage':
       return await cmdCoverage(projectRoot);
-    case 'trace':
-      return await cmdTrace(projectRoot, args[0]);
     default:
       console.error(`Unknown command: ${command}`);
       printUsage();
@@ -72,17 +69,6 @@ async function cmdCoverage(projectRoot: string): Promise<number> {
   return result.unowned > 0 ? 1 : 0;
 }
 
-async function cmdTrace(projectRoot: string, file: string | undefined): Promise<number> {
-  if (!file) {
-    console.error('Usage: ownheim trace <file>');
-    return 1;
-  }
-  const loaded = await loadConfig(projectRoot);
-  const result = await runTrace(loaded, file);
-  console.log(result.explanation);
-  return 0;
-}
-
 function printUsage(): void {
   console.log(`ownheim - find a home for every line of code
 
@@ -90,7 +76,6 @@ Usage:
   ownheim generate           Regenerate CODEOWNERS + manifest from ownheim.config.ts
   ownheim check              Fail if generated CODEOWNERS differs from committed
   ownheim coverage           Report % of files with explicit (non-fallback) owner
-  ownheim trace <file>       Show resolved owner for a path with rule trace
 `);
 }
 
