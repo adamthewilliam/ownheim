@@ -63,4 +63,17 @@ describe('generateCodeowners', () => {
       /missing a GitHub CODEOWNERS handle/,
     );
   });
+
+  it('throws instead of emitting an invalid fallback owner line', () => {
+    const malformed = defineOwnheim({
+      fallback: 'Platform',
+      teams: {
+        Platform: { github: '' },
+      },
+    });
+
+    expect(() => generateCodeowners({ config: malformed, resolved: [] })).toThrow(
+      /missing a GitHub CODEOWNERS handle/,
+    );
+  });
 });

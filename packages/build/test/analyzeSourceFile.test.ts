@@ -113,6 +113,12 @@ export class BillingError extends OwnedError { constructor(m: string) { super(m,
     expect((twice.match(/const __OWNER__\s*=/g) ?? []).length).toBe(1);
   });
 
+  it('can transform the same analyzed file with different owners', () => {
+    const analyzed = analyzeSourceFile('a.ts', `export const x = 1;\n`);
+    expect(analyzed.transform('Billing')).toContain('const __OWNER__ = "Billing";');
+    expect(analyzed.transform('Identity')).toContain('const __OWNER__ = "Identity";');
+  });
+
   it('does not rewrite tracer imports; users bring their own tracer', () => {
     const out = analyzeSourceFile('a.ts', `import { tracer } from '@ownheim/core';\n`).transform('Billing');
     expect(out).toContain(`import { tracer } from '@ownheim/core';`);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { defineOwnheim } from '@ownheim/core/defineOwnheim';
-import { auditSourceFile, auditSourceFiles } from '../src/auditOwnership.ts';
+import { auditSourceFile, auditSourceFiles, explainOwnershipAudit } from '../src/auditOwnership.ts';
 
 const config = defineOwnheim({
   fallback: 'Platform',
@@ -70,6 +70,25 @@ describe('auditSourceFile', () => {
     expect(audit.status).toBe('invalid-jsdoc-owner');
     expect(audit.jsdocOwner).toBe('Nope');
     expect(audit.resolved).toBeUndefined();
+  });
+
+  it('does not mask invalid JSDoc owners with a rule or fallback', () => {
+    const audit = auditSourceFile(config, {
+      filePath: 'tools/deploy.ts',
+      sourceText: '/** @owner Nope */\nexport const deploy = true;',
+    });
+
+    expect(audit.status).toBe('invalid-jsdoc-owner');
+    expect(audit.resolved).toBeUndefined();
+  });
+
+  it('explains fallback ownership without an undefined matched glob', () => {
+    const audit = auditSourceFile(config, {
+      filePath: 'tools/deploy.ts',
+      sourceText: 'export const deploy = true;',
+    });
+
+    expect(explainOwnershipAudit(audit).explanation).toBe('tools/deploy.ts -> Platform (fallback)');
   });
 
   it('summarizes project ownership audits for downstream callers', () => {

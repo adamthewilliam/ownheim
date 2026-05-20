@@ -1,25 +1,22 @@
 // A3 — Dynamic import + TLA contract tests.
 //
-// Goal: assert that the @ownheim/build esbuild plugin's import-rewrite +
-// `__OWNER__` injection survive less-common module shapes:
+// Goal: assert that the @ownheim/build esbuild plugin's `__OWNER__`
+// injection survives less-common module shapes:
 //   1. dynamic `import()` of an owned module
 //   2. dynamic `import()` inside a try/catch
 //   3. top-level await in an owned module
 //
 // We deliberately do NOT use the local `buildBundleFixture` helper here.
 // That harness is locked to `platform: 'neutral'` for ESM and does
-// not expose `nodePaths`. A runnable bundle that imports `@ownheim/core`
-// requires (a) `platform: 'node'` so `node:async_hooks` (used by the
-// runtime's AsyncLocalStorage) resolves, and (b) `nodePaths` pointing at
-// the workspace's `node_modules` so the rewritten
-// `@ownheim/core/logging/createLogger` subpath specifier resolves from the
-// off-tree fixture root. Extending the shared harness is out of scope per
+// not expose `nodePaths`. We keep `platform: 'node'` and `nodePaths` here
+// so the fixture matches real package resolution from an off-tree root.
+// Extending the shared harness is out of scope per
 // the task constraints (only `packages/build/test/contract/` may change).
 //
 // Each test:
 //   (a) writes fixture files into a fresh real-path tmp dir,
 //   (b) bundles via esbuild + the real `ownheim()` plugin export,
-//   (c) asserts the bundle text contains a `createLogger("<owner>")`
+//   (c) asserts the bundle text contains the injected owner literal
 //       initializer originating in `feature.ts`,
 //   (d) executes the bundle in a subprocess via `runBundleInSubprocess`
 //       and parses the structured log line off stdout.
@@ -72,7 +69,7 @@ async function buildContractFixture<TTeams extends Record<string, Team>>(
     write: false,
     format: 'esm',
     platform: 'node',
-    // Make `@ownheim/core/logging/createLogger` resolvable from a fixture root
+    // Make workspace packages resolvable from a fixture root
     // that lives outside the workspace tree. Use the monorepo root rather
     // than `process.cwd()` so the test passes regardless of where it's
     // invoked from (workspace root, package dir, or via turbo).
@@ -97,24 +94,13 @@ const teams: Record<string, Team> = {
 const billingConfig: OwnheimConfig<typeof teams> = { teams };
 
 /**
- * Assert that the bundle contains the rewritten factory binding originating
- * in the owned `feature.ts`. esbuild emits a `// src/feature.ts` banner
- * comment above each module's chunk; the `createLogger("billing")` call we
- * assert on is the plugin's injected initializer.
+ * Assert that the bundle contains owner injection originating in the owned
+ * `feature.ts`. esbuild emits a `// src/feature.ts` banner comment above each
+ * module's chunk; the `"billing"` literal is the plugin-injected owner.
  */
-function expectFactoryBindingForFeature(bundleText: string): void {
-  // Module-banner comment — survives both inline and split chunks because
-  // esbuild always tags each module's IIFE/closure with its source path
-  // ("// src/feature.ts").
+function expectOwnerInjectionForFeature(bundleText: string): void {
   expect(bundleText).toContain('src/feature.ts');
-  // The plugin's per-owner factory initializer. esbuild may emit it as
-  // `const logger = createLogger("billing")` (top-level), as a hoisted
-  // `var logger;` + `logger = createLogger("billing")` pair (when the
-  // owned module is wrapped in an `__esm` chunk for dynamic-import
-  // splitting), or as `var logger = createLogger("billing")`. All three
-  // shapes preserve the team contract — the literal owner string lands
-  // inside `createLogger(...)`.
-  expect(bundleText).toMatch(/logger\s*=\s*createLogger\("billing"\)/);
+  expect(bundleText).toContain('"billing"');
 }
 
 function parseFirstJsonLine(stdout: string): Record<string, unknown> {
@@ -132,9 +118,9 @@ describe('A3 — dynamic import + TLA contract', () => {
         {
           entry: `await import('./feature.ts').then((m) => m.run());\n`,
           feature: [
-            `import { logger } from '@ownheim/core';`,
+            ``,
             `export function run() {`,
-            `  logger.info({ msg: 'hi-from-feature' });`,
+            `  console.log(JSON.stringify({ team: __OWNER__, msg: 'hi-from-feature' }));`,
             `}`,
             ``,
           ].join('\n'),
@@ -143,7 +129,7 @@ describe('A3 — dynamic import + TLA contract', () => {
       );
 
       try {
-        expectFactoryBindingForFeature(fixture.text);
+        expectOwnerInjectionForFeature(fixture.text);
 
         const run = await runBundleInSubprocess(fixture.text, { runtime: 'bun' });
         expect(run.code).toBe(0);
@@ -171,9 +157,9 @@ describe('A3 — dynamic import + TLA contract', () => {
             ``,
           ].join('\n'),
           feature: [
-            `import { logger } from '@ownheim/core';`,
+            ``,
             `export function run() {`,
-            `  logger.info({ msg: 'hi-from-try-catch' });`,
+            `  console.log(JSON.stringify({ team: __OWNER__, msg: 'hi-from-try-catch' }));`,
             `}`,
             ``,
           ].join('\n'),
@@ -183,9 +169,9 @@ describe('A3 — dynamic import + TLA contract', () => {
 
       try {
         // esbuild may either inline the dynamic chunk into the bundle or
-        // split it; either way, the factory-binding initializer must be
-        // present and tagged with `src/feature.ts`.
-        expectFactoryBindingForFeature(fixture.text);
+        // split it; either way, the owner injection must be present and
+        // tagged with `src/feature.ts`.
+        expectOwnerInjectionForFeature(fixture.text);
 
         const run = await runBundleInSubprocess(fixture.text, { runtime: 'bun' });
         expect(run.code).toBe(0);
@@ -203,10 +189,10 @@ describe('A3 — dynamic import + TLA contract', () => {
       const fixture = await buildContractFixture(
         {
           // Static import of the owned module; the entry itself contains no
-          // logger calls. TLA lives in feature.ts.
+          // owner-tagged work. TLA lives in feature.ts.
           entry: `import './feature.ts';\n`,
           feature: [
-            `import { logger } from '@ownheim/core';`,
+            ``,
             ``,
             `async function someAsync() {`,
             `  return 'ready';`,
@@ -215,7 +201,7 @@ describe('A3 — dynamic import + TLA contract', () => {
             `// Top-level await: requires ESM target.`,
             `await someAsync();`,
             ``,
-            `logger.info({ msg: 'hi-after-tla' });`,
+            `console.log(JSON.stringify({ team: __OWNER__, msg: 'hi-after-tla' }));`,
             ``,
           ].join('\n'),
         },
@@ -223,7 +209,7 @@ describe('A3 — dynamic import + TLA contract', () => {
       );
 
       try {
-        expectFactoryBindingForFeature(fixture.text);
+        expectOwnerInjectionForFeature(fixture.text);
 
         const run = await runBundleInSubprocess(fixture.text, { runtime: 'bun' });
         expect(run.code).toBe(0);

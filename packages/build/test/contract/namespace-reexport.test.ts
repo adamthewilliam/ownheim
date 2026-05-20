@@ -6,7 +6,7 @@
 // in CI — not to prescribe what Phase 2 should do. Phase 2 follow-up
 // markers live at the bottom as `it.todo`.
 //
-// Observed behavior (May 2026, RFC 0006 Phase 1, see analyzeSourceFile.ts:8-22):
+// Observed behavior (May 2026, RFC 0006 Phase 1):
 //   1. Namespace imports `import * as ns from '@ownheim/core'` are passed
 //      through verbatim by analyzeSourceFile. The `ns.logger.info(...)` call
 //      site is NOT rewritten to `const logger = createLogger(__OWNER__)`.

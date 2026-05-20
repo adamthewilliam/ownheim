@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/node';
 import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
 import { entrypointOwner } from '@ownheim/express';
 import { ownershipFromError, ownershipMixin } from '@ownheim/pino';
-import { installSentry } from '@ownheim/sentry';
+import { instrumentSentry } from '@ownheim/sentry';
 import { chargeCustomer } from './billing/charge.ts';
 import { requireUser } from './identity/session.ts';
 
@@ -19,7 +19,7 @@ try {
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({ dsn: process.env.SENTRY_DSN });
-  installSentry(Sentry.getClient()!);
+  instrumentSentry(Sentry.getClient()!);
 }
 
 const logger = pino({ mixin: ownershipMixin({ fallbackCodeTeam: 'Platform' }) });
@@ -28,14 +28,16 @@ app.use(express.json());
 
 const billingRouter = express.Router();
 billingRouter.use(entrypointOwner('Billing'));
-billingRouter.post('/charge', async (req, res, next) => {
-  try {
-    const payment = await chargeCustomer(Number(req.body.amount));
-    logger.info({ payment }, 'charged customer');
-    res.json(payment);
-  } catch (error) {
-    next(error);
-  }
+billingRouter.post('/charge', (req, res, next) => {
+  void new Promise<void>((resolve, reject) => {
+    chargeCustomer(Number(req.body.amount))
+      .then((payment) => {
+        logger.info({ payment }, 'charged customer');
+        res.json(payment);
+        resolve();
+      })
+      .catch(reject);
+  }).catch(next);
 });
 
 const identityRouter = express.Router();

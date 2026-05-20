@@ -9,8 +9,8 @@ export default defineConfig({
     'src/generateCodeowners.ts',
     'src/generateManifest.ts',
     'src/generateArtifacts.ts',
-    'src/esbuildPlugin.ts'
-],
+    'src/esbuildPlugin.ts',
+  ],
   format: ['esm', 'cjs'],
   dts: true,
   external: [
@@ -21,8 +21,8 @@ export default defineConfig({
     'picomatch',
     'picomatch/*',
     'ts-morph',
-    'ts-morph/*'
-],
+    'ts-morph/*',
+  ],
   clean: true,
   sourcemap: true,
   treeshake: true,

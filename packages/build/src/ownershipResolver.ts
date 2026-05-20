@@ -34,6 +34,8 @@ export function createOwnershipResolver<TTeams extends Record<string, Team>>(
   const fallbackTeam = getFallbackTeam(config);
 
   const resolve = (input: ResolveInput): ResolvedOwnership | undefined => {
+    // Invalid explicit ownership is treated as an error, not silently ignored.
+    // Callers can surface this as an audit finding instead of masking it with a rule or fallback.
     if (input.jsdocOwner) {
       if (input.jsdocOwner in config.teams) {
         return {

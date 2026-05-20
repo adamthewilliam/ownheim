@@ -21,9 +21,9 @@ export interface FileExtraction {
 
 export interface AnalyzedFile extends FileExtraction {
   /**
-   * Produce the rewritten source text for this file, given the
-   * caller-resolved owner string. Pure with respect to the parsed AST.
-   * Calling this multiple times with different owners is well-defined.
+   * Produce source text with the caller-resolved owner injected as `__OWNER__`.
+   * Pure with respect to the original source text: calling this multiple times
+   * with different owners is well-defined.
    */
   readonly transform: (resolvedOwner: string) => string;
 }

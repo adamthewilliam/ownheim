@@ -1,6 +1,9 @@
-import { SyntaxKind, type SourceFile } from 'ts-morph';
+import { Project, SyntaxKind, type SourceFile } from 'ts-morph';
 
-export function transformSourceFile(sourceFile: SourceFile, resolvedOwner: string): string {
+/** Returns source text with a file-level __OWNER__ constant inserted after directive prologues. */
+export function injectResolvedOwner(filePath: string, sourceText: string, resolvedOwner: string): string {
+  const project = new Project({ useInMemoryFileSystem: true });
+  const sourceFile = project.createSourceFile(filePath, sourceText, { overwrite: true });
   injectOwnerConstant(sourceFile, JSON.stringify(resolvedOwner));
   return sourceFile.getFullText();
 }
@@ -9,7 +12,10 @@ function injectOwnerConstant(sourceFile: SourceFile, ownerLiteral: string): void
   for (const stmt of sourceFile.getStatements()) {
     if (stmt.getKind() !== SyntaxKind.VariableStatement) continue;
     const text = stmt.getText();
-    if (/^\s*(?:export\s+)?const\s+__OWNER__\s*=/.test(text)) return;
+    if (/^\s*(?:export\s+)?const\s+__OWNER__\s*=/.test(text)) {
+      stmt.replaceWithText(`const __OWNER__ = ${ownerLiteral};`);
+      return;
+    }
   }
 
   sourceFile.insertStatements(directivePrologueEndIndex(sourceFile), `const __OWNER__ = ${ownerLiteral};`);

@@ -1,7 +1,6 @@
 import type { OwnheimConfig, ResolvedOwnership, Team } from '@ownheim/core/types';
 import { createSourceAnalyzer, extractFromSourceText, type FileExtraction } from './analyzeSourceFile.ts';
 import { createOwnershipResolver } from './ownershipResolver.ts';
-import { resolveOwnerForFile } from './resolveRules.ts';
 
 export type OwnershipAuditStatus = 'explicit' | 'fallback' | 'unowned' | 'invalid-jsdoc-owner';
 
@@ -55,22 +54,12 @@ export function auditSourceFile<TTeams extends Record<string, Team>>(
   input: AuditSourceFileInput,
 ): OwnershipAudit {
   const extraction = extractFromSourceText(input.filePath, input.sourceText);
-  const resolved = resolveOwnerForFile(config, {
+  const resolved = createOwnershipResolver(config).resolve({
     filePath: input.filePath,
     jsdocOwner: extraction.jsdocOwner,
   });
 
-  const status = determineStatus(config, extraction.jsdocOwner, resolved);
-
-  return {
-    file: input.filePath,
-    extraction,
-    jsdocOwner: extraction.jsdocOwner,
-    resolved,
-    status,
-    isExplicit: status === 'explicit',
-    needsAttention: status !== 'explicit',
-  };
+  return createOwnershipAudit(config, input.filePath, extraction, resolved);
 }
 
 export function auditSourceFiles<TTeams extends Record<string, Team>>(
@@ -85,16 +74,7 @@ export function auditSourceFiles<TTeams extends Record<string, Team>>(
       filePath: file.filePath,
       jsdocOwner: extraction.jsdocOwner,
     });
-    const status = determineStatus(config, extraction.jsdocOwner, resolved);
-    return {
-      file: file.filePath,
-      extraction,
-      jsdocOwner: extraction.jsdocOwner,
-      resolved,
-      status,
-      isExplicit: status === 'explicit',
-      needsAttention: status !== 'explicit',
-    };
+    return createOwnershipAudit(config, file.filePath, extraction, resolved);
   });
   return summarizeOwnershipAudits(audits);
 }
@@ -167,7 +147,7 @@ export function explainOwnershipAudit(audit: OwnershipAudit): OwnershipTrace {
   if (audit.resolved.source === 'fallback') {
     return {
       file: audit.file,
-      explanation: `${audit.file} -> ${audit.resolved.teams.join(', ')} (FALLBACK '${audit.resolved.matchedGlob}')`,
+      explanation: `${audit.file} -> ${audit.resolved.teams.join(', ')} (fallback)`,
     };
   }
   const jsdocNote = audit.jsdocOwner ? ` (jsdoc '@owner ${audit.jsdocOwner}' was unknown, ignored)` : '';
@@ -199,6 +179,24 @@ export function createAttentionFinding(audit: OwnershipAudit): OwnershipAttentio
     status: 'unowned',
     fixable: true,
     message: `${audit.file} has no owner: no rule matched and no fallback is configured. Add a directory rule to ownheim.config.ts or annotate the file with /** @owner <Team> */.`,
+  };
+}
+
+function createOwnershipAudit<TTeams extends Record<string, Team>>(
+  config: OwnheimConfig<TTeams>,
+  filePath: string,
+  extraction: FileExtraction,
+  resolved: ResolvedOwnership | undefined,
+): OwnershipAudit {
+  const status = determineStatus(config, extraction.jsdocOwner, resolved);
+  return {
+    file: filePath,
+    extraction,
+    jsdocOwner: extraction.jsdocOwner,
+    resolved,
+    status,
+    isExplicit: status === 'explicit',
+    needsAttention: status !== 'explicit',
   };
 }
 

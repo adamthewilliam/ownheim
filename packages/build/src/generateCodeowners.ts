@@ -33,7 +33,7 @@ export function generateCodeowners<TTeams extends Record<string, Team>>(
     });
 
   const fallbackTeam = getFallbackTeam(config);
-  const fallbackLine = fallbackTeam ? `* ${config.teams[fallbackTeam]?.github}` : undefined;
+  const fallbackLine = fallbackTeam ? `* ${githubOwners(config, [fallbackTeam], 'fallback')}` : undefined;
 
   const sections: string[] = [header.trimEnd()];
 

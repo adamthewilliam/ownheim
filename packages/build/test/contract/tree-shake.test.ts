@@ -2,7 +2,7 @@
 //
 // The ownheim esbuild plugin (packages/build/src/esbuildPlugin.ts) injects
 // per-file `__OWNER__` constants and rewrites `import { logger } from
-// '@ownheim/core'` into a `createLogger(<owner>)` factory call. Both of
+// '@ownheim/core'` into a `owner injection(<owner>)` owner-tagged call. Both of
 // these are top-level statements with apparent side effects (function
 // invocation, top-level binding) — but bundlers under aggressive
 // configuration (`minify: true, treeShaking: true, sideEffects: false`) may
@@ -116,10 +116,8 @@ describe('A4 tree-shake survival contract', () => {
   it('Scenario 1: log call inside `process.env.NODE_ENV === "production"` branch survives with team tag', async () => {
     const fixture = await bundleFixture({
       files: {
-        'src/entry.ts': `import { logger } from '@ownheim/core';
-
-if (process.env.NODE_ENV === 'production') {
-  logger.info({ msg: 'charging' });
+        'src/entry.ts': `if (process.env.NODE_ENV === 'production') {
+  console.log(JSON.stringify({ team: __OWNER__, msg: 'charging' }));
 }
 `,
       },
@@ -132,8 +130,8 @@ if (process.env.NODE_ENV === 'production') {
 
     try {
       // Documentary: under define+minify+treeShake the bundle still calls
-      // the factory with the rule-resolved owner literal at top level. If
-      // a future esbuild release inlines the factory differently this
+      // the owner injection with the rule-resolved owner literal at top level. If
+      // a future esbuild release inlines the owner injection differently this
       // string match is the canary.
       expect(fixture.text).toContain('"Billing"');
       expect(fixture.text).toContain('charging');
@@ -151,10 +149,8 @@ if (process.env.NODE_ENV === 'production') {
   it('Scenario 2: exported-but-unused `billCustomer` — if retained, team tag is correct on execution', async () => {
     const fixture = await bundleFixture({
       files: {
-        'src/entry.ts': `import { logger } from '@ownheim/core';
-
-export function billCustomer() {
-  logger.info({ msg: 'billing' });
+        'src/entry.ts': `export function billCustomer() {
+  console.log(JSON.stringify({ team: __OWNER__, msg: 'billing' }));
 }
 
 console.log('hello-from-entry');
@@ -169,14 +165,14 @@ console.log('hello-from-entry');
     try {
       // Documentary: in ESM with `format: 'esm'`, esbuild keeps exported
       // bindings (it does not know if a downstream tool will import them).
-      // So we expect both the factory call and the function body to
+      // So we expect both the owner-tagged call and the function body to
       // remain. If either of these flips in the future, that's the
       // signal to revisit the contract.
       const billCustomerRetained = fixture.text.includes('billing');
 
       if (billCustomerRetained) {
         expect(fixture.text).toContain('"Billing"');
-        // Exported function body retained → factory call retained →
+        // Exported function body retained → owner-tagged call retained →
         // team tag must be correct when invoked. The bundle's mangled
         // export name makes direct invocation awkward, so we build a
         // sibling fixture that imports + calls billCustomer through a
@@ -184,10 +180,8 @@ console.log('hello-from-entry');
         // call site reachable from the entry.
         const invokerFixture = await bundleFixture({
           files: {
-            'src/lib/billCustomer.ts': `import { logger } from '@ownheim/core';
-
-export function billCustomer() {
-  logger.info({ msg: 'billing' });
+            'src/lib/billCustomer.ts': `export function billCustomer() {
+  console.log(JSON.stringify({ team: __OWNER__, msg: 'billing' }));
 }
 `,
             'src/entry.ts': `import { billCustomer } from './lib/billCustomer.ts';
@@ -224,10 +218,10 @@ billCustomer();
     }
   });
 
-  it('Scenario 3: consumer with `sideEffects: false` — `__OWNER__` does not block tree-shaking; team tag retained when factory call is retained', async () => {
+  it('Scenario 3: consumer with `sideEffects: false` — `__OWNER__` does not block tree-shaking; team tag retained when owner-tagged call is retained', async () => {
     // Variant A — billCustomer is imported but NOT called. With
     // sideEffects: false in the consumer's package.json, the entire
-    // module (including the factory call AND the __OWNER__ constant)
+    // module (including the owner-tagged call AND the __OWNER__ constant)
     // should be eligible for DCE.
     const unused = await bundleFixture({
       files: {
@@ -236,10 +230,8 @@ billCustomer();
           type: 'module',
           sideEffects: false,
         }),
-        'src/lib/billCustomer.ts': `import { logger } from '@ownheim/core';
-
-export function billCustomer() {
-  logger.info({ msg: 'billing' });
+        'src/lib/billCustomer.ts': `export function billCustomer() {
+  console.log(JSON.stringify({ team: __OWNER__, msg: 'billing' }));
 }
 `,
         'src/entry.ts': `import { billCustomer } from './lib/billCustomer.ts';
@@ -260,10 +252,10 @@ void billCustomer;
       // break DCE.
       expect(unused.text).toContain('hello-from-entry');
 
-      // Documentary: bundlers correctly drop the unreachable factory
+      // Documentary: bundlers correctly drop the unreachable owner injection
       // call AND the __OWNER__ constant. The plugin's per-file
       // injections do NOT defeat `sideEffects: false`.
-      expect(unused.text).not.toContain('createLogger');
+      expect(unused.text).not.toContain('owner injection');
       expect(unused.text).not.toContain('billing');
       expect(unused.text).not.toContain('__OWNER__');
       // The owner literal MUST also be gone — if it were present, that
@@ -273,7 +265,7 @@ void billCustomer;
       await unused.cleanup();
     }
 
-    // Variant B — billCustomer is imported AND called. The factory must
+    // Variant B — billCustomer is imported AND called. The owner injection must
     // be retained AND the team tag must be Billing on execution.
     const used = await bundleFixture({
       files: {
@@ -282,10 +274,8 @@ void billCustomer;
           type: 'module',
           sideEffects: false,
         }),
-        'src/lib/billCustomer.ts': `import { logger } from '@ownheim/core';
-
-export function billCustomer() {
-  logger.info({ msg: 'billing' });
+        'src/lib/billCustomer.ts': `export function billCustomer() {
+  console.log(JSON.stringify({ team: __OWNER__, msg: 'billing' }));
 }
 `,
         'src/entry.ts': `import { billCustomer } from './lib/billCustomer.ts';
@@ -299,7 +289,7 @@ billCustomer();
     });
 
     try {
-      // Documentary: factory call retained alongside the function it
+      // Documentary: owner-tagged call retained alongside the function it
       // closes over; minified literal still appears.
       expect(used.text).toContain('"Billing"');
       expect(used.text).toContain('billing');

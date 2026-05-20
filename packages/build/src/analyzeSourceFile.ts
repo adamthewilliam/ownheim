@@ -1,17 +1,8 @@
-// RFC 0006 — unified per-file owner-aware preprocessing.
-//
-// One ts-morph parse per file. The same parsed `SourceFile` is reused for
-// (a) the read-only extraction (jsdoc owner + OwnedError super calls) and
-// (b) the transform pass (`@ownheim/core` import rewriting + `__OWNER__`
-// constant injection).
-//
-// The external Source analysis module stays deliberately deep: callers choose
-// read-only extraction or extraction + transform. Extraction and transform are
-// internal seams so changes to @owner parsing, findings, or factory rewriting
-// have locality without leaking more interface to callers.
-import { Project, type SourceFile } from 'ts-morph';
+// Parses source files for ownership metadata and, for build-time callers,
+// returns a pure owner-injection function for adding the resolved __OWNER__ constant.
+import { Project } from 'ts-morph';
+import { injectResolvedOwner } from './ownerInjection.ts';
 import { extractFromParsedSourceFile } from './sourceExtraction.ts';
-import { transformSourceFile } from './sourceTransform.ts';
 import type { AnalyzedFile, FileExtraction } from './sourceAnalysisTypes.ts';
 
 export type {
@@ -49,7 +40,6 @@ export function createSourceAnalyzer(): SourceAnalyzer {
     if (existing) project.removeSourceFile(existing);
     const sourceFile = project.createSourceFile(filePath, sourceText, { overwrite: true });
     return {
-      sourceFile,
       extraction: extractFromParsedSourceFile(sourceFile),
     };
   };
@@ -59,10 +49,10 @@ export function createSourceAnalyzer(): SourceAnalyzer {
       return parseAndExtract(filePath, sourceText).extraction;
     },
     analyze(filePath, sourceText) {
-      const { extraction, sourceFile } = parseAndExtract(filePath, sourceText);
+      const { extraction } = parseAndExtract(filePath, sourceText);
       return {
         ...extraction,
-        transform: (resolvedOwner: string) => transformSourceFile(sourceFile, resolvedOwner),
+        transform: (resolvedOwner: string) => injectResolvedOwner(filePath, sourceText, resolvedOwner),
       };
     },
   };
@@ -70,5 +60,4 @@ export function createSourceAnalyzer(): SourceAnalyzer {
 
 interface ParsedAndExtracted {
   readonly extraction: FileExtraction;
-  readonly sourceFile: SourceFile;
 }
