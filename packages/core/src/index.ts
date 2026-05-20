@@ -37,7 +37,13 @@ export {
   type SentryStacktrace,
 } from './resolution/frames.ts';
 
-export { ManifestRegistry, type OwnershipManifest } from './manifest/ManifestRegistry.ts';
+export {
+  ManifestRegistry,
+  normalizeOwnershipManifest,
+  type OwnershipManifest,
+  type OwnershipManifestInput,
+  type RegisteredOwnershipManifest,
+} from './manifest/ManifestRegistry.ts';
 export {
   getDefaultRegistry,
   setDefaultRegistry,

@@ -1,4 +1,4 @@
-import { ManifestRegistry, type OwnershipManifest } from './ManifestRegistry.ts';
+import { ManifestRegistry, type OwnershipManifestInput } from './ManifestRegistry.ts';
 
 let defaultRegistry: ManifestRegistry = ManifestRegistry.empty();
 
@@ -19,7 +19,7 @@ export function resetDefaultRegistry(): void {
  * resolution. Call this once during process startup after loading the JSON
  * produced by `ownheim generate`.
  */
-export function registerOwnershipManifest(manifest: OwnershipManifest): ManifestRegistry {
+export function registerOwnershipManifest(manifest: OwnershipManifestInput): ManifestRegistry {
   const registry = ManifestRegistry.fromManifest(manifest);
   setDefaultRegistry(registry);
   return registry;

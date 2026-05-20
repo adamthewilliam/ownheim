@@ -1,16 +1,33 @@
-export interface OwnershipManifest {
-  readonly version: 1;
+export interface OwnershipManifestInput {
+  readonly version?: number;
   readonly files: Readonly<Record<string, string>>;
 }
 
-const EMPTY_MANIFEST: OwnershipManifest = { version: 1, files: {} };
+export interface RegisteredOwnershipManifest {
+  readonly files: Readonly<Record<string, string>>;
+}
+
+/**
+ * @deprecated Use OwnershipManifestInput for runtime-loaded artifacts or
+ * RegisteredOwnershipManifest for already-normalized registry input.
+ */
+export type OwnershipManifest = OwnershipManifestInput;
+
+const EMPTY_MANIFEST: RegisteredOwnershipManifest = { files: {} };
+
+export function normalizeOwnershipManifest(input: OwnershipManifestInput): RegisteredOwnershipManifest {
+  if (input.version !== undefined && input.version !== 1) {
+    throw new Error(`Unsupported Ownheim manifest version: ${input.version}`);
+  }
+  return { files: input.files };
+}
 
 export class ManifestRegistry {
-  readonly #manifest: OwnershipManifest;
+  readonly #manifest: RegisteredOwnershipManifest;
   readonly #cache: Map<string, string | undefined>;
   readonly #normalisedFiles: ReadonlyMap<string, string>;
 
-  private constructor(manifest: OwnershipManifest) {
+  private constructor(manifest: RegisteredOwnershipManifest) {
     this.#manifest = manifest;
     this.#cache = new Map();
     const normalised = new Map<string, string>();
@@ -20,8 +37,8 @@ export class ManifestRegistry {
     this.#normalisedFiles = normalised;
   }
 
-  static fromManifest(manifest: OwnershipManifest): ManifestRegistry {
-    return new ManifestRegistry(manifest);
+  static fromManifest(manifest: OwnershipManifestInput): ManifestRegistry {
+    return new ManifestRegistry(normalizeOwnershipManifest(manifest));
   }
 
   static empty(): ManifestRegistry {
