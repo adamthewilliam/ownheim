@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/effect",
   "version": "0.1.0",
-  "description": "ownheim — Effect-TS Owner Context.Tag, ownedBy decorator, Logger and Tracer Layers",
+  "description": "ownheim — Effect-TS error ownership and tracing adapters",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -19,16 +19,6 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./Owner": {
-      "import": {
-        "types": "./dist/Owner.d.mts",
-        "default": "./dist/Owner.mjs"
-      },
-      "require": {
-        "types": "./dist/Owner.d.cts",
-        "default": "./dist/Owner.cjs"
-      }
-    },
     "./ownedBy": {
       "import": {
         "types": "./dist/ownedBy.d.mts",
@@ -39,14 +29,14 @@
         "default": "./dist/ownedBy.cjs"
       }
     },
-    "./Logger": {
+    "./Logging": {
       "import": {
-        "types": "./dist/Logger.d.mts",
-        "default": "./dist/Logger.mjs"
+        "types": "./dist/Logging.d.mts",
+        "default": "./dist/Logging.mjs"
       },
       "require": {
-        "types": "./dist/Logger.d.cts",
-        "default": "./dist/Logger.cjs"
+        "types": "./dist/Logging.d.cts",
+        "default": "./dist/Logging.cjs"
       }
     },
     "./Tracer": {

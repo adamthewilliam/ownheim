@@ -3,9 +3,8 @@ import { defineConfig } from 'tsdown';
 export default defineConfig({
   entry: [
     'src/index.ts',
-    'src/Owner.ts',
     'src/ownedBy.ts',
-    'src/Logger.ts',
+    'src/Logging.ts',
     'src/Tracer.ts'
 ],
   format: ['esm', 'cjs'],
