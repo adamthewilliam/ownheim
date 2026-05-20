@@ -20,16 +20,16 @@ export interface SentryClient {
   addEventProcessor(processor: SentryEventProcessor): void;
 }
 
-export type InstallOptions = TagOptions;
+export type InstrumentOptions = TagOptions;
 
-const INSTALLED = Symbol.for('ownheim.sentry.installed');
+const INSTRUMENTED = Symbol.for('ownheim.sentry.instrumented');
 
-type InstalledSentryClient = SentryClient & { [INSTALLED]?: true };
+type InstrumentedSentryClient = SentryClient & { [INSTRUMENTED]?: true };
 
-export function installSentry(client: SentryClient, options: InstallOptions = {}): void {
-  const installedClient = client as InstalledSentryClient;
-  if (installedClient[INSTALLED]) return;
-  installedClient[INSTALLED] = true;
+export function instrumentSentry(client: SentryClient, options: InstrumentOptions = {}): void {
+  const instrumentedClient = client as InstrumentedSentryClient;
+  if (instrumentedClient[INSTRUMENTED]) return;
+  instrumentedClient[INSTRUMENTED] = true;
 
   client.addEventProcessor((event, hint) => {
     const stacktrace = event.exception?.values?.[0]?.stacktrace;

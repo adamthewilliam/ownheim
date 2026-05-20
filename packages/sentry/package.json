@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/sentry",
   "version": "0.1.0",
-  "description": "ownheim — Sentry event processor + CODEOWNERS API sync",
+  "description": "ownheim \u2014 Sentry event processor + CODEOWNERS API sync",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -19,16 +19,6 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./install": {
-      "import": {
-        "types": "./dist/install.d.mts",
-        "default": "./dist/install.mjs"
-      },
-      "require": {
-        "types": "./dist/install.d.cts",
-        "default": "./dist/install.cjs"
-      }
-    },
     "./syncCodeowners": {
       "import": {
         "types": "./dist/syncCodeowners.d.mts",
@@ -37,6 +27,16 @@
       "require": {
         "types": "./dist/syncCodeowners.d.cts",
         "default": "./dist/syncCodeowners.cjs"
+      }
+    },
+    "./instrument": {
+      "import": {
+        "types": "./dist/instrument.d.mts",
+        "default": "./dist/instrument.mjs"
+      },
+      "require": {
+        "types": "./dist/instrument.d.cts",
+        "default": "./dist/instrument.cjs"
       }
     }
   },

@@ -16,10 +16,10 @@ You'll also need whichever Sentry SDK you're using (`@sentry/node`, `@sentry/bun
 
 ```ts
 import * as Sentry from '@sentry/node';
-import { installSentry } from '@ownheim/sentry/install';
+import { instrumentSentry } from '@ownheim/sentry/instrument';
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
-installSentry(Sentry.getClient()!);
+instrumentSentry(Sentry.getClient()!);
 ```
 
 That's it. Every event Sentry sends (exceptions, messages, transactions) now carries a `team` tag. You can filter, alert, and route on it from the Sentry UI.
@@ -50,7 +50,7 @@ throw new OwnedError('user not found', 'Identity');
 ### Options
 
 ```ts
-installSentry(client, {
+instrumentSentry(client, {
   fallback: 'platform',     // default tag value when nothing resolves
   tagKey: 'sentry.team',    // override the tag key (default: 'team')
 });
@@ -94,11 +94,11 @@ The function takes an optional `endpoint` (defaults to `https://sentry.io/api/0`
 
 ## Caveats
 
-- Calling `installSentry` twice registers two processors and you'll merge `team` twice. Idempotent it isn't. Call it once at boot.
+- Calling `instrumentSentry` twice registers two processors and you'll merge `team` twice. Idempotent it isn't. Call it once at boot.
 - The processor mutates `event.tags` directly rather than returning a new event. Sentry's contract allows this; just be aware if you're chaining processors.
 - Stack-frame lookup needs filenames Sentry can match against your manifest keys. If your build mangles paths (bundling, sourcemap stripping), the manifest fallback will miss. The `OwnedError` and scope paths still work.
 - `syncCodeowners` overwrites the project's codeowners config. There's no diff. If someone edited it in the Sentry UI, that edit goes away on the next sync. This is the point. `ownheim.config.ts` is the source of truth.
 
 ## Testing without Sentry
 
-`SentryClient` and `SentryEventProcessor` are structural types. You can build a mock client with a single `addEventProcessor` method, capture the registered processor, and call it directly with synthetic events. The package's tests do exactly this. See `src/install.test.ts`.
+`SentryClient` and `SentryEventProcessor` are structural types. You can build a mock client with a single `addEventProcessor` method, capture the registered processor, and call it directly with synthetic events. The package's tests do exactly this. See `src/instrument.test.ts`.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { runWithEntrypointOwner } from '@ownheim/core/ownership';
-import { instrumentDatadog, type DatadogSpan, type DatadogTracer } from './install.ts';
+import { instrumentDatadog, type DatadogSpan, type DatadogTracer } from './instrument.ts';
 
 function makeMockTracer() {
   const spans: Array<{ name: string; tags: Record<string, string> }> = [];

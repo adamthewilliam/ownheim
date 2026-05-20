@@ -3,7 +3,7 @@ import { OwnedError } from '@ownheim/core/OwnedError';
 import { ManifestRegistry, type OwnershipManifest } from '@ownheim/core/manifest/ManifestRegistry';
 import { resetDefaultRegistry, setDefaultRegistry } from '@ownheim/core/manifest/defaultRegistry';
 import { runWithEntrypointOwner } from '@ownheim/core/ownership';
-import { installSentry, type SentryClient, type SentryEventProcessor } from './install.ts';
+import { instrumentSentry, type SentryClient, type SentryEventProcessor } from './instrument.ts';
 
 function loadManifest(manifest: OwnershipManifest): void {
   setDefaultRegistry(ManifestRegistry.fromManifest(manifest));
@@ -21,10 +21,10 @@ function makeMockClient() {
 
 afterEach(() => resetDefaultRegistry());
 
-describe('installSentry', () => {
+describe('instrumentSentry', () => {
   it('tags events with responder ownership from OwnedError', () => {
     const { processors, client } = makeMockClient();
-    installSentry(client);
+    instrumentSentry(client);
     const err = new OwnedError('boom', { responderTeam: 'Billing' });
 
     const event = processors[0]!({}, { originalException: err });
@@ -34,7 +34,7 @@ describe('installSentry', () => {
 
   it('tags events with entrypoint ownership from scope', () => {
     const { processors, client } = makeMockClient();
-    installSentry(client);
+    instrumentSentry(client);
 
     const event = runWithEntrypointOwner('Identity', () =>
       processors[0]!({}, { originalException: new Error('plain') }),
@@ -45,7 +45,7 @@ describe('installSentry', () => {
   it('uses manifest lookup via stack frames for code ownership', () => {
     loadManifest({ version: 1, files: { 'src/billing/charge.ts': 'Billing' } });
     const { processors, client } = makeMockClient();
-    installSentry(client);
+    instrumentSentry(client);
 
     const event = processors[0]!(
       {
@@ -70,7 +70,7 @@ describe('installSentry', () => {
 
   it('uses fallbackCodeTeam when nothing resolves', () => {
     const { processors, client } = makeMockClient();
-    installSentry(client, { fallbackCodeTeam: 'platform-default' });
+    instrumentSentry(client, { fallbackCodeTeam: 'platform-default' });
 
     const event = processors[0]!({}, { originalException: new Error('orphan') });
     expect(event?.tags?.['ownheim.code_team']).toBe('platform-default');
@@ -78,7 +78,7 @@ describe('installSentry', () => {
 
   it('honours custom tag keys', () => {
     const { processors, client } = makeMockClient();
-    installSentry(client, { tags: { entrypointTeam: 'sentry.entrypoint_team' } });
+    instrumentSentry(client, { tags: { entrypointTeam: 'sentry.entrypoint_team' } });
 
     const event = runWithEntrypointOwner('Billing', () => processors[0]!({}, {}));
     expect(event?.tags?.['sentry.entrypoint_team']).toBe('Billing');
@@ -86,8 +86,8 @@ describe('installSentry', () => {
 
   it('is idempotent', () => {
     const { processors, client } = makeMockClient();
-    installSentry(client);
-    installSentry(client);
+    instrumentSentry(client);
+    instrumentSentry(client);
 
     expect(processors).toHaveLength(1);
   });

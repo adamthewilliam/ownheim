@@ -1,10 +1,10 @@
-export { installSentry } from './install.ts';
+export { instrumentSentry } from './instrument.ts';
 export type {
-  InstallOptions,
+  InstrumentOptions,
   SentryClient,
   SentryEvent,
   SentryEventHint,
   SentryEventProcessor,
-} from './install.ts';
+} from './instrument.ts';
 export { syncCodeowners } from './syncCodeowners.ts';
 export type { SyncCodeownersOptions, SyncResult } from './syncCodeowners.ts';

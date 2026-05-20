@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/datadog",
   "version": "0.1.0",
-  "description": "ownheim — Datadog (dd-trace + RUM) team-tag adapter",
+  "description": "ownheim \u2014 Datadog (dd-trace + RUM) team-tag adapter",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -19,16 +19,6 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./install": {
-      "import": {
-        "types": "./dist/install.d.mts",
-        "default": "./dist/install.mjs"
-      },
-      "require": {
-        "types": "./dist/install.d.cts",
-        "default": "./dist/install.cjs"
-      }
-    },
     "./rum": {
       "import": {
         "types": "./dist/rum.d.mts",
@@ -37,6 +27,16 @@
       "require": {
         "types": "./dist/rum.d.cts",
         "default": "./dist/rum.cjs"
+      }
+    },
+    "./instrument": {
+      "import": {
+        "types": "./dist/instrument.d.mts",
+        "default": "./dist/instrument.mjs"
+      },
+      "require": {
+        "types": "./dist/instrument.d.cts",
+        "default": "./dist/instrument.cjs"
       }
     }
   },
