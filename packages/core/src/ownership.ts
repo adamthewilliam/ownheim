@@ -77,20 +77,9 @@ export function resolveOwnership(input: ResolveOwnershipInput = {}): OwnershipRe
     sources.entrypointTeam = 'scope';
   }
 
-  if (input.moduleOwner !== undefined && input.moduleOwner !== '') {
-    ownership.codeTeam = input.moduleOwner;
-    sources.codeTeam = 'module';
-  } else {
-    const frameSource: FrameSource = input.frameSource ?? callerFrameSource(2);
-    const fromFrame = findOwnedFrame(frameSource, input.registry ?? getDefaultRegistry());
-    if (fromFrame !== undefined) {
-      ownership.codeTeam = fromFrame;
-      sources.codeTeam = 'frame';
-    } else {
-      ownership.codeTeam = input.fallbackCodeTeam ?? 'unowned';
-      sources.codeTeam = 'fallback';
-    }
-  }
+  const code = resolveCodeTeam(input);
+  ownership.codeTeam = code.team;
+  sources.codeTeam = code.source;
 
   if (input.error !== undefined) {
     const responderTeam = walkResponderTeamChain(input.error);
@@ -101,4 +90,21 @@ export function resolveOwnership(input: ResolveOwnershipInput = {}): OwnershipRe
   }
 
   return { ownership, sources } as OwnershipResolution;
+}
+
+function resolveCodeTeam(input: ResolveOwnershipInput): { team: string; source: CodeOwnerSource } {
+  if (input.moduleOwner !== undefined && input.moduleOwner !== '') {
+    return { team: input.moduleOwner, source: 'module' };
+  }
+
+  const registry = input.registry ?? getDefaultRegistry();
+  if (input.frameSource === undefined && registry.isEmpty()) {
+    return { team: input.fallbackCodeTeam ?? 'unowned', source: 'fallback' };
+  }
+
+  const frameSource: FrameSource = input.frameSource ?? callerFrameSource(2);
+  const fromFrame = findOwnedFrame(frameSource, registry);
+  if (fromFrame !== undefined) return { team: fromFrame, source: 'frame' };
+
+  return { team: input.fallbackCodeTeam ?? 'unowned', source: 'fallback' };
 }

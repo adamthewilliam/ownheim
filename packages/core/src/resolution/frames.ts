@@ -3,20 +3,10 @@ import type { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
 /**
  * Yields candidate source-file paths in the order the consumer should
  * consult them. Vendor / internal frames are *not* filtered here — that
- * policy lives in `findOwnedFrame`, because each source has its own idea
- * of "in-app" (Sentry already encodes it as `in_app: false`, V8 does not).
+ * policy lives in `findOwnedFrame`, so callers can pass raw source paths.
  */
 export interface FrameSource {
   frames(): Iterable<string>;
-}
-
-export interface SentryFrame {
-  readonly filename?: string;
-  readonly in_app?: boolean;
-}
-
-export interface SentryStacktrace {
-  readonly frames?: readonly SentryFrame[];
 }
 
 const VENDOR_PATTERNS: readonly RegExp[] = [
@@ -43,9 +33,9 @@ export function parseFrameFile(frame: string): string | undefined {
   return undefined;
 }
 
-function captureStack(): string[] | undefined {
+export function captureStackLines(trimBoundary: (...args: never[]) => unknown): string[] | undefined {
   const err = new Error();
-  Error.captureStackTrace(err, captureStack);
+  Error.captureStackTrace(err, trimBoundary);
   if (typeof err.stack !== 'string') return undefined;
   return err.stack.split('\n').slice(1);
 }
@@ -53,7 +43,7 @@ function captureStack(): string[] | undefined {
 export function callerFrameSource(skipFrames = 2): FrameSource {
   return {
     *frames() {
-      const stack = captureStack();
+      const stack = captureStackLines(captureStackLines);
       if (!stack) return;
 
       for (let i = skipFrames; i < stack.length; i++) {
@@ -63,26 +53,6 @@ export function callerFrameSource(skipFrames = 2): FrameSource {
         const file = parseFrameFile(frame);
         if (!file) continue;
 
-        yield file;
-      }
-    },
-  };
-}
-
-export function fromSentryFrames(s: SentryStacktrace | undefined): FrameSource {
-  return {
-    *frames() {
-      const frames = s?.frames;
-      if (!frames) return;
-
-      // Sentry payload: deepest (most-recent) frame is last.
-      // Iterate newest-last so the deepest in_app frame is consulted first.
-      for (let i = frames.length - 1; i >= 0; i--) {
-        const frame = frames[i];
-        if (!frame) continue;
-        if (frame.in_app === false) continue;
-        const file = frame.filename;
-        if (!file) continue;
         yield file;
       }
     },

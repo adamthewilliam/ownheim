@@ -28,13 +28,10 @@ export { lookupCallerOwner } from './resolution/lookupCallerOwner.ts';
 export { walkResponderTeamChain, isOwnedShape } from './resolution/walkOwnedErrorChain.ts';
 export {
   callerFrameSource,
-  fromSentryFrames,
   findOwnedFrame,
   isVendorFrame,
   parseFrameFile,
   type FrameSource,
-  type SentryFrame,
-  type SentryStacktrace,
 } from './resolution/frames.ts';
 
 export {

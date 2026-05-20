@@ -3,7 +3,6 @@ import { ManifestRegistry } from '../manifest/ManifestRegistry.ts';
 import {
   callerFrameSource,
   findOwnedFrame,
-  fromSentryFrames,
   isVendorFrame,
   parseFrameFile,
   type FrameSource,
@@ -65,40 +64,5 @@ describe('callerFrameSource', () => {
   it('yields the calling file path among its frames', () => {
     const out = [...callerFrameSource(0).frames()];
     expect(out.some((p) => p.endsWith('frames.test.ts'))).toBe(true);
-  });
-});
-
-describe('fromSentryFrames', () => {
-  it('yields nothing when stacktrace is undefined', () => {
-    expect([...fromSentryFrames(undefined).frames()]).toEqual([]);
-  });
-
-  it('yields nothing when frames are missing', () => {
-    expect([...fromSentryFrames({}).frames()]).toEqual([]);
-  });
-
-  it('iterates newest-last (reverse of payload order)', () => {
-    const stacktrace = {
-      frames: [{ filename: 'a.ts' }, { filename: 'b.ts' }, { filename: 'c.ts' }],
-    };
-    expect([...fromSentryFrames(stacktrace).frames()]).toEqual(['c.ts', 'b.ts', 'a.ts']);
-  });
-
-  it('skips frames with no filename', () => {
-    const stacktrace = {
-      frames: [{ filename: 'a.ts' }, {}, { filename: 'b.ts' }],
-    };
-    expect([...fromSentryFrames(stacktrace).frames()]).toEqual(['b.ts', 'a.ts']);
-  });
-
-  it('skips frames with in_app=false', () => {
-    const stacktrace = {
-      frames: [
-        { filename: 'a.ts' },
-        { filename: 'vendor.ts', in_app: false },
-        { filename: 'b.ts', in_app: true },
-      ],
-    };
-    expect([...fromSentryFrames(stacktrace).frames()]).toEqual(['b.ts', 'a.ts']);
   });
 });

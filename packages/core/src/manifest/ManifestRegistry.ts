@@ -26,10 +26,12 @@ export class ManifestRegistry {
   readonly #manifest: RegisteredOwnershipManifest;
   readonly #cache: Map<string, string | undefined>;
   readonly #normalisedFiles: ReadonlyMap<string, string>;
+  readonly #size: number;
 
   private constructor(manifest: RegisteredOwnershipManifest) {
     this.#manifest = manifest;
     this.#cache = new Map();
+    this.#size = Object.keys(manifest.files).length;
     const normalised = new Map<string, string>();
     for (const [registered, owner] of Object.entries(manifest.files)) {
       normalised.set(normalise(registered), owner);
@@ -43,6 +45,10 @@ export class ManifestRegistry {
 
   static empty(): ManifestRegistry {
     return new ManifestRegistry(EMPTY_MANIFEST);
+  }
+
+  isEmpty(): boolean {
+    return this.#size === 0;
   }
 
   lookupOwner(filePath: string): string | undefined {

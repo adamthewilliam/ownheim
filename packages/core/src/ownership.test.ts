@@ -7,7 +7,7 @@ import {
   runWithEntrypointOwner,
   withEntrypointOwnerScope,
 } from './ownership.ts';
-import { fromSentryFrames } from './resolution/frames.ts';
+import type { FrameSource } from './resolution/frames.ts';
 
 describe('runWithEntrypointOwner / currentEntrypointOwner', () => {
   it('returns undefined outside any scope', () => {
@@ -95,15 +95,14 @@ describe('resolveOwnership', () => {
       files: { '/repo/packages/billing/src/ledger.ts': 'Billing' },
     });
 
-    const result = resolveOwnership({
-      registry,
-      frameSource: fromSentryFrames({
-        frames: [
-          { filename: '/repo/node_modules/vendor.js', in_app: true },
-          { filename: '/repo/packages/billing/src/ledger.ts', in_app: true },
-        ],
-      }),
-    });
+    const frameSource: FrameSource = {
+      *frames() {
+        yield '/repo/node_modules/vendor.js';
+        yield '/repo/packages/billing/src/ledger.ts';
+      },
+    };
+
+    const result = resolveOwnership({ registry, frameSource });
 
     expect(result.ownership.codeTeam).toBe('Billing');
     expect(result.sources.codeTeam).toBe('frame');
