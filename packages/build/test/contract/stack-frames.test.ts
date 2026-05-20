@@ -46,7 +46,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
-import { runBundleInSubprocess } from '@ownheim/test-utils/runBundleInSubprocess';
+import { runBundleInSubprocess } from '../helpers/runBundleInSubprocess.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MONOREPO_ROOT = resolve(HERE, '../../../..');

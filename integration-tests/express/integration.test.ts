@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import express, { type NextFunction, type Request, type Response, Router } from 'express';
 import request from 'supertest';
-import { captureStructuredLogs, type CapturedLogs } from '@ownheim/test-utils/captureStructuredLogs';
-import { createLogger } from '@ownheim/core/logging/createLogger';
+import { captureStructuredLogs, createCapturedLogger, type CapturedLogs } from '../helpers/captureStructuredLogs.ts';
 import { currentEntrypointOwner } from '@ownheim/core/ownership';
 import { entrypointOwner } from '@ownheim/express/ownerMiddleware';
 
@@ -14,14 +13,14 @@ import { entrypointOwner } from '@ownheim/express/ownerMiddleware';
 // `createLogger` snapshots `getDefaultLogSink()` at construction time, so the
 // logger has to be built *after* `captureStructuredLogs()` swaps the sink in.
 // We rebuild it per test in `beforeEach`.
-let logger: ReturnType<typeof createLogger>;
+let logger: ReturnType<typeof createCapturedLogger>;
 
 describe('@ownheim/express integration (real Express + supertest)', () => {
   let logs: CapturedLogs;
 
   beforeEach(() => {
     logs = captureStructuredLogs();
-    logger = createLogger('');
+    logger = createCapturedLogger(logs);
   });
 
   afterEach(() => {

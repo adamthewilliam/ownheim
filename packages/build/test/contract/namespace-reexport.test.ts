@@ -27,8 +27,8 @@
 // returns, NOT the `__OWNER__` literal that was injected.
 import { describe, expect, it } from 'bun:test';
 import type { Team } from '@ownheim/core/types';
-import { buildBundleFixture } from '@ownheim/test-utils/buildBundleFixture';
-import { runBundleInSubprocess } from '@ownheim/test-utils/runBundleInSubprocess';
+import { buildBundleFixture } from '../helpers/buildBundleFixture.ts';
+import { runBundleInSubprocess } from '../helpers/runBundleInSubprocess.ts';
 
 const teams: Record<string, Team> = {
   Billing: { github: '@org/billing', owns: ['src/**/*.ts'] },

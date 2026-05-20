@@ -5,9 +5,8 @@ import { BatchHandlerPlugin } from '@orpc/server/plugins';
 import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
 import { BatchLinkPlugin } from '@orpc/client/plugins';
-import { createLogger } from '@ownheim/core/logging/createLogger';
 import { currentEntrypointOwner } from '@ownheim/core/ownership';
-import { captureStructuredLogs, type CapturedLogs } from '@ownheim/test-utils/captureStructuredLogs';
+import { captureStructuredLogs, createCapturedLogger, type CapturedLogs } from '../helpers/captureStructuredLogs.ts';
 import { entrypointProcedure } from '@ownheim/orpc/ownedProcedure';
 import { entrypointOwner } from '@ownheim/orpc/ownerMiddleware';
 
@@ -47,12 +46,12 @@ const taggedOs = (builder: OsBuilder, owner: string): OsBuilder => {
 // `createLogger` snapshots the active default sink at construction time, so
 // the logger MUST be built after `captureStructuredLogs()` installs its sink
 // (i.e. inside `beforeEach`), otherwise it stays bound to `stdoutJsonSink`.
-let logger: ReturnType<typeof createLogger>;
+let logger: ReturnType<typeof createCapturedLogger>;
 let captured: CapturedLogs;
 
 beforeEach(() => {
   captured = captureStructuredLogs();
-  logger = createLogger('');
+  logger = createCapturedLogger(captured);
 });
 
 afterEach(() => {

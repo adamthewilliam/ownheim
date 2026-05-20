@@ -58,7 +58,7 @@ process.env.DD_REMOTE_CONFIGURATION_ENABLED = 'false';
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { runWithEntrypointOwner } from '@ownheim/core/ownership';
-import { instrumentDatadog, type DatadogTracer } from '@ownheim/datadog/install';
+import { instrumentDatadog, type DatadogTracer } from '@ownheim/datadog/instrument';
 
 // dd-trace's runtime types are not exported for our adapter shape, so
 // we type the imported tracer through our adapter's structural

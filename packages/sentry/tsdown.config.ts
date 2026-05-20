@@ -3,8 +3,7 @@ import { defineConfig } from 'tsdown';
 export default defineConfig({
   entry: [
     'src/index.ts',
-    'src/instrument.ts',
-    'src/syncCodeowners.ts'
+    'src/instrument.ts'
 ],
   format: ['esm', 'cjs'],
   dts: true,

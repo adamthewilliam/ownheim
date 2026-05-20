@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import { createLogger } from '@ownheim/core/logging/createLogger';
 import { currentEntrypointOwner } from '@ownheim/core/ownership';
-import { captureStructuredLogs } from '@ownheim/test-utils/captureStructuredLogs';
+import { captureStructuredLogs, createCapturedLogger } from '../helpers/captureStructuredLogs.ts';
 import { Hono } from 'hono';
 import { entrypointOwner } from '@ownheim/hono/ownerMiddleware';
 
@@ -32,7 +31,7 @@ describe('hono entrypointOwner integration (real Hono server)', () => {
 
   it('per-route middleware tags logs from a sync handler', async () => {
     const capture = startCapture();
-    const log = createLogger('Billing');
+    const log = createCapturedLogger(capture);
 
     const app = new Hono();
     app.use('/charge', honoOwnerMiddleware('Billing'));
@@ -50,7 +49,7 @@ describe('hono entrypointOwner integration (real Hono server)', () => {
 
   it('preserves owner scope across multiple awaits in an async handler', async () => {
     const capture = startCapture();
-    const log = createLogger('Billing');
+    const log = createCapturedLogger(capture);
 
     const app = new Hono();
     app.use('/charge', honoOwnerMiddleware('Billing'));
@@ -82,7 +81,7 @@ describe('hono entrypointOwner integration (real Hono server)', () => {
 
   it('per-prefix middleware tags multiple sub-routes under the same owner', async () => {
     const capture = startCapture();
-    const billingLog = createLogger('Billing');
+    const billingLog = createCapturedLogger(capture);
 
     const app = new Hono();
     app.use('/billing/*', honoOwnerMiddleware('Billing'));
@@ -112,7 +111,7 @@ describe('hono entrypointOwner integration (real Hono server)', () => {
 
   it('nested entrypointOwner: innermost owner wins for handler logs', async () => {
     const capture = startCapture();
-    const log = createLogger('Billing');
+    const log = createCapturedLogger(capture);
 
     const app = new Hono();
     app.use('/inner', honoOwnerMiddleware('Billing'));
@@ -136,7 +135,7 @@ describe('hono entrypointOwner integration (real Hono server)', () => {
 
   it('handler error: error handler runs but the failed-request log keeps the owner scope', async () => {
     const capture = startCapture();
-    const log = createLogger('Billing');
+    const log = createCapturedLogger(capture);
 
     const app = new Hono();
     app.use('/boom', honoOwnerMiddleware('Billing'));
@@ -163,8 +162,8 @@ describe('hono entrypointOwner integration (real Hono server)', () => {
 
   it('50 concurrent requests across two prefixes do not cross-contaminate owners', async () => {
     const capture = startCapture();
-    const billingLog = createLogger('Billing');
-    const identityLog = createLogger('Identity');
+    const billingLog = createCapturedLogger(capture);
+    const identityLog = createCapturedLogger(capture);
 
     const app = new Hono();
     app.use('/billing/*', honoOwnerMiddleware('Billing'));

@@ -13,7 +13,7 @@ import type {
   Transport,
   TransportMakeRequestResponse,
 } from '@sentry/core';
-import { installSentry, type SentryClient } from '@ownheim/sentry/install';
+import { instrumentSentry, type SentryClient } from '@ownheim/sentry/instrument';
 
 // In-memory transport: capture every envelope the SDK tries to flush.
 interface CapturedEnvelope {
@@ -53,7 +53,7 @@ function eventsFromEnvelopes(captured: CapturedEnvelope[]): Event[] {
 }
 
 // Bridge the real Sentry Client to the ownheim SentryClient interface.
-// `installSentry` only needs `addEventProcessor`. The real Event type has
+// `instrumentSentry` only needs `addEventProcessor`. The real Event type has
 // `tags: { [key: string]: Primitive }` which is wider than the ownheim
 // SentryEvent's `Record<string, string>` — we coerce both directions via the
 // wrapper since ownheim only writes string values for the team tag.
@@ -92,7 +92,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
   it('tags captured events with the active runWithEntrypointOwner team', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
-    installSentry(asOwnheimClient(client));
+    instrumentSentry(asOwnheimClient(client));
 
     runWithEntrypointOwner('Billing', () => {
       Sentry.captureException(new Error('boom'));
@@ -109,7 +109,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
   it('honours OwnedError owner over the active scope', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
-    installSentry(asOwnheimClient(client));
+    instrumentSentry(asOwnheimClient(client));
 
     const owned = new OwnedError('explicit', { responderTeam: 'Payments' });
 
@@ -127,7 +127,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
   it('falls back when capturing outside any owner scope', async () => {
     const client = Sentry.getClient();
     if (!client) throw new Error('Sentry client not initialised');
-    installSentry(asOwnheimClient(client), { fallbackCodeTeam: 'platform-default' });
+    instrumentSentry(asOwnheimClient(client), { fallbackCodeTeam: 'platform-default' });
 
     Sentry.captureException(new Error('orphan'));
 
@@ -150,7 +150,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
 
     // Install ownheim AFTER — should win because Sentry runs processors
     // in registration order and the last writer to `event.tags.team` wins.
-    installSentry(asOwnheimClient(client));
+    instrumentSentry(asOwnheimClient(client));
 
     runWithEntrypointOwner('Billing', () => {
       Sentry.captureException(new Error('order matters'));
@@ -168,7 +168,7 @@ describe('@ownheim/sentry integration with real @sentry/node', () => {
     if (!client) throw new Error('Sentry client not initialised');
 
     // Ownheim goes FIRST.
-    installSentry(asOwnheimClient(client));
+    instrumentSentry(asOwnheimClient(client));
 
     // Foreign processor runs after ownheim and clobbers the tag.
     client.addEventProcessor(((event) => {

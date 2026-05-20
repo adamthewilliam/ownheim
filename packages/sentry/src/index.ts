@@ -6,5 +6,3 @@ export type {
   SentryEventHint,
   SentryEventProcessor,
 } from './instrument.ts';
-export { syncCodeowners } from './syncCodeowners.ts';
-export type { SyncCodeownersOptions, SyncResult } from './syncCodeowners.ts';

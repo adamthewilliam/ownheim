@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@ownheim/core": "workspace:*",
-    "@ownheim/test-utils": "workspace:*",
     "@ownheim/trpc": "workspace:*"
   },
   "optionalDependencies": {

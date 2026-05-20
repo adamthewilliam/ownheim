@@ -6,8 +6,8 @@
 //   2. dynamic `import()` inside a try/catch
 //   3. top-level await in an owned module
 //
-// We deliberately do NOT use `buildBundleFixture` from @ownheim/test-utils
-// here. That harness is locked to `platform: 'neutral'` for ESM and does
+// We deliberately do NOT use the local `buildBundleFixture` helper here.
+// That harness is locked to `platform: 'neutral'` for ESM and does
 // not expose `nodePaths`. A runnable bundle that imports `@ownheim/core`
 // requires (a) `platform: 'node'` so `node:async_hooks` (used by the
 // runtime's AsyncLocalStorage) resolves, and (b) `nodePaths` pointing at
@@ -31,7 +31,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { ownheim } from '@ownheim/build/esbuildPlugin';
-import { runBundleInSubprocess } from '@ownheim/test-utils/runBundleInSubprocess';
+import { runBundleInSubprocess } from '../helpers/runBundleInSubprocess.ts';
 import type { Team, OwnheimConfig } from '@ownheim/core/types';
 
 const HERE = dirname(fileURLToPath(import.meta.url));

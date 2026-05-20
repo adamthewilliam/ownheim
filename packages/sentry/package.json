@@ -19,16 +19,6 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./syncCodeowners": {
-      "import": {
-        "types": "./dist/syncCodeowners.d.mts",
-        "default": "./dist/syncCodeowners.mjs"
-      },
-      "require": {
-        "types": "./dist/syncCodeowners.d.cts",
-        "default": "./dist/syncCodeowners.cjs"
-      }
-    },
     "./instrument": {
       "import": {
         "types": "./dist/instrument.d.mts",

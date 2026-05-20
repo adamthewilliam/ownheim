@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { initTRPC, TRPCError } from '@trpc/server';
 import type { AnyTRPCMiddlewareFunction, TRPCProcedureBuilder } from '@trpc/server';
-import { createLogger } from '@ownheim/core/logging/createLogger';
 import { currentEntrypointOwner } from '@ownheim/core/ownership';
 import {
   captureStructuredLogs,
+  createCapturedLogger,
   type CapturedLogs,
-} from '@ownheim/test-utils/captureStructuredLogs';
+} from '../helpers/captureStructuredLogs.ts';
 import { entrypointProcedure } from '@ownheim/trpc/ownedProcedure';
 import { entrypointOwner } from '@ownheim/trpc/ownerMiddleware';
 
@@ -60,7 +60,7 @@ afterEach(() => {
 
 describe('integration: real @trpc/server router + entrypointProcedure', () => {
   it('1. single mutation tags logs with the procedure owner', async () => {
-    const log = createLogger('');
+    const log = createCapturedLogger(capture);
 
     const router = t.router({
       charge: tagged(t.procedure, 'Billing').mutation(() => {
@@ -79,7 +79,7 @@ describe('integration: real @trpc/server router + entrypointProcedure', () => {
   });
 
   it('2. async mutation persists the owner scope across awaits', async () => {
-    const log = createLogger('');
+    const log = createCapturedLogger(capture);
     const observed: Array<string | undefined> = [];
 
     const router = t.router({
@@ -100,7 +100,7 @@ describe('integration: real @trpc/server router + entrypointProcedure', () => {
   });
 
   it('3. query and mutation with different owners do not cross-contaminate', async () => {
-    const log = createLogger('');
+    const log = createCapturedLogger(capture);
 
     const router = t.router({
       getUser: tagged(t.procedure, 'Identity').query(() => {
@@ -133,7 +133,7 @@ describe('integration: real @trpc/server router + entrypointProcedure', () => {
   });
 
   it('4. nested sub-router carries its own owner', async () => {
-    const log = createLogger('');
+    const log = createCapturedLogger(capture);
 
     const billingRouter = t.router({
       charge: tagged(t.procedure, 'Billing').mutation(() => {
@@ -177,7 +177,7 @@ describe('integration: real @trpc/server router + entrypointProcedure', () => {
     // arrive batched or one at a time. We simulate the batching surface by
     // firing many concurrent calls through a single caller and asserting
     // each handler runs under its own owner without bleed.
-    const log = createLogger('');
+    const log = createCapturedLogger(capture);
 
     const router = t.router({
       a: tagged(t.procedure, 'Billing').query(() => {
@@ -220,7 +220,7 @@ describe('integration: real @trpc/server router + entrypointProcedure', () => {
   });
 
   it('6. error path: thrown errors still see the owner before propagating', async () => {
-    const log = createLogger('');
+    const log = createCapturedLogger(capture);
     let ownerSeenAtThrow: string | undefined;
 
     const router = t.router({
@@ -254,7 +254,7 @@ describe('integration: real @trpc/server router + entrypointProcedure', () => {
   });
 
   it('exposes the raw entrypointOwner via .use() on a builder', async () => {
-    const log = createLogger('');
+    const log = createCapturedLogger(capture);
 
     const router = t.router({
       ping: t.procedure.use(useOwner('Platform')).query(() => {

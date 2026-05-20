@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "@ownheim/express": "workspace:*",
-    "@ownheim/core": "workspace:*",
-    "@ownheim/test-utils": "workspace:*"
+    "@ownheim/core": "workspace:*"
   },
   "optionalDependencies": {
     "@types/express": "^5.0.6",

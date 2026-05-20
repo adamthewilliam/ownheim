@@ -24,8 +24,8 @@
 //   2. The harness does not expose `nodePaths`, so esbuild cannot resolve
 //      the workspace's `@ownheim/core` package from a tmp-dir entry.
 //
-// We do continue to use `runBundleInSubprocess` from `@ownheim/test-utils`
-// to keep execution-side semantics identical to the rest of the suite.
+// We do continue to use the local `runBundleInSubprocess` helper to keep
+// execution-side semantics identical to the rest of the suite.
 
 import { describe, expect, it } from 'bun:test';
 import { build } from 'esbuild';
@@ -35,7 +35,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import type { Team, OwnheimConfig } from '@ownheim/core/types';
 import { ownheim } from '@ownheim/build/esbuildPlugin';
-import { runBundleInSubprocess } from '@ownheim/test-utils/runBundleInSubprocess';
+import { runBundleInSubprocess } from '../helpers/runBundleInSubprocess.ts';
 
 // ---------------------------------------------------------------------------
 // Bundling helper — local replacement for `buildBundleFixture` that fixes

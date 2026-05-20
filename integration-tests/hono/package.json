@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "@ownheim/hono": "workspace:*",
-    "@ownheim/core": "workspace:*",
-    "@ownheim/test-utils": "workspace:*"
+    "@ownheim/core": "workspace:*"
   },
   "optionalDependencies": {
     "hono": "^4.12.16"
