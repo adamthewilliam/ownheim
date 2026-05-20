@@ -15,7 +15,8 @@
 <p align="center">
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-111827.svg" /></a>
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-first-3178c6.svg" />
-  <img alt="Runtime: Bun" src="https://img.shields.io/badge/runtime-Bun-f9f1e1.svg" />
+  <img alt="Node.js >=18.18" src="https://img.shields.io/badge/node-%3E%3D18.18-339933.svg" />
+  <img alt="Bun" src="https://img.shields.io/badge/bun-supported-f9f1e1.svg" />
   <img alt="ESM" src="https://img.shields.io/badge/modules-ESM-7c3aed.svg" />
 </p>
 
@@ -23,15 +24,37 @@
 
 ## Why Ownheim?
 
-Ownership metadata usually drifts: `CODEOWNERS` gets stale, services emit logs without team context, and no one knows who owns an unclaimed folder until something breaks.
+`CODEOWNERS` is useful, but it has a drift problem. Someone adds a package, moves a service, or renames a team, and the ownership file quietly stops matching the repo. Then CI cannot tell you what is uncovered, logs have no team context, and incidents start with the same question: “who owns this?”
 
-Ownheim makes ownership a typed, reviewable part of your repository:
+Ownheim flips that around. You describe ownership once in TypeScript, generate the repo artifacts from it, and use the same ownership map at runtime.
 
-- **One source of truth** — define ownership once in `ownheim.config.ts`.
-- **Generated artifacts** — produce `CODEOWNERS` and runtime ownership manifests.
-- **CI-friendly enforcement** — check ownership coverage before drift lands.
-- **Runtime context** — tag logs, traces, errors, and framework routes with the owning team.
-- **Monorepo-ready** — designed for TypeScript workspaces with many packages and adapters.
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Write ownership like code</strong><br />
+      Keep teams, globs, and ownership rules in <code>ownheim.config.ts</code>, where they can be typed, reviewed, and tested.
+    </td>
+    <td width="50%" valign="top">
+      <strong>Generate the files people already use</strong><br />
+      Ownheim writes <code>CODEOWNERS</code> and runtime manifests, so GitHub review routing and app telemetry come from the same source.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/assets/ownheim-config.png" alt="Example ownheim.config.ts file" />
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/assets/ownheim-generated-codeowners.png" alt="Generated CODEOWNERS file from Ownheim" />
+    </td>
+  </tr>
+</table>
+
+That gives you a boring, dependable ownership loop:
+
+1. Define owners in `ownheim.config.ts`.
+2. Run `ownheim generate` to write `CODEOWNERS` and `.ownheim/ownership.json`.
+3. Run `ownheim check` and `ownheim coverage` in CI.
+4. Register the manifest in your app so logs, traces, errors, and routes carry team context.
 
 ## Install
 
@@ -52,6 +75,8 @@ bun add @ownheim/datadog @ownheim/otel @ownheim/pino @ownheim/sentry
 # Optional lint adapters
 bun add @ownheim/eslint @ownheim/oxlint
 ```
+
+Prefer npm, pnpm, or Yarn? Use the equivalent command for your package manager.
 
 > Ownheim packages are ESM-first TypeScript packages. Use a TypeScript-aware runtime/bundler such as Bun, Vite, esbuild, tsdown, or enable TypeScript import support in your project.
 
