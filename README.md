@@ -13,11 +13,11 @@
 </p>
 
 <p align="center">
-  <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-111827.svg" /></a>
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-first-3178c6.svg" />
-  <img alt="Node.js >=18.18" src="https://img.shields.io/badge/node-%3E%3D18.18-339933.svg" />
-  <img alt="Bun" src="https://img.shields.io/badge/bun-supported-f9f1e1.svg" />
-  <img alt="ESM" src="https://img.shields.io/badge/modules-ESM-7c3aed.svg" />
+  <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-111827?style=flat-square" /></a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-first-3178c6?style=flat-square&amp;logo=typescript&amp;logoColor=white" />
+  <img alt="Node.js >= 18.18" src="https://img.shields.io/badge/Node.js-%3E%3D18.18-339933?style=flat-square&amp;logo=node.js&amp;logoColor=white" />
+  <img alt="Bun supported" src="https://img.shields.io/badge/Bun-supported-000000?style=flat-square&amp;logo=bun&amp;logoColor=white" />
+  <img alt="ESM only" src="https://img.shields.io/badge/modules-ESM_only-7c3aed?style=flat-square" />
 </p>
 
 ---
