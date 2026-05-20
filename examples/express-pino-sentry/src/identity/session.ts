@@ -1,4 +1,4 @@
-import { OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 export function requireUser(authorization: string | undefined) {
   if (!authorization) {

@@ -1,5 +1,5 @@
 import { trace } from '@opentelemetry/api';
-import { OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 export async function checkout(amount: number) {
   return trace.getTracer('checkout').startActiveSpan('checkout', async (span) => {

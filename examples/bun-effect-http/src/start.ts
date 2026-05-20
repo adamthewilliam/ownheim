@@ -1,5 +1,6 @@
 import { Cause, Effect, Exit, Logger as EffectLogger } from 'effect';
-import { registerOwnershipManifest, runWithEntrypointOwner } from '@ownheim/core';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 import { resolveProjectedOwnershipTags } from '@ownheim/core/tracing/projectOwnership';
 import manifest from '../dist/ownheim-manifest.json' with { type: 'json' };
 import { adminRefund } from './billing/admin/refund.ts';

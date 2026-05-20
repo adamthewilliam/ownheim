@@ -23,5 +23,5 @@ export default defineConfig({
   external: [],
   clean: true,
   sourcemap: true,
-  treeshake: false,
+  treeshake: true,
 });

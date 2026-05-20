@@ -1,4 +1,4 @@
-import { OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 export async function getUser(id: string) {
   if (!id.startsWith('user_')) {

@@ -1,4 +1,4 @@
-import { OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 export async function chargeCustomer(amount: number) {
   if (amount <= 0) {

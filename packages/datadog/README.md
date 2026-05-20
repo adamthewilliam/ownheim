@@ -52,7 +52,7 @@ Register the generated manifest once at process startup:
 
 ```ts
 import manifest from './.ownheim/ownership.json' with { type: 'json' };
-import { registerOwnershipManifest } from '@ownheim/core';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
 
 registerOwnershipManifest(manifest);
 ```
@@ -62,7 +62,7 @@ Spans also include `ownheim.code_team` based on the file/package that started th
 ## Responder ownership
 
 ```ts
-import { OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 throw new OwnedError('payment provider timed out', {
   responderTeam: 'Billing',

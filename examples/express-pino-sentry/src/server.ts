@@ -1,7 +1,7 @@
 import express from 'express';
 import pino from 'pino';
 import * as Sentry from '@sentry/node';
-import { registerOwnershipManifest } from '@ownheim/core';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
 import { entrypointOwner } from '@ownheim/express';
 import { ownershipFromError, ownershipMixin } from '@ownheim/pino';
 import { installSentry } from '@ownheim/sentry';

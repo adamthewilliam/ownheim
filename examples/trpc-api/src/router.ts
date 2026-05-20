@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
-import { currentEntrypointOwner } from '@ownheim/core';
+import { currentEntrypointOwner } from '@ownheim/core/ownership';
 import { entrypointProcedure } from '@ownheim/trpc';
 import { createInvoice } from './billing/service.ts';
 import { getUser } from './identity/service.ts';

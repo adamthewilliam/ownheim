@@ -13,7 +13,7 @@ See [ownership model](./ownership-model.md) for terminology.
 Load the generated manifest once during process startup:
 
 ```ts
-import { registerOwnershipManifest } from '@ownheim/core';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
 import manifest from './.ownheim/ownership.json' with { type: 'json' };
 
 registerOwnershipManifest(manifest);
@@ -62,7 +62,7 @@ const accountsProcedure = entrypointProcedure(publicProcedure, 'Accounts');
 Use `OwnedError` when a failure should route to a specific responder team:
 
 ```ts
-import { OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 throw new OwnedError('Ledger write failed', {
   responderTeam: 'Billing',

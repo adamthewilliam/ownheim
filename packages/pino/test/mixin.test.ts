@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { ownershipFromError, ownershipMixin } from '../src/mixin.ts';
-import { runWithEntrypointOwner, OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
 
 describe('ownershipMixin', () => {
   test('returns fallback code owner when no entrypoint is in scope', () => {

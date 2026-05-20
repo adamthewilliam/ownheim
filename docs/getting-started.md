@@ -15,7 +15,7 @@ Add framework or observability adapters only when you need them.
 Create `ownheim.config.ts` in your repository root:
 
 ```ts
-import { defineOwnheim } from '@ownheim/core';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 
 export default defineOwnheim({
   teams: {
@@ -60,7 +60,7 @@ bunx ownheim coverage
 At application startup:
 
 ```ts
-import { registerOwnershipManifest } from '@ownheim/core';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
 import manifest from './.ownheim/ownership.json' with { type: 'json' };
 
 registerOwnershipManifest(manifest);
@@ -83,7 +83,7 @@ Telemetry emitted during that request can include `ownheim.entrypoint_team=Accou
 ## 7. Mark responders for cross-team failures
 
 ```ts
-import { OwnedError } from '@ownheim/core';
+import { OwnedError } from '@ownheim/core/OwnedError';
 
 throw new OwnedError('Ledger write failed', {
   responderTeam: 'Billing',

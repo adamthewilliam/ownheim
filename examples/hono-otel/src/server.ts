@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { trace } from '@opentelemetry/api';
 import { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { registerOwnershipManifest } from '@ownheim/core';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
 import { entrypointOwner } from '@ownheim/hono';
 import { OwnershipSpanProcessor } from '@ownheim/otel';
 import { checkout } from './billing/checkout.ts';

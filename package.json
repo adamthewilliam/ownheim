@@ -19,7 +19,8 @@
     "format": "bunx oxfmt",
     "typecheck": "turbo run typecheck",
     "build": "turbo run build",
-    "check:publish": "bun run build && node scripts/check-publish.mjs"
+    "check:publish": "bun run build && node scripts/check-publish.mjs",
+    "check:treeshaking": "bun run build && node scripts/check-treeshaking.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

@@ -5,7 +5,7 @@ Ownheim configuration lives in `ownheim.config.ts` and should be the source of t
 ## Basic configuration
 
 ```ts
-import { defineOwnheim } from '@ownheim/core';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 
 export default defineOwnheim({
   teams: {

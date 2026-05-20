@@ -85,7 +85,7 @@ Prefer npm, pnpm, or Yarn? Use the equivalent command for your package manager.
 Create `ownheim.config.ts` at the root of your repository:
 
 ```ts
-import { defineOwnheim } from '@ownheim/core';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 
 export default defineOwnheim({
   teams: {
@@ -117,10 +117,26 @@ bunx ownheim coverage
 Register the generated runtime manifest once during application startup:
 
 ```ts
-import { registerOwnershipManifest } from '@ownheim/core';
+import { registerOwnershipManifest } from '@ownheim/core/manifest/defaultRegistry';
 import manifest from './.ownheim/ownership.json' with { type: 'json' };
 
 registerOwnershipManifest(manifest);
+```
+
+## Bundle size and tree-shaking
+
+Ownheim publishes ESM, marks packages as side-effect free, and exposes subpath exports for bundle-sensitive code. Prefer importing the exact module you use:
+
+```ts
+import { OwnedError } from '@ownheim/core/OwnedError';
+import { runWithEntrypointOwner } from '@ownheim/core/ownership';
+import { generateCodeowners } from '@ownheim/build/generateCodeowners';
+```
+
+Root imports such as `@ownheim/core` and `@ownheim/build` are convenient for Node/tooling code, but they re-export broader surfaces and can make browser/runtime bundles depend on more modules than necessary. To smoke-test bundle behavior locally, run:
+
+```bash
+bun run check:treeshaking
 ```
 
 ## Packages

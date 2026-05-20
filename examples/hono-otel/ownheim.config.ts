@@ -1,4 +1,4 @@
-import { defineOwnheim } from '@ownheim/core';
+import { defineOwnheim } from '@ownheim/core/defineOwnheim';
 
 export default defineOwnheim({
   fallback: 'Platform',
