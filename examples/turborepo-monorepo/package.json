@@ -8,8 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "typecheck": "turbo run typecheck",
+    "build": "turbo run build --filter='./apps/*' --filter='./packages/*'",
+    "typecheck": "turbo run typecheck --filter='./apps/*' --filter='./packages/*'",
     "test": "bun test"
   },
   "dependencies": {

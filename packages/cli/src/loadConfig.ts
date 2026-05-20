@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createJiti } from 'jiti';
 import type { Owner, OwnheimConfig } from '@ownheim/core/types';
 
 export interface LoadedConfig {
@@ -14,8 +15,8 @@ export async function loadConfig(projectRoot: string): Promise<LoadedConfig> {
   for (const filename of DEFAULT_FILENAMES) {
     const path = resolve(projectRoot, filename);
     if (existsSync(path)) {
-      const mod = await import(path);
-      const config = (mod.default ?? mod) as OwnheimConfig<Record<string, Owner>>;
+      const jiti = createJiti(path);
+      const config = await jiti.import<OwnheimConfig<Record<string, Owner>>>(path, { default: true });
       return { config, path, projectRoot };
     }
   }

@@ -96,7 +96,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ownheim/core": "workspace:*",
+    "@ownheim/core": "0.1.0",
     "ts-morph": "^24.0.0",
     "picomatch": "^4.0.2"
   },
@@ -123,5 +123,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "peerDependenciesMeta": {
+    "esbuild": {
+      "optional": true
+    }
   }
 }

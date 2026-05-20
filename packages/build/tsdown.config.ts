@@ -1,6 +1,8 @@
 import { defineConfig } from 'tsdown';
+import { libraryDefaults } from '../../tsdown.base.mjs';
 
 export default defineConfig({
+  ...libraryDefaults,
   entry: [
     'src/index.ts',
     'src/analyzeSourceFile.ts',
@@ -11,19 +13,16 @@ export default defineConfig({
     'src/generateArtifacts.ts',
     'src/esbuildPlugin.ts',
   ],
-  format: ['esm', 'cjs'],
-  dts: true,
-  external: [
-    '@ownheim/core',
-    '@ownheim/core/*',
-    'esbuild',
-    'esbuild/*',
-    'picomatch',
-    'picomatch/*',
-    'ts-morph',
-    'ts-morph/*',
-  ],
-  clean: true,
-  sourcemap: true,
-  treeshake: true,
+  deps: {
+    neverBundle: [
+      '@ownheim/core',
+      '@ownheim/core/*',
+      'esbuild',
+      'esbuild/*',
+      'picomatch',
+      'picomatch/*',
+      'ts-morph',
+      'ts-morph/*',
+    ],
+  },
 });

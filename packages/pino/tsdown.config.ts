@@ -1,19 +1,18 @@
 import { defineConfig } from 'tsdown';
+import { libraryDefaults } from '../../tsdown.base.mjs';
 
 export default defineConfig({
+  ...libraryDefaults,
   entry: [
     'src/index.ts',
-    'src/mixin.ts'
-],
-  format: ['esm', 'cjs'],
-  dts: true,
-  external: [
-    '@ownheim/core',
-    '@ownheim/core/*',
-    'pino',
-    'pino/*'
-],
-  clean: true,
-  sourcemap: true,
-  treeshake: true,
+    'src/mixin.ts',
+  ],
+  deps: {
+    neverBundle: [
+      '@ownheim/core',
+      '@ownheim/core/*',
+      'pino',
+      'pino/*',
+    ],
+  },
 });

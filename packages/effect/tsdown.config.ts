@@ -1,21 +1,20 @@
 import { defineConfig } from 'tsdown';
+import { libraryDefaults } from '../../tsdown.base.mjs';
 
 export default defineConfig({
+  ...libraryDefaults,
   entry: [
     'src/index.ts',
     'src/ownedBy.ts',
     'src/Logging.ts',
-    'src/Tracer.ts'
-],
-  format: ['esm', 'cjs'],
-  dts: true,
-  external: [
-    '@ownheim/core',
-    '@ownheim/core/*',
-    'effect',
-    'effect/*'
-],
-  clean: true,
-  sourcemap: true,
-  treeshake: true,
+    'src/Tracer.ts',
+  ],
+  deps: {
+    neverBundle: [
+      '@ownheim/core',
+      '@ownheim/core/*',
+      'effect',
+      'effect/*',
+    ],
+  },
 });

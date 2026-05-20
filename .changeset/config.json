@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": ["@changesets/cli/changelog", { "repo": "ownheim/ownheim" }],
+  "commit": false,
+  "fixed": [
+    [
+      "@ownheim/build",
+      "@ownheim/cli",
+      "@ownheim/core",
+      "@ownheim/datadog",
+      "@ownheim/effect",
+      "@ownheim/eslint",
+      "@ownheim/express",
+      "@ownheim/hono",
+      "@ownheim/lint-core",
+      "@ownheim/orpc",
+      "@ownheim/otel",
+      "@ownheim/oxlint",
+      "@ownheim/pino",
+      "@ownheim/sentry",
+      "@ownheim/trpc"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}

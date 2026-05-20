@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/datadog",
   "version": "0.1.0",
-  "description": "ownheim \u2014 Datadog (dd-trace + RUM) team-tag adapter",
+  "description": "ownheim — Datadog (dd-trace + RUM) team-tag adapter",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -46,7 +46,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ownheim/core": "workspace:*"
+    "@ownheim/core": "0.1.0"
   },
   "repository": {
     "type": "git",

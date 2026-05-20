@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/sentry",
   "version": "0.1.0",
-  "description": "ownheim \u2014 Sentry event processor + CODEOWNERS API sync",
+  "description": "ownheim — Sentry event processor + CODEOWNERS API sync",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -36,7 +36,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ownheim/core": "workspace:*"
+    "@ownheim/core": "0.1.0"
   },
   "repository": {
     "type": "git",

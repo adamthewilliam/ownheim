@@ -1,18 +1,17 @@
 import { defineConfig } from 'tsdown';
+import { libraryDefaults } from '../../tsdown.base.mjs';
 
 export default defineConfig({
+  ...libraryDefaults,
   entry: [
     'src/index.ts',
     'src/SpanProcessor.ts',
-    'src/resource.ts'
-],
-  format: ['esm', 'cjs'],
-  dts: true,
-  external: [
-    '@ownheim/core',
-    '@ownheim/core/*'
-],
-  clean: true,
-  sourcemap: true,
-  treeshake: true,
+    'src/resource.ts',
+  ],
+  deps: {
+    neverBundle: [
+      '@ownheim/core',
+      '@ownheim/core/*',
+    ],
+  },
 });

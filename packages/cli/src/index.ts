@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 import { resolve } from 'node:path';
 import { runCheck } from './commands/check.ts';
 import { runCoverage } from './commands/coverage.ts';

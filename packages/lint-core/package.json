@@ -96,8 +96,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ownheim/build": "workspace:*",
-    "@ownheim/core": "workspace:*"
+    "@ownheim/build": "0.1.0",
+    "@ownheim/core": "0.1.0"
   },
   "repository": {
     "type": "git",

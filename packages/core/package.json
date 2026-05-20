@@ -1,7 +1,7 @@
 {
   "name": "@ownheim/core",
   "version": "0.1.0",
-  "description": "ownheim \u2014 ownership resolution, scope propagation, logging, and tracing",
+  "description": "ownheim — ownership resolution, scope propagation, logging, and tracing",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,

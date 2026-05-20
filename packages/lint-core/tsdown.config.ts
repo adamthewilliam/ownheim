@@ -1,6 +1,8 @@
 import { defineConfig } from 'tsdown';
+import { libraryDefaults } from '../../tsdown.base.mjs';
 
 export default defineConfig({
+  ...libraryDefaults,
   entry: [
     'src/index.ts',
     'src/types.ts',
@@ -9,17 +11,14 @@ export default defineConfig({
     'src/validateCodeownersEdit.ts',
     'src/rules/noOwnheim.ts',
     'src/rules/noCodeownersEdit.ts',
-    'src/rules/registry.ts'
-],
-  format: ['esm', 'cjs'],
-  dts: true,
-  external: [
-    '@ownheim/build',
-    '@ownheim/build/*',
-    '@ownheim/core',
-    '@ownheim/core/*'
-],
-  clean: true,
-  sourcemap: true,
-  treeshake: true,
+    'src/rules/registry.ts',
+  ],
+  deps: {
+    neverBundle: [
+      '@ownheim/build',
+      '@ownheim/build/*',
+      '@ownheim/core',
+      '@ownheim/core/*',
+    ],
+  },
 });

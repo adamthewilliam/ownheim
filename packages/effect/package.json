@@ -56,7 +56,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ownheim/core": "workspace:*"
+    "@ownheim/core": "0.1.0"
   },
   "peerDependencies": {
     "effect": "^3.10.0"

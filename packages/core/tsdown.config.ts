@@ -1,6 +1,8 @@
 import { defineConfig } from 'tsdown';
+import { libraryDefaults } from '../../tsdown.base.mjs';
 
 export default defineConfig({
+  ...libraryDefaults,
   entry: [
     'src/index.ts',
     'src/defineOwnheim.ts',
@@ -16,12 +18,9 @@ export default defineConfig({
     'src/logging/formatOwnedLogEntry.ts',
     'src/tracing/resolveTagOptions.ts',
     'src/tracing/ownershipTags.ts',
-    'src/tracing/projectOwnership.ts'
-],
-  format: ['esm', 'cjs'],
-  dts: true,
-  external: [],
-  clean: true,
-  sourcemap: true,
-  treeshake: true,
+    'src/tracing/projectOwnership.ts',
+  ],
+  deps: {
+    neverBundle: [],
+  },
 });

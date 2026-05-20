@@ -48,7 +48,8 @@ try {
         bundle: true,
         minify: true,
         format: 'esm',
-        platform: 'browser',
+        platform: 'node',
+        nodePaths: [join(process.cwd(), 'node_modules')],
         treeShaking: true,
         logLevel: 'silent',
       });

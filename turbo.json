@@ -3,6 +3,7 @@
   "ui": "tui",
   "globalDependencies": [
     "tsconfig.base.json",
+    "tsdown.base.mjs",
     "bunfig.toml",
     ".oxlintrc.json"
   ],

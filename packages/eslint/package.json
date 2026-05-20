@@ -46,8 +46,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ownheim/core": "workspace:*",
-    "@ownheim/lint-core": "workspace:*"
+    "@ownheim/core": "0.1.0",
+    "@ownheim/lint-core": "0.1.0"
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"
